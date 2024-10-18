@@ -32,5 +32,5 @@ def jogo(): # função jogo
             pygame.quit()
     
 # iniciar jogo
-jogo()
+jogo() #teste
     
