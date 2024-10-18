@@ -31,8 +31,8 @@ def jogo(): # função jogo
             iniciar = False  
             pygame.quit()
     
-# iniciar jogog
-jogo()
-#teste
+# iniciar jogo
+jogo() # teste
+
 
     
