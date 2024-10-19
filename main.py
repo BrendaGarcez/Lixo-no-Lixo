@@ -1,7 +1,7 @@
 import pygame # importando biblioteca
 import botao
 
-pygame.init() # inicializa os principais modulos (alguns dizem que é importante usar, outros não)
+pygame.init() # inicializa os principais módulos (alguns dizem que é importante usar, outros não)
 
 # Resolução
 telaLargura = 1100
@@ -12,11 +12,12 @@ pygame.display.set_caption("Lixo_No_Lixo") # nome do jogo
 
 estadoJogo = "menu" # situação atual do jogo, para rastrear as telas
 
-def criarBotao(x, y, caminhoImagem): # função para criar botões
-    imagem = pygame.image.load(caminhoImagem).convert_alpha()
-    return botao.Botao(x, y, imagem)
+def criarBotao(x, y, imagem, imagemAlterada): # função para criar botões
+    imagem = pygame.image.load(imagem).convert_alpha()
+    imagemAlterada = pygame.image.load(imagemAlterada).convert_alpha()
+    return botao.Botao(x, y, imagem, imagemAlterada)
 
-def iniciarFases():
+def iniciarFases(): # função das fases (talvez precise mudar/colocar muita coisa aqui)
     fase1Background = pygame.image.load("imagens/fase1/imagemFloresta.png")
     tela.blit(fase1Background, (0, 0))
 
@@ -24,17 +25,30 @@ def menuPrincipal(): # função jogo
     global estadoJogo
 
     # criando os botões do jogo
-    jogarBotao = criarBotao(390, 110, "imagens/menu/menuJogar.png") 
-    sairBotao = criarBotao(390, 370, "imagens/menu/menuSair.png")
-    voltarBotao = criarBotao(800, 570, "imagens/menu/menuVoltar.png")
+    jogarBotao = criarBotao(390, 110, "imagens/GUI/botaoJogar/jogar0.png", "imagens/GUI/botaoJogar/jogar1.png")
+    sairBotao = criarBotao(390, 370, "imagens/GUI/botaoSair/sair0.png", "imagens/GUI/botaoSair/sair1.png")
+    voltarBotao = criarBotao(800, 570, "imagens/GUI/botaoVoltar/voltar0.png", "imagens/GUI/botaoVoltar/voltar1.png")
+
+    posicaoMouse = pygame.mouse.get_pos()
 
     run = True
     while run: 
-        menuBackground = pygame.image.load("imagens/menu/menuBackground.png").convert_alpha() # backGround do menu
+        menuBackground = pygame.image.load("imagens/GUI/Backgrounds/menuBackground.png").convert_alpha() # backGround do menu
         tela.blit(menuBackground,(0, 0)) # coloca a imagem na tela
 
+        posicaoMouse = pygame.mouse.get_pos()
+
+        # mantem a imagem do botão atualizada de acordo com a posição do mouse do usuário
+        jogarBotao.atualizarImagem(posicaoMouse) 
+        sairBotao.atualizarImagem(posicaoMouse)
+        voltarBotao.atualizarImagem(posicaoMouse)
+
         # lógica feia de if else para troca de dela (provável alteração no futuro?)
-        if estadoJogo == "menu": 
+        if estadoJogo == "menu":
+            # botões do menu
+            jogarBotao.desenharBotao(tela)
+            sairBotao.desenharBotao(tela)
+
             if jogarBotao.clicarBotao(tela): 
                 print("Jogar clicado")
                 estadoJogo = "jogando"
@@ -45,6 +59,9 @@ def menuPrincipal(): # função jogo
 
         if estadoJogo == "jogando":
             iniciarFases()
+            #botões das fases
+            voltarBotao.desenharBotao(tela)
+
             if voltarBotao.clicarBotao(tela):
                 print("Voltar clicado")
                 estadoJogo = "menu"
