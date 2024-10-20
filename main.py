@@ -1,7 +1,7 @@
 import pygame # importando biblioteca
 import botao
 
-pygame.init() # inicializa os principais modulos (alguns dizem que é importante usar, outros não)
+pygame.init() # inicializa os principais módulos (alguns dizem que é importante usar, outros não)
 
 # Resolução
 telaLargura = 1100
@@ -10,39 +10,70 @@ telaAltura = 720
 tela = pygame.display.set_mode((telaLargura, telaAltura)) # variável tela recebe a resolução
 pygame.display.set_caption("Lixo_No_Lixo") # nome do jogo
 
-def menuPrincipal(): # função do menu
-    menuBackground = pygame.image.load("imagens/menu/menuBackground.png") # variável menuImagem recebe o carregamento da imagem 
-    jogarImagem = pygame.image.load("imagens/menu/menuJogar.png").convert_alpha()
-    sairImagem = pygame.image.load("imagens/menu/menuSair.png").convert_alpha()
-    
-    # cria os objetos nas coordenadas + imagem passadas como parâmetro
-    jogarBotao = botao.Botao(390, 110, jogarImagem) 
-    sairBotao = botao.Botao(390, 370, sairImagem)
+estadoJogo = "menu" # situação atual do jogo, para rastrear as telas
 
-    tela.blit(menuBackground,(0, 0)) # coloca a imagem na tela
-    
-     # aqui usa a função do objeto Botao
-    if jogarBotao.criarBotao(tela):
-        print("Jogar clicado")
+def criarBotao(x, y, imagem, imagemAlterada): # função para criar botões
+    imagem = pygame.image.load(imagem).convert_alpha()
+    imagemAlterada = pygame.image.load(imagemAlterada).convert_alpha()
+    return botao.Botao(x, y, imagem, imagemAlterada)
 
-    if sairBotao.criarBotao(tela):
-        print("Sair clicado")
+def iniciarFases(): # função das fases (talvez precise mudar/colocar muita coisa aqui)
+    fase1Background = pygame.image.load("imagens/fase1/imagemFloresta.png")
+    tela.blit(fase1Background, (0, 0))
 
-    pygame.display.update() # atualiza a tela
+def menuPrincipal(): # função jogo
+    global estadoJogo
 
+    # criando os botões do jogo
+    jogarBotao = criarBotao(390, 110, "imagens/GUI/botaoJogar/jogar0.png", "imagens/GUI/botaoJogar/jogar1.png")
+    sairBotao = criarBotao(390, 370, "imagens/GUI/botaoSair/sair0.png", "imagens/GUI/botaoSair/sair1.png")
+    voltarBotao = criarBotao(800, 570, "imagens/GUI/botaoVoltar/voltar0.png", "imagens/GUI/botaoVoltar/voltar1.png")
 
-def jogo(): # função jogo
-    iniciar = True
+    posicaoMouse = pygame.mouse.get_pos()
 
-    while iniciar:
-        menuPrincipal()
+    run = True
+    while run: 
+        menuBackground = pygame.image.load("imagens/GUI/Backgrounds/menuBackground.png").convert_alpha() # backGround do menu
+        tela.blit(menuBackground,(0, 0)) # coloca a imagem na tela
 
+        posicaoMouse = pygame.mouse.get_pos()
+
+        # mantem a imagem do botão atualizada de acordo com a posição do mouse do usuário
+        jogarBotao.atualizarImagem(posicaoMouse) 
+        sairBotao.atualizarImagem(posicaoMouse)
+        voltarBotao.atualizarImagem(posicaoMouse)
+
+        # lógica feia de if else para troca de dela (provável alteração no futuro?)
+        if estadoJogo == "menu":
+            # botões do menu
+            jogarBotao.desenharBotao(tela)
+            sairBotao.desenharBotao(tela)
+
+            if jogarBotao.clicarBotao(tela): 
+                print("Jogar clicado")
+                estadoJogo = "jogando"
+
+            if sairBotao.clicarBotao(tela):
+                print("Sair clicado")
+                run = False  
+
+        if estadoJogo == "jogando":
+            iniciarFases()
+            #botões das fases
+            voltarBotao.desenharBotao(tela)
+
+            if voltarBotao.clicarBotao(tela):
+                print("Voltar clicado")
+                estadoJogo = "menu"
+                
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                iniciar = False  
-    pygame.quit()
-    
+                run = False  
+                pygame.quit()
+
+        pygame.display.update() # atualiza a tela
+
 # iniciar jogo
-jogo()
+menuPrincipal()
 
     
