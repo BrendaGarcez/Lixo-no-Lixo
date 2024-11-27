@@ -1,4 +1,4 @@
-### LIXO-NO-LIXO (Jogo Educacional) 🧩  
+# LIXO-NO-LIXO (Jogo Educacional) 🧩  
 **Desenvolvido em Python com Pygame**
 
 ## Descrição  
