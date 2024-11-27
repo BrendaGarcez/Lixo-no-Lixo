@@ -2,16 +2,16 @@
 **Desenvolvido em Python com Pygame**
 
 ## Descrição  
-Este projeto é um jogo educacional voltado para pessoas com deficiência intelectual, com idade mental de pré-escolar. O objetivo é proporcionar uma experiência lúdica e inclusiva, auxiliando no desenvolvimento de habilidades cognitivas e motoras.
+Este projeto é um jogo educacional voltado para pessoas com deficiência intelectual, com idade mental de pré-escolaridade. O objetivo é proporcionar uma experiência lúdica e inclusiva, auxiliando no desenvolvimento de habilidades cognitivas e motoras.
 
 ## Objetivo do Projeto  
-Este jogo foi desenvolvido como parte da disciplina de **Engenharia de Software**, com foco no levantamento de requisitos e no gerenciamento de projetos de software. O desenvolvimento foi realizado utilizando a metodologia ágil **Scrum**, com sprints semanais e revisão contínua.
+Este jogo foi desenvolvido como parte da disciplina de **Engenharia de Software I(na UTFPR, no crso de Ciência da Computação)**, com foco no levantamento de requisitos e no gerenciamento de projetos de software. O desenvolvimento foi realizado utilizando a metodologia ágil **Scrum**, com sprints semanais e revisão contínua.
 
 ## Equipe de Desenvolvimento  
-- **Nome 1** – Product Owner  
-- **Nome 2** – Scrum Master  
-- **Nome 3** – Desenvolvedor(a)  
-- **Brenda** – Desenvolvedora  
+- **Nicole Jamuchewski** – Product Owner  
+- **Brenda Garcez** – Scrum Master  
+- **Brenda Garcez e Matheus** – Desenvolvedores   
+- **João Rafael e Nicole Jamuchewski** – Design   
 
 ## Tecnologias Utilizadas  
 - **Python**  
@@ -21,7 +21,7 @@ Este jogo foi desenvolvido como parte da disciplina de **Engenharia de Software*
 ## Funcionalidades do Jogo  
 - Atividades interativas e educativas  
 - Interface adaptada para acessibilidade  
-- Módulos com diferentes níveis de dificuldade  
+- Módulos com diferentes fases  
 - Feedback sonoro e visual para engajamento do jogador  
 
 ## Como Executar o Jogo  
@@ -39,7 +39,7 @@ Este jogo foi desenvolvido como parte da disciplina de **Engenharia de Software*
    ```
 
 ## Estrutura do Projeto  
-- **/assets**: Arquivos de mídia (imagens, sons).  
+- **/image**: Arquivos de mídia (imagens, sons).  
 - **/src**: Código-fonte do jogo.  
 - **/docs**: Documentação adicional.  
 
@@ -50,6 +50,3 @@ Este jogo foi desenvolvido como parte da disciplina de **Engenharia de Software*
 
 ## Licença  
 Este projeto está licenciado sob a [MIT License](LICENSE).
-
-## Agradecimentos  
-Agradecemos aos professores e colegas que apoiaram no desenvolvimento deste projeto.
