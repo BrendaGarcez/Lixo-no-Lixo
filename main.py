@@ -10,7 +10,7 @@ tela = pygame.display.set_mode((telaLargura, telaAltura))  # Configuração da t
 pygame.display.set_caption("Lixo_No_Lixo")  # Nome do jogo
 
 # Estado do jogo
-estadoJogo = "menu"  # Estado inicial do jogo
+estadoJogo = "menu"  # situação atual do jogo, para rastrear as telas
 rodando = True  # Controla se o programa deve continuar rodando
 
 # Função para criar botões
@@ -23,12 +23,13 @@ def criarBotao(x, y, imagem, imagemAlterada):
 def iniciarFases():
     global estadoJogo
     fasesBackground = pygame.image.load("imagens/GUI/Backgrounds/menuBackground.jpg")
-    
+    tela.blit(fasesBackground,(0,0))
+
     # Criando botões para as fases
     fase1Botao = criarBotao(100, 150, "imagens/GUI/botaoFases/botaoZoo0.png", "imagens/GUI/botaoFases/botaoZoo1.png")
-    fase2Botao = criarBotao(400, 150, "imagens/GUI/botaoFases/botaoSala0.png", "imagens/GUI/botaoFases/botaoSala1.png")
-    fase3Botao = criarBotao(100, 600, "imagens/GUI/botaoFases/botaoPraia0.png", "imagens/GUI/botaoFases/botaoPraia1.png")
-    voltarBotao = criarBotao(900, 570, "imagens/GUI/botaoVoltar/voltar0.png", "imagens/GUI/botaoVoltar/voltar1.png")
+    fase2Botao = criarBotao(400, 103, "imagens/GUI/botaoFases/botaoSala0.png", "imagens/GUI/botaoFases/botaoSala1.png")
+    fase3Botao = criarBotao(100, 200, "imagens/GUI/botaoFases/botaoPraia0.png", "imagens/GUI/botaoFases/botaoPraia1.png")
+    voltarBotao = criarBotao(900, 370, "imagens/GUI/botaoVoltar/voltar0.png", "imagens/GUI/botaoVoltar/voltar1.png")
 
     run = True
     while run:
