@@ -18,7 +18,7 @@ def criarBotao(x, y, imagem, imagemAlterada): # função para criar botões
     return botao.Botao(x, y, imagem, imagemAlterada)
 
 def iniciarFases(): # função das fases (talvez precise mudar/colocar muita coisa aqui)
-    fase1Background = pygame.image.load("imagens/fase1/imagemZoologico.jpg")
+    fase1Background = pygame.image.load("imagens/GUI/Backgrounds/menuBackground.jpg")
     tela.blit(fase1Background, (0, 0))
 
 def menuPrincipal(): # função jogo
