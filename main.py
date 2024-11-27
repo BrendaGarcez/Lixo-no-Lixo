@@ -26,15 +26,15 @@ def iniciarFases():
     tela.blit(fasesBackground,(0,0))
 
     # Criando botões para as fases
-    fase1Botao = criarBotao(100, 150, "imagens/GUI/botaoFases/botaoZoo0.png", "imagens/GUI/botaoFases/botaoZoo1.png")
-    fase2Botao = criarBotao(400, 103, "imagens/GUI/botaoFases/botaoSala0.png", "imagens/GUI/botaoFases/botaoSala1.png")
-    fase3Botao = criarBotao(100, 200, "imagens/GUI/botaoFases/botaoPraia0.png", "imagens/GUI/botaoFases/botaoPraia1.png")
-    voltarBotao = criarBotao(900, 370, "imagens/GUI/botaoVoltar/voltar0.png", "imagens/GUI/botaoVoltar/voltar1.png")
+    fase1Botao = criarBotao(300, 150, "imagens/GUI/botaoFases/botaoZoo0.png", "imagens/GUI/botaoFases/botaoZoo1.png")
+    fase2Botao = criarBotao(600, 150, "imagens/GUI/botaoFases/botaoSala0.png", "imagens/GUI/botaoFases/botaoSala1.png")
+    fase3Botao = criarBotao(800, 150, "imagens/GUI/botaoFases/botaoPraia0.png", "imagens/GUI/botaoFases/botaoPraia1.png")
+    voltarBotao = criarBotao(800, 450, "imagens/GUI/botaoVoltar/voltar0.png", "imagens/GUI/botaoVoltar/voltar1.png")
 
     run = True
     while run:
         tela.blit(fasesBackground, (0, 0))
-        posicaoMouse = pygame.mouse.get_pos()
+        posicaoMouse = pygame.mouse.get_pos()#arrumar para clique e não quando le está precionado
 
         # Atualizar e desenhar botões
         fase1Botao.atualizarImagem(posicaoMouse)
@@ -117,6 +117,12 @@ while rodando:
     if estadoJogo == "menu":
         menuPrincipal()
     elif estadoJogo == "jogando":
+        iniciarFases()
+    elif estadoJogo == "fase1":
+        menuPrincipal()
+    elif estadoJogo == "fase2":
+        menuPrincipal()
+    elif estadoJogo == "fase3":
         iniciarFases()
 
 # Finaliza o pygame
