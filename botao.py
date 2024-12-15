@@ -13,22 +13,22 @@ class Botao(): # objeto
     def desenharBotao(self, tela):
         tela.blit(self.imagem, (self.rect.x, self.rect.y))
     
-    def clicarBotao(self, tela): # mostrar/criar/clicar no botão na tela
-        acao = False # variável para rastrear as ações dos clicks
-        
-        posicaoMouse = pygame.mouse.get_pos() # variável recebe posição do mouse
+    def clicarBotao(self, tela):
+        acao = False  # variável para rastrear as ações dos cliques
+        posicaoMouse = pygame.mouse.get_pos()  # variável recebe a posição do mouse
 
-        if self.rect.collidepoint(posicaoMouse): # verifica se o objeto "colidiu" com o mouse
-           
-           # verifica se algum click foi feito, >> [0] para click esquerdo, se fosse o direito seria [1] E se o estado do objeto está clicked False
-            if pygame.mouse.get_pressed()[0] == 1 and not self.clicked: 
-                self.clicked = True
-                acao = True
-                
-        if pygame.mouse.get_pressed()[0] == 0: 
-            self.clicked = False 
+        # Verifica se o mouse está dentro da área do botão
+        if self.rect.collidepoint(posicaoMouse):
+            for event in pygame.event.get():
+                if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+                    if not self.clicked:  # Detecta o clique apenas uma vez
+                        self.clicked = True
+                        acao = True
+                if event.type == pygame.MOUSEBUTTONUP and event.button == 1:
+                    self.clicked = False  # Reseta a flag ao liberar o mouse
 
-        return acao 
+        return acao
+
     
     def atualizarImagem(self, posicaoMouse): # caso o mouse do usuário passar em cima troca a imagem 
         if self.rect.collidepoint(posicaoMouse):
