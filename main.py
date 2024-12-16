@@ -19,6 +19,84 @@ def criarBotao(x, y, imagem, imagemAlterada):
     imagemAlterada = pygame.image.load(imagemAlterada).convert_alpha()
     return botao.Botao(x, y, imagem, imagemAlterada)
 
+def abrirConfiguracoes():
+
+    global estadoJogo
+    configuracoesBackground = pygame.image.load("imagens/GUI/Backgrounds/configuracoesBackground.jpg")
+    tela.blit(configuracoesBackground, (0, 0))
+    somAtivo = True  # Estado inicial do som (ligado)
+    volume = 0.5
+
+    somLigadoBotao = criarBotao(400, 200, "imagens/GUI/botaoSom/ligado0.png", "imagens/GUI/botaoSom/ligado1.png")
+    somDesligadoBotao = criarBotao(400, 200, "imagens/GUI/botaoSom/desligado0.png", "imagens/GUI/botaoSom/desligado1.png")
+    aumentarVolumeBotao = criarBotao(400, 300, "imagens/GUI/botaoSom/aumentar0.png", "imagens/GUI/botaoSom/aumentar1.png")
+    diminuirVolumeBotao = criarBotao(400, 400, "imagens/GUI/botaoSom/diminuir0.png", "imagens/GUI/botaoSom/diminuir1.png")
+    # Criar botão de voltar
+    voltarBotao = criarBotao(100, 600, "imagens/GUI/botaoVoltar/voltar0.png", "imagens/GUI/botaoVoltar/voltar1.png")
+
+    run = True
+    while run:
+        tela.blit(configuracoesBackground, (0, 0))
+        posicaoMouse = pygame.mouse.get_pos()
+
+        # Atualizar e desenhar botões
+        if somAtivo:
+            somLigadoBotao.atualizarImagem(posicaoMouse)
+            somLigadoBotao.desenharBotao(tela)
+        else:
+            somDesligadoBotao.atualizarImagem(posicaoMouse)
+            somDesligadoBotao.desenharBotao(tela)
+
+        aumentarVolumeBotao.atualizarImagem(posicaoMouse)
+        diminuirVolumeBotao.atualizarImagem(posicaoMouse)
+        voltarBotao.atualizarImagem(posicaoMouse)
+
+        aumentarVolumeBotao.desenharBotao(tela)
+        diminuirVolumeBotao.desenharBotao(tela)
+        voltarBotao.desenharBotao(tela)
+
+        # Exibir nível de volume na tela
+        fonte = pygame.font.Font(None, 36)
+        textoVolume = fonte.render(f"Volume: {int(volume * 100)}%", True, (255, 255, 255))
+        tela.blit(textoVolume, (500, 500))
+
+        # Verificar cliques nos botões
+        if somAtivo and somLigadoBotao.clicarBotao(tela):
+            print("Som desligado")
+            somAtivo = False
+            pygame.mixer.music.pause()  # Pausa a música
+        elif not somAtivo and somDesligadoBotao.clicarBotao(tela):
+            print("Som ligado")
+            somAtivo = True
+            pygame.mixer.music.unpause()  # Retoma a música
+
+        if aumentarVolumeBotao.clicarBotao(tela):
+            if volume < 1.0:
+                volume += 0.1
+                volume = round(volume, 1)  # Limita o volume em 1 casa decimal
+                pygame.mixer.music.set_volume(volume)
+                print(f"Aumentando volume para {int(volume * 100)}%")
+
+        if diminuirVolumeBotao.clicarBotao(tela):
+            if volume > 0.0:
+                volume -= 0.1
+                volume = round(volume, 1)
+                pygame.mixer.music.set_volume(volume)
+                print(f"Diminuindo volume para {int(volume * 100)}%")
+
+        if voltarBotao.clicarBotao(tela):
+            print("Voltando ao menu principal")
+            estadoJogo = "menu"
+            run = False
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                global rodando
+                rodando = False
+                run = False
+
+        pygame.display.update()
+
 # Função para as fases
 def iniciarFases():
     global estadoJogo
@@ -29,7 +107,7 @@ def iniciarFases():
     fase1Botao = criarBotao(80, 200, "imagens/GUI/botaoFases/botaoZoo0.png", "imagens/GUI/botaoFases/botaoZoo1.png")
     fase2Botao = criarBotao(580, 200, "imagens/GUI/botaoFases/botaoSala0.png", "imagens/GUI/botaoFases/botaoSala1.png")
     fase3Botao = criarBotao(400, 450, "imagens/GUI/botaoFases/botaoPraia0.png", "imagens/GUI/botaoFases/botaoPraia1.png")
-    voltarBotao = criarBotao(100, 600, "imagens/GUI/botaoVoltar/voltar0.png", "imagens/GUI/botaoVoltar/voltar1.png")
+    voltarBotao = criarBotao(100, 620, "imagens/GUI/botaoVoltar/voltar0.png", "imagens/GUI/botaoVoltar/voltar1.png")
 
     run = True
     while run:
@@ -80,6 +158,7 @@ def menuPrincipal():
 
     # Criando botões do menu
     jogarBotao = criarBotao(295, 130, "imagens/GUI/botaoJogar/jogar0.png", "imagens/GUI/botaoJogar/jogar1.png")
+    configuracoesBotao = criarBotao(800, 550, "imagens/GUI/botaoConfiguracoes/configuracoes0.png", "imagens/GUI/botaoConfiguracoes/configuracoes1.png")
     sairBotao = criarBotao(390, 370, "imagens/GUI/botaoSair/sair0.png", "imagens/GUI/botaoSair/sair1.png")
 
     run = True
@@ -89,9 +168,11 @@ def menuPrincipal():
 
         # Atualizar e desenhar botões
         jogarBotao.atualizarImagem(posicaoMouse)
+        configuracoesBotao.atualizarImagem(posicaoMouse)
         sairBotao.atualizarImagem(posicaoMouse)
 
         jogarBotao.desenharBotao(tela)
+        configuracoesBotao.desenharBotao(tela)
         sairBotao.desenharBotao(tela)
 
         # Verificar cliques
@@ -99,6 +180,10 @@ def menuPrincipal():
             print("Jogar clicado")
             estadoJogo = "jogando"
             run = False
+        if configuracoesBotao.clicarBotao(tela):
+            print("Configurações clicado")
+            abrirConfiguracoes()
+
         if sairBotao.clicarBotao(tela):
             print("Sair clicado")
             global rodando
