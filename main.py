@@ -151,6 +151,111 @@ def iniciarFases():
 
         pygame.display.update()
 
+def fase1():
+    global estadoJogo
+    fase1Background = pygame.image.load("imagens/fase1/imagemZoologico.jpg")
+
+    voltarBotao = criarBotao(40, 50, "imagens/GUI/botaoVoltar/voltar0.png", "imagens/GUI/botaoVoltar/voltar1.png")
+    configuracoesBotao = criarBotao(860, 50, "imagens/GUI/botaoConfiguracoes/configuracoes0.png", "imagens/GUI/botaoConfiguracoes/configuracoes1.png")
+    
+    run = True
+    while run:
+        tela.blit(fase1Background, (0, 0))
+        posicaoMouse = pygame.mouse.get_pos()
+
+        voltarBotao.atualizarImagem(posicaoMouse)
+        configuracoesBotao.atualizarImagem(posicaoMouse)
+
+        voltarBotao.desenharBotao(tela)
+        configuracoesBotao.desenharBotao(tela)
+        
+        if voltarBotao.clicarBotao(tela):
+            print("Voltar clicado")
+            estadoJogo = "jogando"
+            run = False
+        if configuracoesBotao.clicarBotao(tela):
+            print("Configurações clicado")
+            abrirConfiguracoes()
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                global rodando
+                rodando = False
+                run = False
+
+        # Atualiza a tela
+        pygame.display.update()
+
+def fase2():
+    global estadoJogo
+    fase1Background = pygame.image.load("imagens/fase2/imagemSaladeAula.jpg")
+
+    voltarBotao = criarBotao(40, 50, "imagens/GUI/botaoVoltar/voltar0.png", "imagens/GUI/botaoVoltar/voltar1.png")
+    configuracoesBotao = criarBotao(860, 50, "imagens/GUI/botaoConfiguracoes/configuracoes0.png", "imagens/GUI/botaoConfiguracoes/configuracoes1.png")
+
+    run = True
+    while run:
+        tela.blit(fase1Background, (0, 0))
+        posicaoMouse = pygame.mouse.get_pos()
+
+        voltarBotao.atualizarImagem(posicaoMouse)
+        configuracoesBotao.atualizarImagem(posicaoMouse)
+
+        voltarBotao.desenharBotao(tela)
+        configuracoesBotao.desenharBotao(tela)
+        
+        if voltarBotao.clicarBotao(tela):
+            print("Voltar clicado")
+            estadoJogo = "jogando"
+            run = False
+        if configuracoesBotao.clicarBotao(tela):
+            print("Configurações clicado")
+            abrirConfiguracoes()
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                global rodando
+                rodando = False
+                run = False
+
+        # Atualiza a tela
+        pygame.display.update()
+
+def fase3():
+    global estadoJogo
+    fase1Background = pygame.image.load("imagens/fase3/imagemPraia.jpg")
+
+    voltarBotao = criarBotao(40, 50, "imagens/GUI/botaoVoltar/voltar0.png", "imagens/GUI/botaoVoltar/voltar1.png")
+    configuracoesBotao = criarBotao(860, 50, "imagens/GUI/botaoConfiguracoes/configuracoes0.png", "imagens/GUI/botaoConfiguracoes/configuracoes1.png")
+
+    run = True
+    while run:
+        tela.blit(fase1Background, (0, 0))
+        posicaoMouse = pygame.mouse.get_pos()
+
+        voltarBotao.atualizarImagem(posicaoMouse)
+        configuracoesBotao.atualizarImagem(posicaoMouse)
+
+        voltarBotao.desenharBotao(tela)
+        configuracoesBotao.desenharBotao(tela)
+        
+        if voltarBotao.clicarBotao(tela):
+            print("Voltar clicado")
+            estadoJogo = "jogando"
+            run = False
+        if configuracoesBotao.clicarBotao(tela):
+            print("Configurações clicado")
+            abrirConfiguracoes()
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                global rodando
+                rodando = False
+                run = False
+
+        # Atualiza a tela
+        pygame.display.update()
+
 # Função para o menu principal
 def menuPrincipal():
     global estadoJogo
@@ -204,11 +309,11 @@ while rodando:
     elif estadoJogo == "jogando":
         iniciarFases()
     elif estadoJogo == "fase1":
-        menuPrincipal()
+        fase1()
     elif estadoJogo == "fase2":
-        menuPrincipal()
+        fase2()
     elif estadoJogo == "fase3":
-        iniciarFases()
+        fase3()
 
 # Finaliza o pygame
 pygame.quit()
