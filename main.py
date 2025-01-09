@@ -103,7 +103,11 @@ def abrirInstrucoes():
     instrucoesBackground = pygame.image.load("imagens/GUI/Backgrounds/instrucoesBackground.jpg")
     voltarBotao = criarBotao(40, 50, "imagens/GUI/botaoVoltar/voltar0.png", "imagens/GUI/botaoVoltar/voltar1.png")
     configuracoesBotao = criarBotao(900, 50, "imagens/GUI/botaoConfiguracoes/configuracoes0.png", "imagens/GUI/botaoConfiguracoes/configuracoes1.png")
-    
+    fase1Botao = criarBotao(20, 250, "imagens/fase1/faseBotao1.png", "imagens/fase1/faseBotao1.png")
+    fase2Botao = criarBotao(20, 370, "imagens/fase2/faseBotao2.png", "imagens/fase2/faseBotao2.png")
+    fase3Botao = criarBotao(20, 490, "imagens/fase3/faseBotao3.png", "imagens/fase3/faseBotao3.png")
+
+
     instrucoes_texto = [
         "",
         "Bem-vindo ao jogo!",
@@ -144,6 +148,14 @@ def abrirInstrucoes():
 
         configuracoesBotao.atualizarImagem(posicaoMouse)
         configuracoesBotao.desenharBotao(tela)
+
+        fase1Botao.atualizarImagem(posicaoMouse)
+        fase1Botao.desenharBotao(tela)
+        fase2Botao.atualizarImagem(posicaoMouse)
+        fase2Botao.desenharBotao(tela)
+        fase3Botao.atualizarImagem(posicaoMouse)
+        fase3Botao.desenharBotao(tela)
+
 
         # Superfície para instruções
         superficie_instrucoes = pygame.Surface((largura_quadro, max(altura_conteudo, altura_quadro)), pygame.SRCALPHA)
