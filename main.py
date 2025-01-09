@@ -97,6 +97,119 @@ def abrirConfiguracoes():
 
         pygame.display.update()
 
+
+def abrirInstrucoes():
+    global estadoJogo
+    instrucoesBackground = pygame.image.load("imagens/GUI/Backgrounds/instrucoesBackground.jpg")
+    voltarBotao = criarBotao(40, 50, "imagens/GUI/botaoVoltar/voltar0.png", "imagens/GUI/botaoVoltar/voltar1.png")
+    configuracoesBotao = criarBotao(900, 50, "imagens/GUI/botaoConfiguracoes/configuracoes0.png", "imagens/GUI/botaoConfiguracoes/configuracoes1.png")
+    
+    instrucoes_texto = [
+        "",
+        "Bem-vindo ao jogo!",
+        "",
+        "Instruções:",
+        "- Utilize as setas do teclado para movimentar o personagem.",
+        "- Colete os itens correspondentes para marcar pontos.",
+        "- Evite os obstáculos para não perder vidas.",
+        "- Use o botão de 'Pause' para pausar o jogo.",
+        "",
+        "Boa sorte e divirta-se!",
+    ]
+
+    fonte = pygame.font.Font("sons/tipografia/LuckiestGuy-Regular.ttf", 20)
+    cor_texto = (255, 255, 255)
+    espacamento = 40
+
+    largura_quadro = 670
+    altura_quadro = 480
+    posicao_quadro = (330, 180)
+
+    altura_conteudo = len(instrucoes_texto) * espacamento
+    deslocamento = 0  # Posição inicial
+    clicando_na_barra = False
+
+    barra_largura = 15
+    barra_altura = max(30, altura_quadro * (altura_quadro / max(altura_conteudo, altura_quadro)))
+    barra_x = posicao_quadro[0] + largura_quadro - barra_largura - 5
+
+
+    run = True
+    while run:
+        tela.blit(instrucoesBackground, (0, 0))
+        posicaoMouse = pygame.mouse.get_pos()
+
+        voltarBotao.atualizarImagem(posicaoMouse)
+        voltarBotao.desenharBotao(tela)
+
+        configuracoesBotao.atualizarImagem(posicaoMouse)
+        configuracoesBotao.desenharBotao(tela)
+
+        # Superfície para instruções
+        superficie_instrucoes = pygame.Surface((largura_quadro, max(altura_conteudo, altura_quadro)), pygame.SRCALPHA)
+        superficie_instrucoes.fill((131, 69, 31))
+
+        # Renderizar o texto
+        for i, linha in enumerate(instrucoes_texto):
+            texto = fonte.render(linha, True, cor_texto)
+            superficie_instrucoes.blit(texto, (20, i * espacamento))
+
+        # Garantir que o deslocamento esteja dentro dos limites
+        deslocamento = max(0, min(deslocamento, altura_conteudo - altura_quadro))
+
+        # Recorte da parte visível
+        recorte = superficie_instrucoes.subsurface((0, deslocamento, largura_quadro, altura_quadro))
+        tela.blit(recorte, posicao_quadro)
+
+        # Barra de rolagem
+        trilho_x = barra_x
+        trilho_altura = altura_quadro
+        pygame.draw.rect(tela, (50, 50, 50), (trilho_x, posicao_quadro[1], barra_largura, trilho_altura))
+
+        barra_y = posicao_quadro[1] + (deslocamento / max(altura_conteudo, 1)) * altura_quadro
+        pygame.draw.rect(tela, (70, 130, 180), (barra_x, barra_y, barra_largura, barra_altura), border_radius=5)
+
+
+        if voltarBotao.clicarBotao(tela):
+            print("Voltando ao menu principal")
+            estadoJogo = "menu"
+            run = False
+        if configuracoesBotao.clicarBotao(tela):
+            print("Configurações clicado")
+            abrirConfiguracoes()
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                global rodando
+                rodando = False
+                run = False
+
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                if event.button == 1:  # Clique esquerdo
+                    if trilho_x <= posicaoMouse[0] <= trilho_x + barra_largura and barra_y <= posicaoMouse[1] <= barra_y + barra_altura:
+                        clicando_na_barra = True
+
+                elif event.button == 4:  # Rolar para cima
+                    deslocamento = max(deslocamento - 20, 0)
+                elif event.button == 5:  # Rolar para baixo
+                    deslocamento = min(deslocamento + 20, altura_conteudo - altura_quadro)
+
+            elif event.type == pygame.MOUSEBUTTONUP:
+                if event.button == 1:
+                    clicando_na_barra = False
+
+            elif event.type == pygame.MOUSEMOTION:
+                if clicando_na_barra:
+                    deslocamento = max(0, min(altura_conteudo - altura_quadro,
+                                              (event.pos[1] - posicao_quadro[1]) * (altura_conteudo / altura_quadro)))
+
+        if voltarBotao.clicarBotao(tela):
+            estadoJogo = "menu"
+            run = False
+
+        pygame.display.update()
+
+
 def abrirCreditos():
     global estadoJogo
     creditosBackground = pygame.image.load("imagens/GUI/Backgrounds/creditos.jpg")
@@ -374,10 +487,11 @@ def menuPrincipal():
     menuBackground = pygame.image.load("imagens/GUI/Backgrounds/menuBackground.jpg")
 
     # Criando botões do menu
-    jogarBotao = criarBotao(295, 130, "imagens/GUI/botaoJogar/jogar0.png", "imagens/GUI/botaoJogar/jogar1.png")
-    configuracoesBotao = criarBotao(900, 625, "imagens/GUI/botaoConfiguracoes/configuracoes0.png", "imagens/GUI/botaoConfiguracoes/configuracoes1.png")
-    sairBotao = criarBotao(390, 370, "imagens/GUI/botaoSair/sair0.png", "imagens/GUI/botaoSair/sair1.png")
-    creditosBotao = criarBotao(820, 620, "imagens/GUI/botaoConfiguracoes/info0.png", "imagens/GUI/botaoConfiguracoes/info1.png")  
+    jogarBotao = criarBotao(400, 300, "imagens/GUI/botaoJogar/jogar0.png", "imagens/GUI/botaoJogar/jogar1.png")
+    configuracoesBotao = criarBotao(900, 50, "imagens/GUI/botaoConfiguracoes/configuracoes0.png", "imagens/GUI/botaoConfiguracoes/configuracoes1.png")
+    instrucoesBotao = criarBotao(400, 425, "imagens/GUI/botaoInicio/instrucoes1.png", "imagens/GUI/botaoInicio/instrucoes01.png")
+    sairBotao = criarBotao(40, 50, "imagens/GUI/botaoSair/sair0.png", "imagens/GUI/botaoSair/sair1.png")
+    creditosBotao = criarBotao(980, 620, "imagens/GUI/botaoConfiguracoes/info0.png", "imagens/GUI/botaoConfiguracoes/info1.png")  
 
     run = True
     while run:
@@ -387,11 +501,13 @@ def menuPrincipal():
         # Atualizar e desenhar botões
         jogarBotao.atualizarImagem(posicaoMouse)
         configuracoesBotao.atualizarImagem(posicaoMouse)
+        instrucoesBotao.atualizarImagem(posicaoMouse)
         sairBotao.atualizarImagem(posicaoMouse)
         creditosBotao.atualizarImagem(posicaoMouse)
 
         jogarBotao.desenharBotao(tela)
         configuracoesBotao.desenharBotao(tela)
+        instrucoesBotao.desenharBotao(tela)
         sairBotao.desenharBotao(tela)
         creditosBotao.desenharBotao(tela)
 
@@ -403,6 +519,9 @@ def menuPrincipal():
         if configuracoesBotao.clicarBotao(tela):
             print("Configurações clicado")
             abrirConfiguracoes()
+        if instrucoesBotao.clicarBotao(tela):
+            print("Instruções clicado")
+            abrirInstrucoes()
         if creditosBotao.clicarBotao(tela):  # Detecta clique no botão de créditos
             print("Créditos clicado")
             abrirCreditos()
