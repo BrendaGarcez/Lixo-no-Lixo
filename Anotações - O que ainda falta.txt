@@ -1,0 +1,67 @@
+Geral de Trabalho
+
+- Documentação de Risco
+- Documentação Geral
+- Casos de Uso(Tabelas e Diagramas)
+- Verificar se tem mais algo
+
+
+---- Mudanças professora ----
+-Layout detalhes p/professor
+-Sobre o jogo + créditos
+-Info de total objetos por fase
+-Alterar botão confirmar
+-Mudar o você perdeu
+-Visibilidade dos itens melhor
+-Mostrar quantos itens tem que selecionar nas fases
+-Colocar limite de tempo
+
+
+
+
+Geral de aplicativo
+-->>> Design de Lixos, Botões e Tutoriais
+->>> Tamanho de botões
+->>> 
+
+Telas:
+-----Tela Inicial-----
+- Organização dos Botões
+- Tela de Pontuação (Ainda verificar como fara a área do avaliador)
+-----Instruções-----
+- Troca de tela quando clica no botão de cada fase
+- Tamanho dos botões
+- Organizar tamanhos 
+
+-----Créditos-----
+- particularmente pronto
+-----Configurações-----
+-Estética
+-----Sons-----
+-Todos(escolher)
+	- Sons de movimentação
+	- Musica de fundo
+	- Nome dos objetos falados
+-----Fase 1-----
+-> objetos de cena
+-> botão de confirmar
+-> mensagens de apoio caso erro e de incentivo caso acerto
+-> Lógica do jogo(pontuação, quantidade de itens, tempo)
+-> áudio dos nomes
+-> legenda paras os itens
+-----Fase 2-----
+-> objetos de cena
+-> botão de confirmar
+-> mensagens de apoio caso erro e de incentivo caso acerto
+-> Lógica do jogo(pontuação, quantidade de itens, tempo)
+-> áudio dos nomes
+-> legenda paras os itens
+
+-----Fase 3-----
+-> objetos de cena
+-> área de lixo e de coisas da praia
+-> mensagens de apoio caso erro e de incentivo caso acerto
+-> Lógica do jogo(pontuação, quantidade de itens, tempo)
+-> áudio dos nomes
+-> legenda paras os itens
+
