@@ -97,6 +97,31 @@ def abrirConfiguracoes():
 
         pygame.display.update()
 
+def abrirCreditos():
+    global estadoJogo
+    creditosBackground = pygame.image.load("imagens/GUI/Backgrounds/creditos.jpg")
+    voltarBotao = criarBotao(100, 620, "imagens/GUI/botaoVoltar/voltar0.png", "imagens/GUI/botaoVoltar/voltar1.png")
+
+    run = True
+    while run:
+        tela.blit(creditosBackground, (0, 0))
+        posicaoMouse = pygame.mouse.get_pos()
+
+        voltarBotao.atualizarImagem(posicaoMouse)
+        voltarBotao.desenharBotao(tela)
+        if voltarBotao.clicarBotao(tela):
+            print("Voltando ao menu principal")
+            estadoJogo = "menu"
+            run = False
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                global rodando
+                rodando = False
+                run = False
+
+        pygame.display.update()
+
 # Função para as fases
 def iniciarFases():
     global estadoJogo
@@ -265,6 +290,7 @@ def menuPrincipal():
     jogarBotao = criarBotao(295, 130, "imagens/GUI/botaoJogar/jogar0.png", "imagens/GUI/botaoJogar/jogar1.png")
     configuracoesBotao = criarBotao(800, 550, "imagens/GUI/botaoConfiguracoes/configuracoes0.png", "imagens/GUI/botaoConfiguracoes/configuracoes1.png")
     sairBotao = criarBotao(390, 370, "imagens/GUI/botaoSair/sair0.png", "imagens/GUI/botaoSair/sair1.png")
+    creditosBotao = criarBotao(800, 620, "imagens/GUI/botaoConfiguracoes/info0.png", "imagens/GUI/botaoConfiguracoes/info1.png")  
 
     run = True
     while run:
@@ -275,10 +301,12 @@ def menuPrincipal():
         jogarBotao.atualizarImagem(posicaoMouse)
         configuracoesBotao.atualizarImagem(posicaoMouse)
         sairBotao.atualizarImagem(posicaoMouse)
+        creditosBotao.atualizarImagem(posicaoMouse)
 
         jogarBotao.desenharBotao(tela)
         configuracoesBotao.desenharBotao(tela)
         sairBotao.desenharBotao(tela)
+        creditosBotao.desenharBotao(tela)
 
         # Verificar cliques
         if jogarBotao.clicarBotao(tela):
@@ -288,6 +316,9 @@ def menuPrincipal():
         if configuracoesBotao.clicarBotao(tela):
             print("Configurações clicado")
             abrirConfiguracoes()
+        if creditosBotao.clicarBotao(tela):  # Detecta clique no botão de créditos
+            print("Créditos clicado")
+            abrirCreditos()
 
         if sairBotao.clicarBotao(tela):
             print("Sair clicado")
