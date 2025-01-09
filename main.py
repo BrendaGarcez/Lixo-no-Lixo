@@ -103,17 +103,19 @@ def abrirCreditos():
     voltarBotao = criarBotao(40, 50, "imagens/GUI/botaoVoltar/voltar0.png", "imagens/GUI/botaoVoltar/voltar1.png")
 
     linhas_creditos = [
-            "                             Desenvolvido por:   ",
-            "Brenda Amanda da Silva Garcez",
-            "Nicole Louise Matias Jamuchewski",
-            "João Rafael Modreira Anhaia",
-            "Ilustrações por:",
-            "Maria Souza",
-            "Lucas Santos",
+            "                                  Desenvolvido por:   ",
+            "- Brenda Amanda da Silva Garcez",
+            "- Nicole Louise Matias Jamuchewski",
+            "- João Rafael Moreira Anhaia",
+            "                                   Ilustrações por:",
+            "- Matheus",
+            "- Pedro",
+            "                                         Fontes por:",
+            "- 'Luckiest' Guy por Astigmatic (Google Fonts)",
             "                             Obrigado por jogar!",
         ]
 
-    fonte = pygame.font.Font(None, 40)  # Fonte para os textos
+    fonte = pygame.font.Font("sons/tipografia/LuckiestGuy-Regular.ttf", 25)  # 40 é o tamanho da fonte
     cor_texto = (255, 255, 255)         # Cor do texto
     espacamento = 50                    # Espaçamento entre linhas
 
@@ -121,15 +123,30 @@ def abrirCreditos():
     altura_quadro = 350                 # Altura do quadrado marrom
     posicao_quadro = (200, 220)         # Posição do quadrado marrom
     
+
+    configuracoesBotao = criarBotao(930, 50, "imagens/GUI/botaoConfiguracoes/configuracoes0.png", "imagens/GUI/botaoConfiguracoes/configuracoes1.png")
+    
+
     # Altura total do conteúdo
     altura_conteudo = len(linhas_creditos) * espacamento
     deslocamento = 0  # Controla a rolagem do conteúdo
+
+    barra_largura = 15
+    barra_altura = max(30, altura_quadro * (altura_quadro / altura_conteudo))  # Altura proporcional mínima
+    barra_x = posicao_quadro[0] + largura_quadro - barra_largura - 5  # Margem lateral direita do quadro
+    barra_y = posicao_quadro[1]  # Posição inicial da barra
+    trilho_x = barra_x
+    trilho_altura = altura_quadro
+
+    clicando_na_barra = False
 
     run = True
     while run:
         tela.blit(creditosBackground, (0, 0))
         posicaoMouse = pygame.mouse.get_pos()
 
+        configuracoesBotao.atualizarImagem(posicaoMouse)
+        configuracoesBotao.desenharBotao(tela)
         voltarBotao.atualizarImagem(posicaoMouse)
         voltarBotao.desenharBotao(tela)
 
@@ -144,22 +161,51 @@ def abrirCreditos():
         recorte = superficie_creditos.subsurface((0, deslocamento, largura_quadro, altura_quadro))
         tela.blit(recorte, posicao_quadro)
 
+        pygame.draw.rect(tela, (50, 50, 50), (trilho_x, posicao_quadro[1], barra_largura, trilho_altura))
+
+        # Atualizar posição da barra de rolagem
+        barra_y = posicao_quadro[1] + (deslocamento / altura_conteudo) * altura_quadro
+
+        # Desenhar a barra de rolagem
+        pygame.draw.rect(tela, (236, 155, 94), (barra_x, barra_y, barra_largura, barra_altura), border_radius=5)
+
+
+        if voltarBotao.clicarBotao(tela):
+            print("Voltando ao menu principal")
+            estadoJogo = "menu"
+            run = False
+        if configuracoesBotao.clicarBotao(tela):
+            print("Configurações clicado")
+            abrirConfiguracoes()      
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 global rodando
                 rodando = False
                 run = False
+
+            # Clique do mouse
             elif event.type == pygame.MOUSEBUTTONDOWN:
-                if event.button == 4:  # Rolar para cima
+                if event.button == 1:  # Clique esquerdo
+                    if trilho_x <= posicaoMouse[0] <= trilho_x + barra_largura and barra_y <= posicaoMouse[1] <= barra_y + barra_altura:
+                        clicando_na_barra = True
+
+                elif event.button == 4:  # Rolar para cima
                     deslocamento = max(deslocamento - 20, 0)
                 elif event.button == 5:  # Rolar para baixo
                     deslocamento = min(deslocamento + 20, altura_conteudo - altura_quadro)
 
-        if voltarBotao.clicarBotao(tela):
-            print("Voltando ao menu principal")
-            estadoJogo = "menu"
-            run = False
+            # Soltar o clique do mouse
+            elif event.type == pygame.MOUSEBUTTONUP:
+                if event.button == 1:  # Clique esquerdo
+                    clicando_na_barra = False
+
+            # Movimento do mouse
+            elif event.type == pygame.MOUSEMOTION:
+                if clicando_na_barra:
+                    # Atualizar a posição do deslocamento com base no movimento do mouse
+                    deslocamento = max(0, min(altura_conteudo - altura_quadro, 
+                                              (event.pos[1] - posicao_quadro[1]) * (altura_conteudo / altura_quadro)))
 
         pygame.display.update()
 
