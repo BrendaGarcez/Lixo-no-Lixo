@@ -100,7 +100,30 @@ def abrirConfiguracoes():
 def abrirCreditos():
     global estadoJogo
     creditosBackground = pygame.image.load("imagens/GUI/Backgrounds/creditos.jpg")
-    voltarBotao = criarBotao(100, 620, "imagens/GUI/botaoVoltar/voltar0.png", "imagens/GUI/botaoVoltar/voltar1.png")
+    voltarBotao = criarBotao(40, 50, "imagens/GUI/botaoVoltar/voltar0.png", "imagens/GUI/botaoVoltar/voltar1.png")
+
+    linhas_creditos = [
+            "                             Desenvolvido por:   ",
+            "Brenda Amanda da Silva Garcez",
+            "Nicole Louise Matias Jamuchewski",
+            "João Rafael Modreira Anhaia",
+            "Ilustrações por:",
+            "Maria Souza",
+            "Lucas Santos",
+            "                             Obrigado por jogar!",
+        ]
+
+    fonte = pygame.font.Font(None, 40)  # Fonte para os textos
+    cor_texto = (255, 255, 255)         # Cor do texto
+    espacamento = 50                    # Espaçamento entre linhas
+
+    largura_quadro = 700                # Largura do quadrado marrom
+    altura_quadro = 350                 # Altura do quadrado marrom
+    posicao_quadro = (200, 220)         # Posição do quadrado marrom
+    
+    # Altura total do conteúdo
+    altura_conteudo = len(linhas_creditos) * espacamento
+    deslocamento = 0  # Controla a rolagem do conteúdo
 
     run = True
     while run:
@@ -109,16 +132,34 @@ def abrirCreditos():
 
         voltarBotao.atualizarImagem(posicaoMouse)
         voltarBotao.desenharBotao(tela)
-        if voltarBotao.clicarBotao(tela):
-            print("Voltando ao menu principal")
-            estadoJogo = "menu"
-            run = False
+
+         # Desenhar os textos dentro do quadrado marrom com rolagem
+        superficie_creditos = pygame.Surface((largura_quadro, altura_conteudo), pygame.SRCALPHA)
+        superficie_creditos.fill((131, 69, 31))  # Cor de fundo do quadrado
+
+        for i, linha in enumerate(linhas_creditos):
+            texto = fonte.render(linha, True, cor_texto)
+            superficie_creditos.blit(texto, (20, i * espacamento))
+        
+        recorte = superficie_creditos.subsurface((0, deslocamento, largura_quadro, altura_quadro))
+        tela.blit(recorte, posicao_quadro)
+
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 global rodando
                 rodando = False
                 run = False
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                if event.button == 4:  # Rolar para cima
+                    deslocamento = max(deslocamento - 20, 0)
+                elif event.button == 5:  # Rolar para baixo
+                    deslocamento = min(deslocamento + 20, altura_conteudo - altura_quadro)
+
+        if voltarBotao.clicarBotao(tela):
+            print("Voltando ao menu principal")
+            estadoJogo = "menu"
+            run = False
 
         pygame.display.update()
 
@@ -181,7 +222,7 @@ def fase1():
     fase1Background = pygame.image.load("imagens/fase1/imagemZoologico.jpg")
 
     voltarBotao = criarBotao(40, 50, "imagens/GUI/botaoVoltar/voltar0.png", "imagens/GUI/botaoVoltar/voltar1.png")
-    configuracoesBotao = criarBotao(860, 50, "imagens/GUI/botaoConfiguracoes/configuracoes0.png", "imagens/GUI/botaoConfiguracoes/configuracoes1.png")
+    configuracoesBotao = criarBotao(900, 130, "imagens/GUI/botaoConfiguracoes/configuracoes0.png", "imagens/GUI/botaoConfiguracoes/configuracoes1.png")
     
     run = True
     while run:
@@ -216,7 +257,7 @@ def fase2():
     fase1Background = pygame.image.load("imagens/fase2/imagemSaladeAula.jpg")
 
     voltarBotao = criarBotao(40, 50, "imagens/GUI/botaoVoltar/voltar0.png", "imagens/GUI/botaoVoltar/voltar1.png")
-    configuracoesBotao = criarBotao(860, 50, "imagens/GUI/botaoConfiguracoes/configuracoes0.png", "imagens/GUI/botaoConfiguracoes/configuracoes1.png")
+    configuracoesBotao = criarBotao(900, 130, "imagens/GUI/botaoConfiguracoes/configuracoes0.png", "imagens/GUI/botaoConfiguracoes/configuracoes1.png")
 
     run = True
     while run:
@@ -251,7 +292,7 @@ def fase3():
     fase1Background = pygame.image.load("imagens/fase3/imagemPraia.jpg")
 
     voltarBotao = criarBotao(40, 50, "imagens/GUI/botaoVoltar/voltar0.png", "imagens/GUI/botaoVoltar/voltar1.png")
-    configuracoesBotao = criarBotao(860, 50, "imagens/GUI/botaoConfiguracoes/configuracoes0.png", "imagens/GUI/botaoConfiguracoes/configuracoes1.png")
+    configuracoesBotao = criarBotao(900, 130, "imagens/GUI/botaoConfiguracoes/configuracoes0.png", "imagens/GUI/botaoConfiguracoes/configuracoes1.png")
 
     run = True
     while run:
@@ -288,9 +329,9 @@ def menuPrincipal():
 
     # Criando botões do menu
     jogarBotao = criarBotao(295, 130, "imagens/GUI/botaoJogar/jogar0.png", "imagens/GUI/botaoJogar/jogar1.png")
-    configuracoesBotao = criarBotao(800, 550, "imagens/GUI/botaoConfiguracoes/configuracoes0.png", "imagens/GUI/botaoConfiguracoes/configuracoes1.png")
+    configuracoesBotao = criarBotao(900, 625, "imagens/GUI/botaoConfiguracoes/configuracoes0.png", "imagens/GUI/botaoConfiguracoes/configuracoes1.png")
     sairBotao = criarBotao(390, 370, "imagens/GUI/botaoSair/sair0.png", "imagens/GUI/botaoSair/sair1.png")
-    creditosBotao = criarBotao(800, 620, "imagens/GUI/botaoConfiguracoes/info0.png", "imagens/GUI/botaoConfiguracoes/info1.png")  
+    creditosBotao = criarBotao(820, 620, "imagens/GUI/botaoConfiguracoes/info0.png", "imagens/GUI/botaoConfiguracoes/info1.png")  
 
     run = True
     while run:
