@@ -1,6 +1,9 @@
 import pygame  # Importando biblioteca
 import botao  # Importando a classe Botao
+import botaoObjetos
 import image
+import random
+import math
 
 pygame.init()  # Inicializa os módulos do pygame
 
@@ -19,6 +22,17 @@ def criarBotao(x, y, imagem, imagemAlterada):
     imagem = pygame.image.load(imagem).convert_alpha()
     imagemAlterada = pygame.image.load(imagemAlterada).convert_alpha()
     return botao.Botao(x, y, imagem, imagemAlterada)
+
+def criarBotaoImagens(x, y, imagem, imagemAlterada):
+    imagem = pygame.image.load(imagem).convert_alpha()
+    imagemAlterada = pygame.image.load(imagemAlterada).convert_alpha()
+    
+    # Redimensionar as imagens
+    largura, altura = 200, 120  # Exemplo de tamanho, ajuste conforme necessário
+    imagem = pygame.transform.scale(imagem, (largura, altura))
+    imagemAlterada = pygame.transform.scale(imagemAlterada, (largura, altura))
+    
+    return botaoObjetos.BotaoObjetos(x, y, imagem, imagemAlterada)
 
 def abrirConfiguracoes():
 
@@ -233,9 +247,11 @@ def abrirCreditos():
             "- Brenda Amanda da Silva Garcez",
             "- Nicole Louise Matias Jamuchewski",
             "- João Rafael Moreira Anhaia",
+            "- Matheus Vinícius dos Santos Sachinski",
+            "- Pedro (resto do nome)",
+
             "                                   Ilustrações por:",
-            "- Matheus",
-            "- Pedro",
+            "- Nomes",
             "                                         Fontes por:",
             "- 'Luckiest' Guy por Astigmatic (Google Fonts)",
             "                             Obrigado por jogar!",
@@ -392,40 +408,164 @@ def iniciarFases():
         pygame.display.update()
 
 def fase1():
-    global estadoJogo, rodando
+    global estadoJogo
     fase1Background = pygame.image.load("imagens/fase1/imagemZoologico.jpg")
-    
-    max_images = 10
-    current_phase = 1  
-    phase_folder = f"imagens/fase{current_phase}"
-    
-    try:
-        image_paths = image.generate_image_sequence(phase_folder, max_images)
-        images = [pygame.image.load(img_path) for img_path in image_paths]
-    except Exception as e:
-        print(f"Erro ao carregar imagens: {e}")
-        return
-    
+
     voltarBotao = criarBotao(40, 50, "imagens/GUI/botaoVoltar/voltar0.png", "imagens/GUI/botaoVoltar/voltar1.png")
     configuracoesBotao = criarBotao(900, 130, "imagens/GUI/botaoConfiguracoes/configuracoes0.png", "imagens/GUI/botaoConfiguracoes/configuracoes1.png")
     
-    run = True
-    x_offset = 100
-    y_offset = 350
-    spacing = 120  # Espaçamento entre as imagens
-    max_columns = 5  # Limita o número de imagens por linha
+    # Configurações para objetos
+    largura_tela, altura_tela = tela.get_size()
+    centro_x = largura_tela // 3 + 30
+    centro_y = altura_tela // 2
+    raio_x = largura_tela // 3 + 40
+    raio_y = altura_tela // 4
+    distancia_minima = 140  # Distância mínima entre objetos
 
+    # Lista de imagens
+    imagensCorretas = [
+        "imagens/fase1/corretas/bichoquecomecupim.png",
+        "imagens/fase1/corretas/capibara.png",
+        "imagens/fase1/corretas/coala.png",
+        "imagens/fase1/corretas/elefante.png",
+        "imagens/fase1/corretas/esquilo.png",
+        "imagens/fase1/corretas/gamba.png",
+        "imagens/fase1/corretas/panda.png",
+        "imagens/fase1/corretas/panda2.png",
+        "imagens/fase1/corretas/passaro.png",
+        "imagens/fase1/corretas/pescoco.png",
+        "imagens/fase1/corretas/raposa.png",
+        "imagens/fase1/corretas/renatogarcia.png",
+    ]
+
+    imagensIncorretas = [
+        "imagens/fase1/incorretas/caixa.png",
+        "imagens/fase1/incorretas/copoamassado.png",
+        "imagens/fase1/incorretas/frauda.png",
+        "imagens/fase1/incorretas/garrafa.png",
+        "imagens/fase1/incorretas/garrafapet1.png",
+        "imagens/fase1/incorretas/garrafapet2.png",
+        "imagens/fase1/incorretas/latinha.png",
+        "imagens/fase1/incorretas/latinha2.png",
+        "imagens/fase1/incorretas/lixojoão.png",
+        "imagens/fase1/incorretas/papel.png",
+        "imagens/fase1/incorretas/sacodepapel.png",
+    ]
+
+    # Selecionando aleatoriamente 6 imagens corretas e 4 incorretas
+    imagensCorretasSelecionadas = random.sample(imagensCorretas, 6)  # Seleciona 6 imagens corretas aleatórias
+    imagensIncorretasSelecionadas = random.sample(imagensIncorretas, 4)  # Seleciona 4 imagens incorretas aleatórias
+
+    objetos = []
+
+    imagensCorretasClicadas = 0  # Contador de imagens corretas clicadas
+    imagensIncorretasClicadas = 0  # Contador de imagens incorretas clicadas
+
+    jogoGanhou = False  # variável para rastrear se o jogo foi vencido
+    jogoPerdeu = False  # variável para rastrear se o jogo foi perdido
+
+    objetosSelecionados = []  # Lista para armazenar objetos selecionados
+
+    # Função auxiliar para posicionar objetos
+    def posicionar_objetos(lista_imagens, tipo="correto"):
+        imagens_selecionadas = lista_imagens  # Lista de imagens a posicionar
+
+        while imagens_selecionadas:
+            imagem = imagens_selecionadas.pop(0)
+            
+            posicao_valida = False
+            tentativa = 0
+            while not posicao_valida and tentativa < 100:  # Limite de tentativas para evitar loop infinito
+                tentativa += 1
+                
+                # Gerar posição aleatória
+                x = random.randint(centro_x - raio_x, centro_x + raio_x)
+                y = random.randint(centro_y - raio_y, centro_y + raio_y)
+                
+                posicao_valida = True  # Assume que a posição é válida inicialmente
+                
+                # Verifica se está longe o suficiente de outros objetos
+                for obj in objetos:
+                    distancia = math.sqrt((x - obj["x"])**2 + (y - obj["y"])**2)
+                    if distancia < distancia_minima:
+                        posicao_valida = False
+                        break
+
+            if posicao_valida:
+                # Cria o botão para o objeto
+                botao = criarBotaoImagens(x, y, imagem, imagem)
+                objetos.append({"x": x, "y": y, "botao": botao, "tipo": tipo, "movimento": 0})
+            else:
+                print(f"Falha ao posicionar objeto após {tentativa} tentativas: {imagem}")
+
+
+    # Posicionar objetos corretos e incorretos
+    posicionar_objetos(imagensCorretasSelecionadas, "correto")
+    posicionar_objetos(imagensIncorretasSelecionadas, "incorreto")
+
+    # Calcular a posição centralizada para o botão de confirmar na parte inferior
+    largura_botao_confirmar = 200  # Tamanho estimado do botão (ajuste conforme necessário)
+    altura_botao_confirmar = 50    # Altura estimada do botão (ajuste conforme necessário)
+    x_botao_confirmar = (largura_tela - 60 - largura_botao_confirmar) // 2  # Centraliza na horizontal
+    y_botao_confirmar = altura_tela - altura_botao_confirmar - 35      # Posiciona perto da parte inferior
+    
+    # Criar o botão de confirmar no centro inferior da tela
+    confirmarBotao = criarBotao(x_botao_confirmar, y_botao_confirmar, "imagens/GUI/botaoConfirmar/confirmar1.png", "imagens/GUI/botaoConfirmar/confirmar2.png")
+
+    run = True
     while run:
-        x_offset = 100  # Reinicia o deslocamento horizontal
         tela.blit(fase1Background, (0, 0))
+        
+        if jogoPerdeu:
+            tela.blit(pygame.image.load("imagens/fase1/perdeuZoologico.jpg"), (0, 0))
+            objetos.clear()  # Limpa todos os objetos
+
+        if jogoGanhou:
+            tela.blit(pygame.image.load("imagens/fase1/ganhouZoologico.jpg"), (0, 0))
+            objetos.clear()  # Limpa todos os objetos
+
         posicaoMouse = pygame.mouse.get_pos()
 
         voltarBotao.atualizarImagem(posicaoMouse)
         configuracoesBotao.atualizarImagem(posicaoMouse)
+        confirmarBotao.atualizarImagem(posicaoMouse)  # Atualiza a imagem do botão de confirmar
 
         voltarBotao.desenharBotao(tela)
         configuracoesBotao.desenharBotao(tela)
-        
+        confirmarBotao.desenharBotao(tela)  # Desenha o botão de confirmar
+
+        # Atualizar e desenhar objetos com movimento
+        for obj in objetos:
+            # Criar um efeito de oscilação suave usando a função seno
+            obj["movimento"] += 0.05  # Aumentar o movimento progressivamente
+            obj["y"] += math.sin(obj["movimento"]) * 2  # Ajuste da posição Y com o efeito oscilatório
+
+            botao = obj["botao"]
+            botao.atualizarImagem(posicaoMouse)
+            botao.desenharBotao(tela)
+
+        # Verificar clique nos objetos
+        for obj in objetos:
+            if obj["botao"].clicarBotao(tela):
+                if obj not in objetosSelecionados:
+                    objetosSelecionados.append(obj)  # Adiciona à lista de objetos selecionados
+                    print(f"Objeto {obj['tipo']} selecionado na posição ({obj['x']}, {obj['y']})!")
+
+        # Verificar clique no botão de confirmar
+        if confirmarBotao.clicarBotao(tela):
+            for obj in objetosSelecionados:
+                if obj["tipo"] == "correto":
+                    imagensCorretasClicadas += 1
+                    if imagensCorretasClicadas == 6:  # Clicou em todas as imagens corretas
+                        jogoGanhou = True
+                elif obj["tipo"] == "incorreto":
+                    imagensIncorretasClicadas += 1
+                    if imagensIncorretasClicadas == 4:  # Clicou em todas as imagens incorretas
+                        jogoPerdeu = True
+                objetos.remove(obj)  # Remove os objetos selecionados
+            objetosSelecionados.clear()  # Limpa a lista de objetos selecionados
+            print("Objetos removidos após clicar no botão confirmar.")
+
         if voltarBotao.clicarBotao(tela):
             print("Voltar clicado")
             estadoJogo = "jogando"
@@ -434,17 +574,14 @@ def fase1():
             print("Configurações clicado")
             abrirConfiguracoes()
 
-        # Desenha as imagens na tela
-        for index, img in enumerate(images):
-            tela.blit(img, (x_offset + (index % max_columns) * spacing, y_offset + (index // max_columns) * spacing))
-
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
+                global rodando
                 rodando = False
                 run = False
 
+        # Atualiza a tela
         pygame.display.update()
-
 
 def fase2():
     global estadoJogo

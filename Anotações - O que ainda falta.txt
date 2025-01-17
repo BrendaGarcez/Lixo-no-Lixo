@@ -9,10 +9,10 @@ Geral de Trabalho
 ---- Mudanças professora ----
 -Layout detalhes p/professor
 -Sobre o jogo + créditos
--Info de total objetos por fase
--Alterar botão confirmar
+-Info de total objetos por fase (em desenvolvimento)
+-Alterar botão confirmar               (Matheus: "Não sei do que se trata")
 -Mudar o você perdeu
--Visibilidade dos itens melhor
+-Visibilidade dos itens melhor (Feito)
 -Mostrar quantos itens tem que selecionar nas fases
 -Colocar limite de tempo
 
@@ -34,21 +34,25 @@ Telas:
 - Organizar tamanhos 
 
 -----Créditos-----
-- particularmente pronto
+- particularmente pronto  (corrigir algumas coisas lá)
+
 -----Configurações-----
 -Estética
+
 -----Sons-----
 -Todos(escolher)
 	- Sons de movimentação
 	- Musica de fundo
 	- Nome dos objetos falados
+
 -----Fase 1-----
--> objetos de cena
--> botão de confirmar
--> mensagens de apoio caso erro e de incentivo caso acerto
--> Lógica do jogo(pontuação, quantidade de itens, tempo)
--> áudio dos nomes
--> legenda paras os itens
+-> objetos de cena (feito)
+-> botão de confirmar (em desenvolvimento)
+-> mensagens de apoio caso erro e de incentivo caso acerto (fazer)
+-> Lógica do jogo(pontuação, quantidade de itens, tempo) (fazer)
+-> áudio dos nomes (fazer)
+-> legenda paras os itens (fazer)
+
 -----Fase 2-----
 -> objetos de cena
 -> botão de confirmar
