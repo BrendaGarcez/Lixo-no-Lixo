@@ -1,5 +1,6 @@
 import pygame  # Importando biblioteca
 import botao  # Importando a classe Botao
+import image
 
 pygame.init()  # Inicializa os módulos do pygame
 
@@ -340,6 +341,8 @@ def iniciarFases():
     fasesBackground = pygame.image.load("imagens/GUI/Backgrounds/menuBackground.jpg")
     tela.blit(fasesBackground,(0,0))
 
+
+    
     # Criando botões para as fases
     fase1Botao = criarBotao(80, 200, "imagens/GUI/botaoFases/botaoZoo0.png", "imagens/GUI/botaoFases/botaoZoo1.png")
     fase2Botao = criarBotao(580, 200, "imagens/GUI/botaoFases/botaoSala0.png", "imagens/GUI/botaoFases/botaoSala1.png")
@@ -389,14 +392,31 @@ def iniciarFases():
         pygame.display.update()
 
 def fase1():
-    global estadoJogo
+    global estadoJogo, rodando
     fase1Background = pygame.image.load("imagens/fase1/imagemZoologico.jpg")
-
+    
+    max_images = 10
+    current_phase = 1  
+    phase_folder = f"imagens/fase{current_phase}"
+    
+    try:
+        image_paths = image.generate_image_sequence(phase_folder, max_images)
+        images = [pygame.image.load(img_path) for img_path in image_paths]
+    except Exception as e:
+        print(f"Erro ao carregar imagens: {e}")
+        return
+    
     voltarBotao = criarBotao(40, 50, "imagens/GUI/botaoVoltar/voltar0.png", "imagens/GUI/botaoVoltar/voltar1.png")
     configuracoesBotao = criarBotao(900, 130, "imagens/GUI/botaoConfiguracoes/configuracoes0.png", "imagens/GUI/botaoConfiguracoes/configuracoes1.png")
     
     run = True
+    x_offset = 100
+    y_offset = 350
+    spacing = 120  # Espaçamento entre as imagens
+    max_columns = 5  # Limita o número de imagens por linha
+
     while run:
+        x_offset = 100  # Reinicia o deslocamento horizontal
         tela.blit(fase1Background, (0, 0))
         posicaoMouse = pygame.mouse.get_pos()
 
@@ -414,14 +434,17 @@ def fase1():
             print("Configurações clicado")
             abrirConfiguracoes()
 
+        # Desenha as imagens na tela
+        for index, img in enumerate(images):
+            tela.blit(img, (x_offset + (index % max_columns) * spacing, y_offset + (index // max_columns) * spacing))
+
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                global rodando
                 rodando = False
                 run = False
 
-        # Atualiza a tela
         pygame.display.update()
+
 
 def fase2():
     global estadoJogo
