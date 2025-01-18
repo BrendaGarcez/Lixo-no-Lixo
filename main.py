@@ -4,6 +4,7 @@ import botaoObjetos
 import image
 import random
 import math
+import time
 
 pygame.init()  # Inicializa os módulos do pygame
 
@@ -414,13 +415,21 @@ def fase1():
     voltarBotao = criarBotao(40, 50, "imagens/GUI/botaoVoltar/voltar0.png", "imagens/GUI/botaoVoltar/voltar1.png")
     configuracoesBotao = criarBotao(900, 130, "imagens/GUI/botaoConfiguracoes/configuracoes0.png", "imagens/GUI/botaoConfiguracoes/configuracoes1.png")
     
+    # Configurações para o texto do temporizador
+    fonte = pygame.font.Font("sons/tipografia/LuckiestGuy-Regular.ttf", 36)
+    cor_texto = (255, 255, 255)  # Branco
+    
     # Configurações para objetos
     largura_tela, altura_tela = tela.get_size()
     centro_x = largura_tela // 3 + 30
-    centro_y = altura_tela // 2
+    centro_y = altura_tela // 2 - 20
     raio_x = largura_tela // 3 + 40
     raio_y = altura_tela // 4
     distancia_minima = 140  # Distância mínima entre objetos
+
+    # Inicializa a fonte para o texto do contador
+    fonte = pygame.font.Font("sons/tipografia/LuckiestGuy-Regular.ttf", 36)  # 'None' usa a fonte padrão; 36 é o tamanho 
+    cor_texto = (255, 255, 255)  # Cor do texto (branco)
 
     # Lista de imagens
     imagensCorretas = [
@@ -512,6 +521,11 @@ def fase1():
     # Criar o botão de confirmar no centro inferior da tela
     confirmarBotao = criarBotao(x_botao_confirmar, y_botao_confirmar, "imagens/GUI/botaoConfirmar/confirmar1.png", "imagens/GUI/botaoConfirmar/confirmar2.png")
 
+     # Configurações do temporizador
+    tempo_inicial = 120  # Tempo inicial em segundos
+    tempo_restante = tempo_inicial
+    tempo_inicializado = pygame.time.get_ticks()  # Registrar o momento em que o temporizador começa
+
     run = True
     while run:
         tela.blit(fase1Background, (0, 0))
@@ -519,10 +533,50 @@ def fase1():
         if jogoPerdeu:
             tela.blit(pygame.image.load("imagens/fase1/perdeuZoologico.jpg"), (0, 0))
             objetos.clear()  # Limpa todos os objetos
-
-        if jogoGanhou:
+            tempo_restante = 0  # Define o tempo como 0 para exibir 00:00
+        elif jogoGanhou:
             tela.blit(pygame.image.load("imagens/fase1/ganhouZoologico.jpg"), (0, 0))
             objetos.clear()  # Limpa todos os objetos
+        else:
+            # Atualizar o tempo restante apenas se o jogo ainda está ativo
+            tempo_decorrido = (pygame.time.get_ticks() - tempo_inicializado) // 1000
+            tempo_restante = max(tempo_inicial - tempo_decorrido, 0)
+
+            if tempo_restante == 0:
+                jogoPerdeu = True
+
+        # Exibir o temporizador
+        minutos = tempo_restante // 60
+        segundos = tempo_restante % 60
+        texto_tempo = f"TEMPO: {minutos:02}:{segundos:02}"
+
+        texto_contorno_tempo = fonte.render(texto_tempo, True, (0, 0, 0))  # Contorno preto
+        texto_preenchimento_tempo = fonte.render(texto_tempo, True, cor_texto)  # Texto branco
+        posicao_tempo = (largura_tela - 240, 20)  # Posição abaixo do contador de objetos
+
+        # Desenhar o texto com contorno
+        tela.blit(texto_contorno_tempo, (posicao_tempo[0] - 1, posicao_tempo[1]))
+        tela.blit(texto_contorno_tempo, (posicao_tempo[0] + 1, posicao_tempo[1]))
+        tela.blit(texto_contorno_tempo, (posicao_tempo[0], posicao_tempo[1] - 1))
+        tela.blit(texto_contorno_tempo, (posicao_tempo[0], posicao_tempo[1] + 1))
+
+        # Desenhar o texto preenchido no centro
+        tela.blit(texto_preenchimento_tempo, posicao_tempo)
+
+        # Renderiza o texto do contador com contorno
+        texto_contorno = fonte.render(f"TOTAL DE OBJETOS: {imagensCorretasClicadas}/6", True, (0, 0, 0))  # Preto para o contorno
+        texto_preenchimento = fonte.render(f"TOTAL DE OBJETOS: {imagensCorretasClicadas}/6", True, cor_texto)  # Cor original
+
+        posicao_texto = (20, 20)  # Posição no canto superior esquerdo
+
+        # Desenhar o texto com deslocamento para criar o contorno
+        tela.blit(texto_contorno, (posicao_texto[0] - 1, posicao_texto[1]))  # Esquerda
+        tela.blit(texto_contorno, (posicao_texto[0] + 1, posicao_texto[1]))  # Direita
+        tela.blit(texto_contorno, (posicao_texto[0], posicao_texto[1] - 1))  # Cima
+        tela.blit(texto_contorno, (posicao_texto[0], posicao_texto[1] + 1))  # Baixo
+
+        # Desenhar o texto preenchido no centro
+        tela.blit(texto_preenchimento, posicao_texto)
 
         posicaoMouse = pygame.mouse.get_pos()
 
@@ -536,10 +590,6 @@ def fase1():
 
         # Atualizar e desenhar objetos com movimento
         for obj in objetos:
-            # Criar um efeito de oscilação suave usando a função seno
-            obj["movimento"] += 0.05  # Aumentar o movimento progressivamente
-            obj["y"] += math.sin(obj["movimento"]) * 2  # Ajuste da posição Y com o efeito oscilatório
-
             botao = obj["botao"]
             botao.atualizarImagem(posicaoMouse)
             botao.desenharBotao(tela)
@@ -547,9 +597,12 @@ def fase1():
         # Verificar clique nos objetos
         for obj in objetos:
             if obj["botao"].clicarBotao(tela):
-                if obj not in objetosSelecionados:
-                    objetosSelecionados.append(obj)  # Adiciona à lista de objetos selecionados
+                # Permitir selecionar apenas um objeto por vez
+                if not objetosSelecionados:  # Verifica se a lista está vazia
+                    objetosSelecionados.append(obj)  # Adiciona o objeto à lista de selecionados
                     print(f"Objeto {obj['tipo']} selecionado na posição ({obj['x']}, {obj['y']})!")
+                else:
+                    print("Já há um objeto selecionado. Clique em confirmar antes de selecionar outro.")
 
         # Verificar clique no botão de confirmar
         if confirmarBotao.clicarBotao(tela):
@@ -562,9 +615,9 @@ def fase1():
                     imagensIncorretasClicadas += 1
                     if imagensIncorretasClicadas == 4:  # Clicou em todas as imagens incorretas
                         jogoPerdeu = True
-                objetos.remove(obj)  # Remove os objetos selecionados
+                objetos.remove(obj)  # Remove o objeto selecionado
             objetosSelecionados.clear()  # Limpa a lista de objetos selecionados
-            print("Objetos removidos após clicar no botão confirmar.")
+            print("Seleção confirmada. Você pode selecionar outro objeto.")
 
         if voltarBotao.clicarBotao(tela):
             print("Voltar clicado")

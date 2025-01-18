@@ -7,22 +7,20 @@ Geral de Trabalho
 
 
 ---- Mudanças professora ----
--Layout detalhes p/professor
--Sobre o jogo + créditos
--Info de total objetos por fase (em desenvolvimento)
--Alterar botão confirmar               (Matheus: "Não sei do que se trata")
--Mudar o você perdeu
--Visibilidade dos itens melhor (Feito)
--Mostrar quantos itens tem que selecionar nas fases
--Colocar limite de tempo
-
-
+-Layout detalhes p/professor 
+-Sobre o jogo + créditos 
+-Info de total objetos por fase (feito)
+-Alterar botão confirmar (feito, mas falta imagem)       
+-Mudar o você perdeu (pedir imagem novas)
+-Visibilidade dos itens melhor (feito?)
+-Mostrar quantos itens tem que selecionar nas fases (feito)
+-Colocar limite de tempo (feito)
 
 
 Geral de aplicativo
 -->>> Design de Lixos, Botões e Tutoriais
 ->>> Tamanho de botões
-->>> 
+->>>  O VOLUME NÃO TÁ FICANDO FIXO AO AUMENTAR OU DIMINUIR, SE CLICAR NAS CONFIG VOLTA A SER 50%
 
 Telas:
 -----Tela Inicial-----
@@ -47,11 +45,13 @@ Telas:
 
 -----Fase 1-----
 -> objetos de cena (feito)
--> botão de confirmar (em desenvolvimento)
+-> botão de confirmar (feito mas melhorar lógica e adicionar coisas para facilitar o uso)
 -> mensagens de apoio caso erro e de incentivo caso acerto (fazer)
--> Lógica do jogo(pontuação, quantidade de itens, tempo) (fazer)
--> áudio dos nomes (fazer)
--> legenda paras os itens (fazer)
+-> Lógica do jogo(pontuação, quantidade de itens, tempo) (falta pontuação)
+-> áudio dos nomes (fazer, mas necessário dos áudios para desenvolver isso)
+-> legenda paras os itens (fazer, talvez alguma lógica com a "colisão do mouse e objeto", dar um pop-out de um texto em cima, dá para usar a fonte bonitinha lá)
+
+LÓGICA DAS PRÓXIMAS FASES SERÁ SEMELHANTE A 1, a 3 precisará mudar um pouco mais
 
 -----Fase 2-----
 -> objetos de cena
