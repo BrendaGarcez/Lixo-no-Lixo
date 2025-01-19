@@ -15,6 +15,8 @@ class BotaoObjetos():
         self.maskAlterada = pygame.mask.from_surface(self.imagemAlterada)
         self.mask = self.maskOriginal  # Inicialmente, a máscara é a original
 
+        self.fatorAumento = 1.05  # Fator de aumento (20% maior)
+
     def desenharBotao(self, tela):
         tela.blit(self.imagem, (self.rect.x, self.rect.y))
     
@@ -47,7 +49,9 @@ class BotaoObjetos():
             largura, altura = self.mask.get_size()  # Obtém as dimensões da máscara
             if 0 <= offset[0] < largura and 0 <= offset[1] < altura:
                 if self.mask.get_at(offset):  # Verifica pixel-perfect
-                    self.imagem = self.imagemAlterada
+                    self.imagem = pygame.transform.scale(self.imagemAlterada, 
+                                                          (int(self.imagemAlterada.get_width() * self.fatorAumento), 
+                                                           int(self.imagemAlterada.get_height() * self.fatorAumento)))
                     self.mask = self.maskAlterada  # Atualiza a máscara para a versão alterada
                 else:
                     self.imagem = self.imagemOriginal

@@ -26,7 +26,9 @@ Telas:
 -----Tela Inicial-----
 - Organização dos Botões
 - Tela de Pontuação (Ainda verificar como fara a área do avaliador)
------Instruções-----
+
+-----Instruções----- 
+- FALTA ARRUMAR TUDO AQUI PRATICAMENTE
 - Troca de tela quando clica no botão de cada fase
 - Tamanho dos botões
 - Organizar tamanhos 
