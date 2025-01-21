@@ -35,22 +35,32 @@ def criarBotaoImagens(x, y, imagem, imagemAlterada):
     
     return botaoObjetos.BotaoObjetos(x, y, imagem, imagemAlterada)
 
+import pygame
+
 def abrirConfiguracoes():
+    pygame.mixer.init()
+    pygame.mixer.music.load("sons/musicafundo.mp3")
+    pygame.mixer.music.set_volume(0.5)
+    pygame.mixer.music.play(-1)  # Música toca em loop
+
+    som_click = pygame.mixer.Sound("sons/mouseclick.wav")
+    som_click.set_volume(0.7)
+
     configuracoesBackground = pygame.image.load("imagens/GUI/Backgrounds/configuracoesBackground.jpg")
     tela.blit(configuracoesBackground, (0, 0))
-    somAtivo = True  # Estado inicial do som (ligado)
+    somAtivo = True  # Estado inicial do som
     volume = 0.5
 
     somLigadoBotao = criarBotao(400, 200, "imagens/GUI/botaoSom/ligado0.png", "imagens/GUI/botaoSom/ligado1.png")
     somDesligadoBotao = criarBotao(400, 200, "imagens/GUI/botaoSom/desligado0.png", "imagens/GUI/botaoSom/desligado1.png")
-    aumentarVolumeBotao = criarBotao(400, 300, "imagens/GUI/botaoSom/aumentar0.png", "imagens/GUI/botaoSom/aumentar1.png")
-    diminuirVolumeBotao = criarBotao(400, 400, "imagens/GUI/botaoSom/diminuir0.png", "imagens/GUI/botaoSom/diminuir1.png")
     voltarBotao = criarBotao(20, 650, "imagens/GUI/botaoVoltar/voltar0.png", "imagens/GUI/botaoVoltar/voltar1.png")
 
     run = True
     while run:
         tela.blit(configuracoesBackground, (0, 0))
         posicaoMouse = pygame.mouse.get_pos()
+        cliqueMouse = pygame.mouse.get_pressed()
+
         # Atualizar e desenhar botões
         if somAtivo:
             somLigadoBotao.atualizarImagem(posicaoMouse)
@@ -59,58 +69,39 @@ def abrirConfiguracoes():
             somDesligadoBotao.atualizarImagem(posicaoMouse)
             somDesligadoBotao.desenharBotao(tela)
 
-        aumentarVolumeBotao.atualizarImagem(posicaoMouse)
-        diminuirVolumeBotao.atualizarImagem(posicaoMouse)
         voltarBotao.atualizarImagem(posicaoMouse)
-
-        aumentarVolumeBotao.desenharBotao(tela)
-        diminuirVolumeBotao.desenharBotao(tela)
         voltarBotao.desenharBotao(tela)
 
-        # Exibir nível de volume na tela com contorno
+        # Barra de volume
+        barra_x, barra_y = 400, 300
+        barra_largura, barra_altura = 300, 10
+        pygame.draw.rect(tela, (100, 100, 100), (barra_x, barra_y, barra_largura, barra_altura))  # Fundo da barra
+        pygame.draw.rect(tela, (0, 200, 0), (barra_x, barra_y, int(volume * barra_largura), barra_altura))  # Barra de volume
+        pygame.draw.circle(tela, (255, 0, 0), (barra_x + int(volume * barra_largura), barra_y + barra_altura // 2), 10)  # Indicador do volume
+
+        if cliqueMouse[0] and barra_x <= posicaoMouse[0] <= barra_x + barra_largura and barra_y - 10 <= posicaoMouse[1] <= barra_y + barra_altura + 10:
+            volume = (posicaoMouse[0] - barra_x) / barra_largura
+            volume = max(0, min(volume, 1))
+            pygame.mixer.music.set_volume(volume)
+
+        # Texto do volume
         fonte = pygame.font.Font(None, 36)
         texto_volume = f"Volume: {int(volume * 100)}%"
-        texto_contorno = fonte.render(texto_volume, True, (0, 0, 0))  # Cor do contorno (preto)
-        texto_preenchimento = fonte.render(texto_volume, True, (255, 255, 255))  # Cor do texto (branco)
+        texto_renderizado = fonte.render(texto_volume, True, (255, 255, 255))
+        tela.blit(texto_renderizado, (barra_x + barra_largura + 20, barra_y - 10))
 
-        # Posição do texto
-        x, y = 500, 500
-
-        # Desenhar contorno
-        tela.blit(texto_contorno, (x - 1, y))  # Esquerda
-        tela.blit(texto_contorno, (x + 1, y))  # Direita
-        tela.blit(texto_contorno, (x, y - 1))  # Cima
-        tela.blit(texto_contorno, (x, y + 1))  # Baixo
-
-        # Desenhar texto principal
-        tela.blit(texto_preenchimento, (x, y))
-
-        # Verificar cliques nos botões
+        # Verificar cliques
         if somAtivo and somLigadoBotao.clicarBotao(tela):
-            print("Som desligado")
             somAtivo = False
-            pygame.mixer.music.pause()  # Pausa a música
+            pygame.mixer.music.pause()
+            som_click.play()  # Som de clique
         elif not somAtivo and somDesligadoBotao.clicarBotao(tela):
-            print("Som ligado")
             somAtivo = True
-            pygame.mixer.music.unpause()  # Retoma a música
-
-        if aumentarVolumeBotao.clicarBotao(tela):
-            if volume < 1.0:
-                volume += 0.1
-                volume = round(volume, 1)  # Limita o volume em 1 casa decimal
-                pygame.mixer.music.set_volume(volume)
-                print(f"Aumentando volume para {int(volume * 100)}%")
-
-        if diminuirVolumeBotao.clicarBotao(tela):
-            if volume > 0.0:
-                volume -= 0.1
-                volume = round(volume, 1)
-                pygame.mixer.music.set_volume(volume)
-                print(f"Diminuindo volume para {int(volume * 100)}%")
+            pygame.mixer.music.unpause()
+            som_click.play()  # Som de clique
 
         if voltarBotao.clicarBotao(tela):
-            print("Voltando") # tem q corrigr pois essa opção pode ser clicada durante a fase, e vc ao voltar continua o andamento dela
+            som_click.play()  # Som de clique
             run = False
 
         for event in pygame.event.get():
@@ -120,6 +111,7 @@ def abrirConfiguracoes():
                 run = False
 
         pygame.display.update()
+
 
 
 
