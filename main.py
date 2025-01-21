@@ -51,8 +51,8 @@ def abrirConfiguracoes():
     somAtivo = True  # Estado inicial do som
     volume = 0.5
 
-    somLigadoBotao = criarBotao(400, 200, "imagens/GUI/botaoSom/ligado0.png", "imagens/GUI/botaoSom/ligado1.png")
-    somDesligadoBotao = criarBotao(400, 200, "imagens/GUI/botaoSom/desligado0.png", "imagens/GUI/botaoSom/desligado1.png")
+    somLigadoBotao = criarBotao(510, 200, "imagens/GUI/botaoSom/ligado0.png", "imagens/GUI/botaoSom/ligado1.png")
+    somDesligadoBotao = criarBotao(510, 200, "imagens/GUI/botaoSom/desligado0.png", "imagens/GUI/botaoSom/desligado1.png")
     voltarBotao = criarBotao(20, 650, "imagens/GUI/botaoVoltar/voltar0.png", "imagens/GUI/botaoVoltar/voltar1.png")
 
     run = True
@@ -76,8 +76,8 @@ def abrirConfiguracoes():
         barra_x, barra_y = 400, 300
         barra_largura, barra_altura = 300, 10
         pygame.draw.rect(tela, (100, 100, 100), (barra_x, barra_y, barra_largura, barra_altura))  # Fundo da barra
-        pygame.draw.rect(tela, (0, 200, 0), (barra_x, barra_y, int(volume * barra_largura), barra_altura))  # Barra de volume
-        pygame.draw.circle(tela, (255, 0, 0), (barra_x + int(volume * barra_largura), barra_y + barra_altura // 2), 10)  # Indicador do volume
+        pygame.draw.rect(tela, (139, 69, 19), (barra_x, barra_y, int(volume * barra_largura), barra_altura))  # Barra de volume
+        pygame.draw.circle(tela, (139, 50, 17), (barra_x + int(volume * barra_largura), barra_y + barra_altura // 2), 10)  # Indicador do volume
 
         if cliqueMouse[0] and barra_x <= posicaoMouse[0] <= barra_x + barra_largura and barra_y - 10 <= posicaoMouse[1] <= barra_y + barra_altura + 10:
             volume = (posicaoMouse[0] - barra_x) / barra_largura
@@ -530,8 +530,8 @@ def fase1():
     posicionar_objetos(imagensIncorretasSelecionadas, "incorreto")
 
     # Calcular a posição centralizada para o botão de confirmar na parte inferior
-    largura_botao_confirmar = 200  # Tamanho estimado do botão (ajuste conforme necessário)
-    altura_botao_confirmar = 50    # Altura estimada do botão (ajuste conforme necessário)
+    largura_botao_confirmar = 56  # Tamanho estimado do botão (ajuste conforme necessário)
+    altura_botao_confirmar = 56    # Altura estimada do botão (ajuste conforme necessário)
     x_botao_confirmar = (largura_tela - 60 - largura_botao_confirmar) // 2  # Centraliza na horizontal
     y_botao_confirmar = altura_tela - altura_botao_confirmar - 35      # Posiciona perto da parte inferior
     
