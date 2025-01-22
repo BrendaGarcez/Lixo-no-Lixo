@@ -45,7 +45,7 @@ def tocar_musica(nova_musica): # FUNÇÃO DA MÚSICA DE FUNDO
     if musica_atual != nova_musica:  # Só troca se a música for diferente
         pygame.mixer.music.stop()  # Para a música atual
         pygame.mixer.music.load(nova_musica)  # Carrega a nova música
-        pygame.mixer.music.set_volume(0.2)
+        pygame.mixer.music.set_volume(0.35)
         pygame.mixer.music.play(-1)  # Toca em loop
         musica_atual = nova_musica  # Atualiza a música atual
 
@@ -54,7 +54,9 @@ def abrirConfiguracoes():
 
     configuracoesBackground = pygame.image.load("imagens/GUI/Backgrounds/configuracoesBackground.jpg")
     tela.blit(configuracoesBackground, (0, 0))
-    volume = 0.5
+
+    # Defina o volume atual como o valor de pygame.mixer.music.get_volume(), que é entre 0 e 1
+    volume = pygame.mixer.music.get_volume()  # Obter o volume atual
 
     somLigadoBotao = criarBotao(510, 200, "imagens/GUI/botaoSom/ligado0.png", "imagens/GUI/botaoSom/ligado1.png")
     somDesligadoBotao = criarBotao(510, 200, "imagens/GUI/botaoSom/desligado0.png", "imagens/GUI/botaoSom/desligado1.png")
@@ -87,7 +89,7 @@ def abrirConfiguracoes():
         if cliqueMouse[0] and barra_x <= posicaoMouse[0] <= barra_x + barra_largura and barra_y - 10 <= posicaoMouse[1] <= barra_y + barra_altura + 10:
             volume = (posicaoMouse[0] - barra_x) / barra_largura
             volume = max(0, min(volume, 1))
-            pygame.mixer.music.set_volume(volume)
+            pygame.mixer.music.set_volume(volume)  # Atualiza o volume
 
         # Texto do volume
         fonte = pygame.font.Font(None, 36)
@@ -116,6 +118,7 @@ def abrirConfiguracoes():
                 run = False
 
         pygame.display.update()
+
 
 def abrirInstrucoes():
     global estadoJogo
