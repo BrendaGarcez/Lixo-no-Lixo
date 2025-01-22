@@ -45,9 +45,14 @@ def tocar_musica(nova_musica): # FUNÇÃO DA MÚSICA DE FUNDO
     if musica_atual != nova_musica:  # Só troca se a música for diferente
         pygame.mixer.music.stop()  # Para a música atual
         pygame.mixer.music.load(nova_musica)  # Carrega a nova música
-        pygame.mixer.music.set_volume(0.35)
+        pygame.mixer.music.set_volume(0.3)
         pygame.mixer.music.play(-1)  # Toca em loop
         musica_atual = nova_musica  # Atualiza a música atual
+        
+def tocar_efeito_sonoro(efeito):
+    if somAtivo:  # Verifica se os sons estão ativos
+        efeito_sonoro = pygame.mixer.Sound(efeito)
+        efeito_sonoro.play()  # Toca o efeito sonoro sem parar a música de fundo
 
 def abrirConfiguracoes():
     global somAtivo
@@ -715,16 +720,14 @@ def fase1():
                     if imagensCorretasClicadas == 6:  # Clicou em todas as imagens corretas
                         jogoGanhou = True
                     # Tocar som de resposta certa
-                    pygame.mixer.music.load("sons/somObjetoCorreto/respostaCerta.mp3")
-                    pygame.mixer.music.play()     
+                    tocar_efeito_sonoro("sons/somObjetoCorreto/respostaCerta.mp3")
                 elif obj["tipo"] == "incorreto":
                     imagensIncorretasClicadas += 1
                     vidas -= 1  # Perde uma vida a cada erro
                     if vidas == 0:
                         jogoPerdeu = True
                     # Tocar som de resposta errada
-                    pygame.mixer.music.load("sons/somObjetoIncorreto/respostaErrada.mp3")
-                    pygame.mixer.music.play()    
+                    tocar_efeito_sonoro("sons/somObjetoIncorreto/respostaErrada.mp3")
                 objetos.remove(obj)  # Remove o objeto selecionado
             objetosSelecionados.clear()  # Limpa a lista de objetos selecionados
             print("Seleção confirmada. Você pode selecionar outro objeto.")
@@ -1024,20 +1027,17 @@ def fase2():
                     if imagensCorretasClicadas == 6:  # Clicou em todas as imagens corretas
                         jogoGanhou = True
                     # Tocar som de resposta certa
-                    pygame.mixer.music.load("sons/somObjetoCorreto/respostaCerta.mp3")
-                    pygame.mixer.music.play()        
+                    tocar_efeito_sonoro("sons/somObjetoCorreto/respostaCerta.mp3")
                 elif obj["tipo"] == "incorreto":
                     imagensIncorretasClicadas += 1
                     vidas -= 1  # Perde uma vida a cada erro
                     if vidas == 0:
                         jogoPerdeu = True
                     # Tocar som de resposta errada
-                    pygame.mixer.music.load("sons/somObjetoIncorreto/respostaErrada.mp3")
-                    pygame.mixer.music.play()        
+                    tocar_efeito_sonoro("sons/somObjetoIncorreto/respostaErrada.mp3")
                 objetos.remove(obj)  # Remove o objeto selecionado
             objetosSelecionados.clear()  # Limpa a lista de objetos selecionados
             print("Seleção confirmada. Você pode selecionar outro objeto.")
-
 
         if voltarBotao.clicarBotao(tela):
             som_click.play()  # Som de clique
