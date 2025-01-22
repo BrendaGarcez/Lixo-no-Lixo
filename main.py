@@ -14,7 +14,12 @@ telaAltura = 720
 tela = pygame.display.set_mode((telaLargura, telaAltura))  # Configuração da tela
 pygame.display.set_caption("Lixo_No_Lixo")  # Nome do jogo
 
-# Estado do jogo
+som_click = pygame.mixer.Sound("sons/somClickMouse/mouseclick.wav")
+som_click.set_volume(0.3)
+somAtivo = True  # Estado inicial do som
+musica_atual = None
+pygame.mixer.init()
+
 estadoJogo = "menu"  # situação atual do jogo, para rastrear as telas
 rodando = True  # Controla se o programa deve continuar rodando
 
@@ -35,20 +40,20 @@ def criarBotaoImagens(x, y, imagem, imagemAlterada):
     
     return botaoObjetos.BotaoObjetos(x, y, imagem, imagemAlterada)
 
-import pygame
+def tocar_musica(nova_musica): # FUNÇÃO DA MÚSICA DE FUNDO
+    global musica_atual
+    if musica_atual != nova_musica:  # Só troca se a música for diferente
+        pygame.mixer.music.stop()  # Para a música atual
+        pygame.mixer.music.load(nova_musica)  # Carrega a nova música
+        pygame.mixer.music.set_volume(0.2)
+        pygame.mixer.music.play(-1)  # Toca em loop
+        musica_atual = nova_musica  # Atualiza a música atual
 
 def abrirConfiguracoes():
-    pygame.mixer.init()
-    pygame.mixer.music.load("sons/musicafundo.mp3")
-    pygame.mixer.music.set_volume(0.5)
-    pygame.mixer.music.play(-1)  # Música toca em loop
-
-    som_click = pygame.mixer.Sound("sons/mouseclick.wav")
-    som_click.set_volume(0.7)
+    global somAtivo
 
     configuracoesBackground = pygame.image.load("imagens/GUI/Backgrounds/configuracoesBackground.jpg")
     tela.blit(configuracoesBackground, (0, 0))
-    somAtivo = True  # Estado inicial do som
     volume = 0.5
 
     somLigadoBotao = criarBotao(510, 200, "imagens/GUI/botaoSom/ligado0.png", "imagens/GUI/botaoSom/ligado1.png")
@@ -92,13 +97,13 @@ def abrirConfiguracoes():
 
         # Verificar cliques
         if somAtivo and somLigadoBotao.clicarBotao(tela):
+            som_click.play()  # Som de clique
             somAtivo = False
             pygame.mixer.music.pause()
-            som_click.play()  # Som de clique
         elif not somAtivo and somDesligadoBotao.clicarBotao(tela):
+            som_click.play()  # Som de clique
             somAtivo = True
             pygame.mixer.music.unpause()
-            som_click.play()  # Som de clique
 
         if voltarBotao.clicarBotao(tela):
             som_click.play()  # Som de clique
@@ -111,9 +116,6 @@ def abrirConfiguracoes():
                 run = False
 
         pygame.display.update()
-
-
-
 
 def abrirInstrucoes():
     global estadoJogo
@@ -204,10 +206,13 @@ def abrirInstrucoes():
 
         # Verificar cliques nos botões
         if voltarBotao.clicarBotao(tela):
+            som_click.play()  # Som de clique
             print("Voltando ao menu principal")
             estadoJogo = "menu"
             run = False
+
         if configuracoesBotao.clicarBotao(tela):
+            som_click.play()  # Som de clique
             print("Configurações clicado")
             abrirConfiguracoes()
 
@@ -237,7 +242,6 @@ def abrirInstrucoes():
                                               (event.pos[1] - posicao_quadro[1]) * (altura_conteudo / altura_quadro)))
 
         pygame.display.update()
-
 
 
 def abrirCreditos():
@@ -327,10 +331,12 @@ def abrirCreditos():
         pygame.draw.rect(tela, (236, 155, 94), (barra_x, barra_y, barra_largura, barra_altura), border_radius=5)
 
         if voltarBotao.clicarBotao(tela):
+            som_click.play()  # Som de clique
             print("Voltando ao menu principal")
             estadoJogo = "menu"
             run = False
         if configuracoesBotao.clicarBotao(tela):
+            som_click.play()  # Som de clique
             print("Configurações clicado")
             abrirConfiguracoes()
 
@@ -371,7 +377,10 @@ def iniciarFases():
     global estadoJogo
     fasesBackground = pygame.image.load("imagens/GUI/Backgrounds/menuBackground.jpg")
     tela.blit(fasesBackground,(0,0))
-
+    
+    if somAtivo:
+        tocar_musica("sons/musicaMenu/musicafundo.mp3")
+        
     # Criando botões para as fases
     fase1Botao = criarBotao(80, 200, "imagens/GUI/botaoFases/botaoZoo0.png", "imagens/GUI/botaoFases/botaoZoo1.png")
     fase2Botao = criarBotao(580, 200, "imagens/GUI/botaoFases/botaoSala0.png", "imagens/GUI/botaoFases/botaoSala1.png")
@@ -396,18 +405,22 @@ def iniciarFases():
 
         # Verificar cliques
         if fase1Botao.clicarBotao(tela):
+            som_click.play()  # Som de clique
             print("Fase 1 selecionada")
             estadoJogo = "fase1"
             run = False
         if fase2Botao.clicarBotao(tela):
+            som_click.play()  # Som de clique
             print("Fase 2 selecionada")
             estadoJogo = "fase2"
             run = False
         if fase3Botao.clicarBotao(tela):
+            som_click.play()  # Som de clique
             print("Fase 3 selecionada")
             estadoJogo = "fase3"
             run = False
         if voltarBotao.clicarBotao(tela):
+            som_click.play()  # Som de clique
             print("Voltar clicado")
             estadoJogo = "menu"
             run = False
@@ -423,6 +436,10 @@ def iniciarFases():
 def fase1():
     global estadoJogo
     fase1Background = pygame.image.load("imagens/fase1/imagemZoologico.jpg")
+
+    # Verificar som
+    if somAtivo:
+        tocar_musica("sons/musicaZoo/fundoZoo.mp3")  # Toca a primeira música
 
     voltarBotao = criarBotao(20, 650, "imagens/GUI/botaoVoltar/voltar0.png", "imagens/GUI/botaoVoltar/voltar1.png")
     configuracoesBotao = criarBotao(940, 660, "imagens/GUI/botaoConfiguracoes/configuracoes0.png", "imagens/GUI/botaoConfiguracoes/configuracoes1.png")
@@ -543,6 +560,7 @@ def fase1():
     tempo_restante = tempo_inicial
     tempo_inicializado = pygame.time.get_ticks()  # Registrar o momento em que o temporizador começa
     
+    mostrar_informacoes = True
     run = True
     while run:
         tela.blit(fase1Background, (0, 0))
@@ -577,8 +595,29 @@ def fase1():
 
         # Desenhar o texto preenchido no centro
         tela.blit(texto_vidas_preenchimento, posicao_vidas)
+
+        # Adicionar o botão "Tentar Novamente" para as telas de vitória e derrota
+        botaoTentarNovamente = criarBotao(
+            405,  # Centraliza horizontalmente
+            380,  # Posiciona um pouco abaixo do texto
+            "imagens/GUI/botaoTentarnovamente/tentarnovamente.png",
+            "imagens/GUI/botaoTentarnovamente/tentarnovamente.png"
+        )
+
         # Se o jogo foi ganho ou perdido, exibe o tempo total e o número de objetos errados
         if jogoGanhou or jogoPerdeu:
+            mostrar_informacoes = False
+            # Desenhar o botão "Tentar Novamente"
+            botaoTentarNovamente.atualizarImagem(posicaoMouse)
+            botaoTentarNovamente.desenharBotao(tela)
+
+            # Verificar clique no botão "Tentar Novamente"
+            if botaoTentarNovamente.clicarBotao(tela):
+                som_click.play()  # Tocar o som de clique
+                print("Botão 'Tentar Novamente' clicado.")
+                run = False  # Sai do loop atual
+                fase1()  # Reinicia a fase
+            
             tempo_total = tempo_inicial - tempo_restante  # Tempo total que o jogador levou
             erros = imagensIncorretasClicadas  # Número de objetos errados que o jogador clicou
             
@@ -588,7 +627,7 @@ def fase1():
             # Renderizando o texto para mostrar no centro da tela
             texto_contorno_conclusao = fonte.render(texto_conclusao, True, (0, 0, 0))  # Contorno preto
             texto_preenchimento_conclusao = fonte.render(texto_conclusao, True, cor_texto)  # Texto branco
-            posicao_conclusao = (largura_tela // 2 - texto_contorno_conclusao.get_width() // 2, altura_tela // 2)  # Centraliza o texto
+            posicao_conclusao = (largura_tela // 2 - texto_contorno_conclusao.get_width() // 2, altura_tela // 2 - 50)  # Centraliza o texto
 
             # Desenhar o texto com contorno
             tela.blit(texto_contorno_conclusao, (posicao_conclusao[0] - 1, posicao_conclusao[1]))
@@ -599,48 +638,52 @@ def fase1():
             # Desenhar o texto preenchido no centro
             tela.blit(texto_preenchimento_conclusao, posicao_conclusao)
 
-        # Exibir o temporizador
-        minutos = tempo_restante // 60
-        segundos = tempo_restante % 60
-        texto_tempo = f"TEMPO: {minutos:02}:{segundos:02}"
+        if mostrar_informacoes:
+            # Exibir o temporizador
+            minutos = tempo_restante // 60
+            segundos = tempo_restante % 60
+            texto_tempo = f"TEMPO: {minutos:02}:{segundos:02}"
 
-        texto_contorno_tempo = fonte.render(texto_tempo, True, (0, 0, 0))  # Contorno preto
-        texto_preenchimento_tempo = fonte.render(texto_tempo, True, cor_texto)  # Texto branco
-        posicao_tempo = (780, 130)  # Posição abaixo do contador de objetos
+            texto_contorno_tempo = fonte.render(texto_tempo, True, (0, 0, 0))  # Contorno preto
+            texto_preenchimento_tempo = fonte.render(texto_tempo, True, cor_texto)  # Texto branco
+            posicao_tempo = (780, 130)  # Posição abaixo do contador de objetos
 
-        # Desenhar o texto com contorno
-        tela.blit(texto_contorno_tempo, (posicao_tempo[0] - 1, posicao_tempo[1]))
-        tela.blit(texto_contorno_tempo, (posicao_tempo[0] + 1, posicao_tempo[1]))
-        tela.blit(texto_contorno_tempo, (posicao_tempo[0], posicao_tempo[1] - 1))
-        tela.blit(texto_contorno_tempo, (posicao_tempo[0], posicao_tempo[1] + 1))
+            # Desenhar o texto com contorno
+            tela.blit(texto_contorno_tempo, (posicao_tempo[0] - 1, posicao_tempo[1]))
+            tela.blit(texto_contorno_tempo, (posicao_tempo[0] + 1, posicao_tempo[1]))
+            tela.blit(texto_contorno_tempo, (posicao_tempo[0], posicao_tempo[1] - 1))
+            tela.blit(texto_contorno_tempo, (posicao_tempo[0], posicao_tempo[1] + 1))
 
-        # Desenhar o texto preenchido no centro
-        tela.blit(texto_preenchimento_tempo, posicao_tempo)
+            # Desenhar o texto preenchido no centro
+            tela.blit(texto_preenchimento_tempo, posicao_tempo)
 
-        # Renderiza o texto do contador com contorno
-        texto_contorno = fonte.render(f"TOTAL DE OBJETOS: {imagensCorretasClicadas}/6", True, (0, 0, 0))  # Preto para o contorno
-        texto_preenchimento = fonte.render(f"TOTAL DE OBJETOS: {imagensCorretasClicadas}/6", True, cor_texto)  # Cor original
+            # Renderiza o texto do contador com contorno
+            texto_contorno = fonte.render(f"TOTAL DE OBJETOS: {imagensCorretasClicadas}/6", True, (0, 0, 0))  # Preto para o contorno
+            texto_preenchimento = fonte.render(f"TOTAL DE OBJETOS: {imagensCorretasClicadas}/6", True, cor_texto)  # Cor original
 
-        posicao_texto = (120, 130)  # Posição no canto superior esquerdo
+            posicao_texto = (120, 130)  # Posição no canto superior esquerdo
 
-        # Desenhar o texto com deslocamento para criar o contorno
-        tela.blit(texto_contorno, (posicao_texto[0] - 1, posicao_texto[1]))  # Esquerda
-        tela.blit(texto_contorno, (posicao_texto[0] + 1, posicao_texto[1]))  # Direita
-        tela.blit(texto_contorno, (posicao_texto[0], posicao_texto[1] - 1))  # Cima
-        tela.blit(texto_contorno, (posicao_texto[0], posicao_texto[1] + 1))  # Baixo
+            # Desenhar o texto com deslocamento para criar o contorno
+            tela.blit(texto_contorno, (posicao_texto[0] - 1, posicao_texto[1]))  # Esquerda
+            tela.blit(texto_contorno, (posicao_texto[0] + 1, posicao_texto[1]))  # Direita
+            tela.blit(texto_contorno, (posicao_texto[0], posicao_texto[1] - 1))  # Cima
+            tela.blit(texto_contorno, (posicao_texto[0], posicao_texto[1] + 1))  # Baixo
 
-        # Desenhar o texto preenchido no centro
-        tela.blit(texto_preenchimento, posicao_texto)
+            # Desenhar o texto preenchido no centro
+            tela.blit(texto_preenchimento, posicao_texto)
 
         posicaoMouse = pygame.mouse.get_pos()
 
         voltarBotao.atualizarImagem(posicaoMouse)
         configuracoesBotao.atualizarImagem(posicaoMouse)
-        confirmarBotao.atualizarImagem(posicaoMouse)  # Atualiza a imagem do botão de confirmar
 
         voltarBotao.desenharBotao(tela)
         configuracoesBotao.desenharBotao(tela)
-        confirmarBotao.desenharBotao(tela)  # Desenha o botão de confirmar
+
+        # Apenas processa o botão confirmar se o jogo ainda não foi ganho ou perdido
+        if not jogoGanhou and not jogoPerdeu:
+            confirmarBotao.atualizarImagem(posicaoMouse)  # Atualiza a imagem do botão de confirmar
+            confirmarBotao.desenharBotao(tela)  # Desenha o botão de confirmar
 
         # Atualizar e desenhar objetos com movimento
         for obj in objetos:
@@ -651,6 +694,7 @@ def fase1():
         # Verificar clique nos objetos
         for obj in objetos:
             if obj["botao"].clicarBotao(tela):
+                som_click.play()  # Som de clique
                 # Substituir o objeto selecionado
                 if objetosSelecionados:
                     print(f"Objeto {objetosSelecionados[0]['tipo']} desmarcado.")
@@ -661,28 +705,35 @@ def fase1():
 
         # Verificar clique no botão de confirmar
         if confirmarBotao.clicarBotao(tela):
+            som_click.play()  # Som de clique
             for obj in objetosSelecionados:
                 if obj["tipo"] == "correto":
                     imagensCorretasClicadas += 1
                     if imagensCorretasClicadas == 6:  # Clicou em todas as imagens corretas
                         jogoGanhou = True
+                    # Tocar som de resposta certa
+                    pygame.mixer.music.load("sons/somObjetoCorreto/respostaCerta.mp3")
+                    pygame.mixer.music.play()     
                 elif obj["tipo"] == "incorreto":
                     imagensIncorretasClicadas += 1
                     vidas -= 1  # Perde uma vida a cada erro
                     if vidas == 0:
                         jogoPerdeu = True
+                    # Tocar som de resposta errada
+                    pygame.mixer.music.load("sons/somObjetoIncorreto/respostaErrada.mp3")
+                    pygame.mixer.music.play()    
                 objetos.remove(obj)  # Remove o objeto selecionado
             objetosSelecionados.clear()  # Limpa a lista de objetos selecionados
             print("Seleção confirmada. Você pode selecionar outro objeto.")
 
-
-
         if voltarBotao.clicarBotao(tela):
+            som_click.play()  # Som de clique
             print("Voltar clicado")
             estadoJogo = "jogando"
             run = False
 
         if configuracoesBotao.clicarBotao(tela):
+            som_click.play()  # Som de clique
             print("Configurações clicado")
             abrirConfiguracoes()
         for event in pygame.event.get():
@@ -697,6 +748,10 @@ def fase1():
 def fase2():
     global estadoJogo
     fase1Background = pygame.image.load("imagens/fase2/imagemSaladeAula.jpg")
+
+    # Verificar som
+    if somAtivo:
+        tocar_musica("sons/musicaSala/fundoSala.mp3")  # Toca a primeira música
 
     voltarBotao = criarBotao(20, 650, "imagens/GUI/botaoVoltar/voltar0.png", "imagens/GUI/botaoVoltar/voltar1.png")
     configuracoesBotao = criarBotao(940, 660, "imagens/GUI/botaoConfiguracoes/configuracoes0.png", "imagens/GUI/botaoConfiguracoes/configuracoes1.png")
@@ -813,6 +868,8 @@ def fase2():
     tempo_inicializado = pygame.time.get_ticks()  # Registrar o momento em que o temporizador começa
 
     run = True
+    mostrar_informacoes = True
+
     while run:
         tela.blit(fase1Background, (0, 0))
         if jogoPerdeu:
@@ -847,8 +904,29 @@ def fase2():
         # Desenhar o texto preenchido no centro
         tela.blit(texto_vidas_preenchimento, posicao_vidas)
 
+        # Adicionar o botão "Tentar Novamente" para as telas de vitória e derrota
+        botaoTentarNovamente = criarBotao(
+            405,  # Centraliza horizontalmente
+            380,  # Posiciona um pouco abaixo do texto
+            "imagens/GUI/botaoTentarnovamente/tentarnovamente.png",
+            "imagens/GUI/botaoTentarnovamente/tentarnovamente.png"
+        )
+
         # Se o jogo foi ganho ou perdido, exibe o tempo total e o número de objetos errados
         if jogoGanhou or jogoPerdeu:
+            mostrar_informacoes = False
+
+            # Desenhar o botão "Tentar Novamente"
+            botaoTentarNovamente.atualizarImagem(posicaoMouse)
+            botaoTentarNovamente.desenharBotao(tela)
+
+            # Verificar clique no botão "Tentar Novamente"
+            if botaoTentarNovamente.clicarBotao(tela):
+                som_click.play()  # Tocar o som de clique
+                print("Botão 'Tentar Novamente' clicado.")
+                run = False  # Sai do loop atual
+                fase2()  # Reinicia a fase
+
             tempo_total = tempo_inicial - tempo_restante  # Tempo total que o jogador levou
             erros = imagensIncorretasClicadas  # Número de objetos errados que o jogador clicou
             
@@ -858,7 +936,7 @@ def fase2():
             # Renderizando o texto para mostrar no centro da tela
             texto_contorno_conclusao = fonte.render(texto_conclusao, True, (0, 0, 0))  # Contorno preto
             texto_preenchimento_conclusao = fonte.render(texto_conclusao, True, cor_texto)  # Texto branco
-            posicao_conclusao = (largura_tela // 2 - texto_contorno_conclusao.get_width() // 2, altura_tela // 2)  # Centraliza o texto
+            posicao_conclusao = (largura_tela // 2 - texto_contorno_conclusao.get_width() // 2, altura_tela // 2 - 50)  # Centraliza o texto
 
             # Desenhar o texto com contorno
             tela.blit(texto_contorno_conclusao, (posicao_conclusao[0] - 1, posicao_conclusao[1]))
@@ -869,48 +947,52 @@ def fase2():
             # Desenhar o texto preenchido no centro
             tela.blit(texto_preenchimento_conclusao, posicao_conclusao)
 
-        # Exibir o temporizador
-        minutos = tempo_restante // 60
-        segundos = tempo_restante % 60
-        texto_tempo = f"TEMPO: {minutos:02}:{segundos:02}"
+        if mostrar_informacoes:
+            # Exibir o temporizador
+            minutos = tempo_restante // 60
+            segundos = tempo_restante % 60
+            texto_tempo = f"TEMPO: {minutos:02}:{segundos:02}"
 
-        texto_contorno_tempo = fonte.render(texto_tempo, True, (0, 0, 0))  # Contorno preto
-        texto_preenchimento_tempo = fonte.render(texto_tempo, True, cor_texto)  # Texto branco
-        posicao_tempo = (780, 130)  # Posição abaixo do contador de objetos
+            texto_contorno_tempo = fonte.render(texto_tempo, True, (0, 0, 0))  # Contorno preto
+            texto_preenchimento_tempo = fonte.render(texto_tempo, True, cor_texto)  # Texto branco
+            posicao_tempo = (780, 130)  # Posição abaixo do contador de objetos
 
-        # Desenhar o texto com contorno
-        tela.blit(texto_contorno_tempo, (posicao_tempo[0] - 1, posicao_tempo[1]))
-        tela.blit(texto_contorno_tempo, (posicao_tempo[0] + 1, posicao_tempo[1]))
-        tela.blit(texto_contorno_tempo, (posicao_tempo[0], posicao_tempo[1] - 1))
-        tela.blit(texto_contorno_tempo, (posicao_tempo[0], posicao_tempo[1] + 1))
+            # Desenhar o texto com contorno
+            tela.blit(texto_contorno_tempo, (posicao_tempo[0] - 1, posicao_tempo[1]))
+            tela.blit(texto_contorno_tempo, (posicao_tempo[0] + 1, posicao_tempo[1]))
+            tela.blit(texto_contorno_tempo, (posicao_tempo[0], posicao_tempo[1] - 1))
+            tela.blit(texto_contorno_tempo, (posicao_tempo[0], posicao_tempo[1] + 1))
 
-        # Desenhar o texto preenchido no centro
-        tela.blit(texto_preenchimento_tempo, posicao_tempo)
+            # Desenhar o texto preenchido no centro
+            tela.blit(texto_preenchimento_tempo, posicao_tempo)
 
-        # Renderiza o texto do contador com contorno
-        texto_contorno = fonte.render(f"TOTAL DE OBJETOS: {imagensCorretasClicadas}/6", True, (0, 0, 0))  # Preto para o contorno
-        texto_preenchimento = fonte.render(f"TOTAL DE OBJETOS: {imagensCorretasClicadas}/6", True, cor_texto)  # Cor original
+            # Renderiza o texto do contador com contorno
+            texto_contorno = fonte.render(f"TOTAL DE OBJETOS: {imagensCorretasClicadas}/6", True, (0, 0, 0))  # Preto para o contorno
+            texto_preenchimento = fonte.render(f"TOTAL DE OBJETOS: {imagensCorretasClicadas}/6", True, cor_texto)  # Cor original
 
-        posicao_texto = (120, 130)  # Posição no canto superior esquerdo
+            posicao_texto = (120, 130)  # Posição no canto superior esquerdo
 
-        # Desenhar o texto com deslocamento para criar o contorno
-        tela.blit(texto_contorno, (posicao_texto[0] - 1, posicao_texto[1]))  # Esquerda
-        tela.blit(texto_contorno, (posicao_texto[0] + 1, posicao_texto[1]))  # Direita
-        tela.blit(texto_contorno, (posicao_texto[0], posicao_texto[1] - 1))  # Cima
-        tela.blit(texto_contorno, (posicao_texto[0], posicao_texto[1] + 1))  # Baixo
+            # Desenhar o texto com deslocamento para criar o contorno
+            tela.blit(texto_contorno, (posicao_texto[0] - 1, posicao_texto[1]))  # Esquerda
+            tela.blit(texto_contorno, (posicao_texto[0] + 1, posicao_texto[1]))  # Direita
+            tela.blit(texto_contorno, (posicao_texto[0], posicao_texto[1] - 1))  # Cima
+            tela.blit(texto_contorno, (posicao_texto[0], posicao_texto[1] + 1))  # Baixo
 
-        # Desenhar o texto preenchido no centro
-        tela.blit(texto_preenchimento, posicao_texto)
+            # Desenhar o texto preenchido no centro
+            tela.blit(texto_preenchimento, posicao_texto)
 
         posicaoMouse = pygame.mouse.get_pos()
 
+        # Apenas processa o botão confirmar se o jogo ainda não foi ganho ou perdido
+        if not jogoGanhou and not jogoPerdeu:
+            confirmarBotao.atualizarImagem(posicaoMouse)  # Atualiza a imagem do botão de confirmar
+            confirmarBotao.desenharBotao(tela)  # Desenha o botão de confirmar
+        
         voltarBotao.atualizarImagem(posicaoMouse)
         configuracoesBotao.atualizarImagem(posicaoMouse)
-        confirmarBotao.atualizarImagem(posicaoMouse)  # Atualiza a imagem do botão de confirmar
 
         voltarBotao.desenharBotao(tela)
         configuracoesBotao.desenharBotao(tela)
-        confirmarBotao.desenharBotao(tela)  # Desenha o botão de confirmar
 
         # Atualizar e desenhar objetos com movimento
         for obj in objetos:
@@ -921,6 +1003,7 @@ def fase2():
         # Verificar clique nos objetos
         for obj in objetos:
             if obj["botao"].clicarBotao(tela):
+                som_click.play()  # Som de clique
                 # Substituir o objeto selecionado
                 if objetosSelecionados:
                     print(f"Objeto {objetosSelecionados[0]['tipo']} desmarcado.")
@@ -931,27 +1014,36 @@ def fase2():
 
         # Verificar clique no botão de confirmar
         if confirmarBotao.clicarBotao(tela):
+            som_click.play()  # Som de clique
             for obj in objetosSelecionados:
                 if obj["tipo"] == "correto":
                     imagensCorretasClicadas += 1
                     if imagensCorretasClicadas == 6:  # Clicou em todas as imagens corretas
                         jogoGanhou = True
+                    # Tocar som de resposta certa
+                    pygame.mixer.music.load("sons/somObjetoCorreto/respostaCerta.mp3")
+                    pygame.mixer.music.play()        
                 elif obj["tipo"] == "incorreto":
                     imagensIncorretasClicadas += 1
                     vidas -= 1  # Perde uma vida a cada erro
                     if vidas == 0:
                         jogoPerdeu = True
+                    # Tocar som de resposta errada
+                    pygame.mixer.music.load("sons/somObjetoIncorreto/respostaErrada.mp3")
+                    pygame.mixer.music.play()        
                 objetos.remove(obj)  # Remove o objeto selecionado
             objetosSelecionados.clear()  # Limpa a lista de objetos selecionados
             print("Seleção confirmada. Você pode selecionar outro objeto.")
 
 
         if voltarBotao.clicarBotao(tela):
+            som_click.play()  # Som de clique
             print("Voltar clicado")
             estadoJogo = "jogando"
             run = False
 
         if configuracoesBotao.clicarBotao(tela):
+            som_click.play()  # Som de clique
             print("Configurações clicado")
             abrirConfiguracoes()
 
@@ -1005,6 +1097,9 @@ def menuPrincipal():
     global estadoJogo
     menuBackground = pygame.image.load("imagens/GUI/Backgrounds/menuBackground.jpg")
 
+    if somAtivo:
+        tocar_musica("sons/musicaMenu/musicafundo.mp3")  # Toca a primeira música
+
     # Criando botões do menu
     jogarBotao = criarBotao(400, 300, "imagens/GUI/botaoJogar/jogar0.png", "imagens/GUI/botaoJogar/jogar1.png")
     configuracoesBotao = criarBotao(900, 50, "imagens/GUI/botaoConfiguracoes/configuracoes0.png", "imagens/GUI/botaoConfiguracoes/configuracoes1.png")
@@ -1032,26 +1127,31 @@ def menuPrincipal():
 
         # Verificar cliques
         if jogarBotao.clicarBotao(tela):
+            som_click.play()  # Som de clique
             print("Jogar clicado")
             estadoJogo = "jogando"
             run = False
             
         if configuracoesBotao.clicarBotao(tela):
+            som_click.play()  # Som de clique
             print("Configurações clicado")
             abrirConfiguracoes()
             run = False
 
         if instrucoesBotao.clicarBotao(tela):
+            som_click.play()  # Som de clique
             print("Instruções clicado")
             abrirInstrucoes()
             run = False
 
         if creditosBotao.clicarBotao(tela):  # Detecta clique no botão de créditos
+            som_click.play()  # Som de clique
             print("Créditos clicado")
             abrirCreditos()
             run = False
 
         if sairBotao.clicarBotao(tela):
+            som_click.play()  # Som de clique
             print("Sair clicado")
             global rodando
             rodando = False
