@@ -1064,12 +1064,241 @@ def fase3():
     global estadoJogo
     fase1Background = pygame.image.load("imagens/fase3/imagemPraia.jpg")
 
-    voltarBotao = criarBotao(40, 50, "imagens/GUI/botaoVoltar/voltar0.png", "imagens/GUI/botaoVoltar/voltar1.png")
-    configuracoesBotao = criarBotao(900, 130, "imagens/GUI/botaoConfiguracoes/configuracoes0.png", "imagens/GUI/botaoConfiguracoes/configuracoes1.png")
+    # Verificar som
+    if somAtivo:
+        tocar_musica("sons/musicaPraia/fundoPraia.mp3")  # Toca a primeira música
 
+    voltarBotao = criarBotao(20, 650, "imagens/GUI/botaoVoltar/voltar0.png", "imagens/GUI/botaoVoltar/voltar1.png")
+    configuracoesBotao = criarBotao(940, 660, "imagens/GUI/botaoConfiguracoes/configuracoes0.png", "imagens/GUI/botaoConfiguracoes/configuracoes1.png")
+    
+    # Configurações para o texto do temporizador
+    fonte = pygame.font.Font("sons/tipografia/LuckiestGuy-Regular.ttf", 36)
+    cor_texto = (255, 255, 255)  # Branco
+    
+    # Configurações para objetos
+    largura_tela, altura_tela = tela.get_size()
+    centro_x = largura_tela // 3 + 30
+    centro_y = altura_tela // 2 - 20
+    raio_x = largura_tela // 3 + 40
+    raio_y = altura_tela // 4
+    distancia_minima = 140  # Distância mínima entre objetos
+
+    # Lista de imagens
+    imagensCorretas = [
+        "imagens/fase3/corretas/baldedeareia.png",
+        "imagens/fase3/corretas/bolsadepraia.png",
+        "imagens/fase3/corretas/coco.png",
+        "imagens/fase3/corretas/coqueiro.png",
+        "imagens/fase3/corretas/guardasol.png",
+        "imagens/fase3/corretas/objetodepraia.png",
+        "imagens/fase3/corretas/ocrusdepraia.png",
+        "imagens/fase3/corretas/toalhadepraia.png",
+    ]
+
+    imagensIncorretas = [
+        "imagens/fase3/incorretas/banana.png",
+        "imagens/fase3/incorretas/caixa.png",
+        "imagens/fase3/incorretas/copoamassado.png",
+        "imagens/fase3/incorretas/frauda.png",
+        "imagens/fase3/incorretas/garrafa.png",
+        "imagens/fase3/incorretas/garrafapet1.png",
+        "imagens/fase3/incorretas/garrafapet2.png",
+        "imagens/fase3/incorretas/latinha.png",
+        "imagens/fase3/incorretas/latinha2.png",
+        "imagens/fase3/incorretas/lixojoão.png",
+        "imagens/fase3/incorretas/papel.png",
+        "imagens/fase1/incorretas/maçacomida.png",
+        "imagens/fase3/incorretas/papel.png",
+        "imagens/fase3/incorretas/sacodepapel.png",
+        "imagens/fase3/incorretas/salgadinho.png",
+    ]
+
+    # Selecionando aleatoriamente 6 imagens corretas e 4 incorretas
+    imagensCorretasSelecionadas = random.sample(imagensCorretas, 6)  # Seleciona 6 imagens corretas aleatórias
+    imagensIncorretasSelecionadas = random.sample(imagensIncorretas, 4)  # Seleciona 4 imagens incorretas aleatórias
+
+    objetos = []
+
+    imagensCorretasClicadas = 0  # Contador de imagens corretas clicadas
+    imagensIncorretasClicadas = 0  # Contador de imagens incorretas clicadas
+
+    jogoGanhou = False  # variável para rastrear se o jogo foi vencido
+    jogoPerdeu = False  # variável para rastrear se o jogo foi perdido
+
+    objetosSelecionados = []  # Lista para armazenar objetos selecionados
+
+    # Definir o número de vidas
+    vidas = 3  # O jogo começa com 3 vidas
+    vida_imagens = [
+        pygame.transform.scale(pygame.image.load("imagens/GUI/vidas/0vidas.png"), (220, 60)),
+        pygame.transform.scale(pygame.image.load("imagens/GUI/vidas/1vidas.png"), (220, 60)),
+        pygame.transform.scale(pygame.image.load("imagens/GUI/vidas/2vidas.png"), (220, 60)),
+        pygame.transform.scale(pygame.image.load("imagens/GUI/vidas/3vidas.png"), (220, 60))
+    ]
+
+    # Função auxiliar para posicionar objetos
+    def posicionar_objetos(lista_imagens, tipo="correto"):
+        imagens_selecionadas = lista_imagens  # Lista de imagens a posicionar
+
+        while imagens_selecionadas:
+            imagem = imagens_selecionadas.pop(0)
+            
+            posicao_valida = False
+            tentativa = 0
+            while not posicao_valida and tentativa < 100:  # Limite de tentativas para evitar loop infinito
+                tentativa += 1
+                
+                # Gerar posição aleatória
+                x = random.randint(centro_x - raio_x, centro_x + raio_x)
+                y = random.randint(centro_y - raio_y, centro_y + raio_y)
+                
+                posicao_valida = True  # Assume que a posição é válida inicialmente
+                
+                # Verifica se está longe o suficiente de outros objetos
+                for obj in objetos:
+                    distancia = math.sqrt((x - obj["x"])**2 + (y - obj["y"])**2)
+                    if distancia < distancia_minima:
+                        posicao_valida = False
+                        break
+
+            if posicao_valida:
+                # Cria o botão para o objeto
+                botao = criarBotaoImagens(x, y, imagem, imagem)
+                objetos.append({"x": x, "y": y, "botao": botao, "tipo": tipo, "movimento": 0})
+            else:
+                print(f"Falha ao posicionar objeto após {tentativa} tentativas: {imagem}")
+
+
+    # Posicionar objetos corretos e incorretos
+    posicionar_objetos(imagensCorretasSelecionadas, "correto")
+    posicionar_objetos(imagensIncorretasSelecionadas, "incorreto")
+
+    # Calcular a posição centralizada para o botão de confirmar na parte inferior
+    largura_botao_confirmar = 56  # Tamanho estimado do botão (ajuste conforme necessário)
+    altura_botao_confirmar = 56    # Altura estimada do botão (ajuste conforme necessário)
+    x_botao_confirmar = (largura_tela - 60 - largura_botao_confirmar) // 2  # Centraliza na horizontal
+    y_botao_confirmar = altura_tela - altura_botao_confirmar - 35      # Posiciona perto da parte inferior
+    
+    # Criar o botão de confirmar no centro inferior da tela
+    confirmarBotao = criarBotao(x_botao_confirmar, y_botao_confirmar, "imagens/GUI/botaoConfirmar/confirmar1.png", "imagens/GUI/botaoConfirmar/confirmar2.png")
+
+     # Configurações do temporizador
+    tempo_inicial = 120  # Tempo inicial em segundos
+    tempo_restante = tempo_inicial
+    tempo_inicializado = pygame.time.get_ticks()  # Registrar o momento em que o temporizador começa
+    
+    mostrar_informacoes = True
     run = True
     while run:
         tela.blit(fase1Background, (0, 0))
+        if jogoPerdeu:
+            tela.blit(pygame.image.load("imagens/fase3/perdeuPraia.jpg"), (0, 0))
+            objetos.clear()  # Limpa todos os objetos
+        elif jogoGanhou:
+            tela.blit(pygame.image.load("imagens/fase3/ganhouPraia.jpg"), (0, 0))
+            objetos.clear()  # Limpa todos os objetos
+        else:
+            tempo_decorrido = (pygame.time.get_ticks() - tempo_inicializado) // 1000
+            tempo_restante = max(tempo_inicial - tempo_decorrido, 0)
+
+            if tempo_restante == 0:
+                jogoPerdeu = True
+
+        # Exibir as vidas
+        tela.blit(vida_imagens[vidas], (140, 640))  # Exibe a imagem das vidas no canto superior esquerdo
+        # Configurações para o texto de "VIDAS"
+        texto_vidas = "VIDAS"
+        texto_vidas_contorno = fonte.render(texto_vidas, True, (0, 0, 0))  # Contorno preto
+        texto_vidas_preenchimento = fonte.render(texto_vidas, True, cor_texto)  # Texto branco
+
+        # Posição do texto "VIDAS" ajustada
+        posicao_vidas = (largura_tela // 4 - texto_vidas_contorno.get_width() // 1.32, altura_tela - 34)
+
+        # Desenhar o texto com contorno
+        tela.blit(texto_vidas_contorno, (posicao_vidas[0] - 1, posicao_vidas[1]))
+        tela.blit(texto_vidas_contorno, (posicao_vidas[0] + 1, posicao_vidas[1]))
+        tela.blit(texto_vidas_contorno, (posicao_vidas[0], posicao_vidas[1] - 1))
+        tela.blit(texto_vidas_contorno, (posicao_vidas[0], posicao_vidas[1] + 1))
+
+        # Desenhar o texto preenchido no centro
+        tela.blit(texto_vidas_preenchimento, posicao_vidas)
+
+        # Adicionar o botão "Tentar Novamente" para as telas de vitória e derrota
+        botaoTentarNovamente = criarBotao(
+            405,  # Centraliza horizontalmente
+            380,  # Posiciona um pouco abaixo do texto
+            "imagens/GUI/botaoTentarnovamente/tentarnovamente.png",
+            "imagens/GUI/botaoTentarnovamente/tentarnovamente.png"
+        )
+
+        # Se o jogo foi ganho ou perdido, exibe o tempo total e o número de objetos errados
+        if jogoGanhou or jogoPerdeu:
+            mostrar_informacoes = False
+            # Desenhar o botão "Tentar Novamente"
+            botaoTentarNovamente.atualizarImagem(posicaoMouse)
+            botaoTentarNovamente.desenharBotao(tela)
+
+            # Verificar clique no botão "Tentar Novamente"
+            if botaoTentarNovamente.clicarBotao(tela):
+                som_click.play()  # Tocar o som de clique
+                print("Botão 'Tentar Novamente' clicado.")
+                run = False  # Sai do loop atual
+                fase1()  # Reinicia a fase
+            
+            tempo_total = tempo_inicial - tempo_restante  # Tempo total que o jogador levou
+            erros = imagensIncorretasClicadas  # Número de objetos errados que o jogador clicou
+            
+            # Configurações para o texto a ser exibido (pode usar a mesma fonte que foi definida antes)
+            texto_conclusao = f"Tempo: {tempo_total // 60:02}:{tempo_total % 60:02} | Erros: {erros}"
+
+            # Renderizando o texto para mostrar no centro da tela
+            texto_contorno_conclusao = fonte.render(texto_conclusao, True, (0, 0, 0))  # Contorno preto
+            texto_preenchimento_conclusao = fonte.render(texto_conclusao, True, cor_texto)  # Texto branco
+            posicao_conclusao = (largura_tela // 2 - texto_contorno_conclusao.get_width() // 2, altura_tela // 2 - 50)  # Centraliza o texto
+
+            # Desenhar o texto com contorno
+            tela.blit(texto_contorno_conclusao, (posicao_conclusao[0] - 1, posicao_conclusao[1]))
+            tela.blit(texto_contorno_conclusao, (posicao_conclusao[0] + 1, posicao_conclusao[1]))
+            tela.blit(texto_contorno_conclusao, (posicao_conclusao[0], posicao_conclusao[1] - 1))
+            tela.blit(texto_contorno_conclusao, (posicao_conclusao[0], posicao_conclusao[1] + 1))
+
+            # Desenhar o texto preenchido no centro
+            tela.blit(texto_preenchimento_conclusao, posicao_conclusao)
+
+        if mostrar_informacoes:
+            # Exibir o temporizador
+            minutos = tempo_restante // 60
+            segundos = tempo_restante % 60
+            texto_tempo = f"TEMPO: {minutos:02}:{segundos:02}"
+
+            texto_contorno_tempo = fonte.render(texto_tempo, True, (0, 0, 0))  # Contorno preto
+            texto_preenchimento_tempo = fonte.render(texto_tempo, True, cor_texto)  # Texto branco
+            posicao_tempo = (780, 130)  # Posição abaixo do contador de objetos
+
+            # Desenhar o texto com contorno
+            tela.blit(texto_contorno_tempo, (posicao_tempo[0] - 1, posicao_tempo[1]))
+            tela.blit(texto_contorno_tempo, (posicao_tempo[0] + 1, posicao_tempo[1]))
+            tela.blit(texto_contorno_tempo, (posicao_tempo[0], posicao_tempo[1] - 1))
+            tela.blit(texto_contorno_tempo, (posicao_tempo[0], posicao_tempo[1] + 1))
+
+            # Desenhar o texto preenchido no centro
+            tela.blit(texto_preenchimento_tempo, posicao_tempo)
+
+            # Renderiza o texto do contador com contorno
+            texto_contorno = fonte.render(f"TOTAL DE OBJETOS: {imagensCorretasClicadas}/6", True, (0, 0, 0))  # Preto para o contorno
+            texto_preenchimento = fonte.render(f"TOTAL DE OBJETOS: {imagensCorretasClicadas}/6", True, cor_texto)  # Cor original
+
+            posicao_texto = (120, 130)  # Posição no canto superior esquerdo
+
+            # Desenhar o texto com deslocamento para criar o contorno
+            tela.blit(texto_contorno, (posicao_texto[0] - 1, posicao_texto[1]))  # Esquerda
+            tela.blit(texto_contorno, (posicao_texto[0] + 1, posicao_texto[1]))  # Direita
+            tela.blit(texto_contorno, (posicao_texto[0], posicao_texto[1] - 1))  # Cima
+            tela.blit(texto_contorno, (posicao_texto[0], posicao_texto[1] + 1))  # Baixo
+
+            # Desenhar o texto preenchido no centro
+            tela.blit(texto_preenchimento, posicao_texto)
+
         posicaoMouse = pygame.mouse.get_pos()
 
         voltarBotao.atualizarImagem(posicaoMouse)
@@ -1077,15 +1306,61 @@ def fase3():
 
         voltarBotao.desenharBotao(tela)
         configuracoesBotao.desenharBotao(tela)
-        
+
+        # Apenas processa o botão confirmar se o jogo ainda não foi ganho ou perdido
+        if not jogoGanhou and not jogoPerdeu:
+            confirmarBotao.atualizarImagem(posicaoMouse)  # Atualiza a imagem do botão de confirmar
+            confirmarBotao.desenharBotao(tela)  # Desenha o botão de confirmar
+
+        # Atualizar e desenhar objetos com movimento
+        for obj in objetos:
+            botao = obj["botao"]
+            botao.atualizarImagem(posicaoMouse)
+            botao.desenharBotao(tela)
+
+        # Verificar clique nos objetos
+        for obj in objetos:
+            if obj["botao"].clicarBotao(tela):
+                som_click.play()  # Som de clique
+                # Substituir o objeto selecionado
+                if objetosSelecionados:
+                    print(f"Objeto {objetosSelecionados[0]['tipo']} desmarcado.")
+                    objetosSelecionados.clear()  # Limpa a seleção atual
+
+                objetosSelecionados.append(obj)  # Seleciona o novo objeto
+                print(f"Objeto {obj['tipo']} selecionado na posição ({obj['x']}, {obj['y']})!")
+
+        # Verificar clique no botão de confirmar
+        if confirmarBotao.clicarBotao(tela):
+            som_click.play()  # Som de clique
+            for obj in objetosSelecionados:
+                if obj["tipo"] == "correto":
+                    imagensCorretasClicadas += 1
+                    if imagensCorretasClicadas == 6:  # Clicou em todas as imagens corretas
+                        jogoGanhou = True
+                    # Tocar som de resposta certa
+                    tocar_efeito_sonoro("sons/somObjetoCorreto/respostaCerta.mp3")
+                elif obj["tipo"] == "incorreto":
+                    imagensIncorretasClicadas += 1
+                    vidas -= 1  # Perde uma vida a cada erro
+                    if vidas == 0:
+                        jogoPerdeu = True
+                    # Tocar som de resposta errada
+                    tocar_efeito_sonoro("sons/somObjetoIncorreto/respostaErrada.mp3")
+                objetos.remove(obj)  # Remove o objeto selecionado
+            objetosSelecionados.clear()  # Limpa a lista de objetos selecionados
+            print("Seleção confirmada. Você pode selecionar outro objeto.")
+
         if voltarBotao.clicarBotao(tela):
+            som_click.play()  # Som de clique
             print("Voltar clicado")
             estadoJogo = "jogando"
             run = False
+
         if configuracoesBotao.clicarBotao(tela):
+            som_click.play()  # Som de clique
             print("Configurações clicado")
             abrirConfiguracoes()
-
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 global rodando

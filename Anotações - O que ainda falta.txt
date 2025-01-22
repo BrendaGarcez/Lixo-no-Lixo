@@ -41,16 +41,16 @@ Telas:
 
 -----Sons-----
 -Todos(escolher)
-	- Sons de movimentação
-	- Musica de fundo
-	- Nome dos objetos falados
+	- Sons de movimentação (??)
+	- Musica de fundo (em andamento)
+	- Nome dos objetos falados (a pensar)
 
 -----Fase 1-----
 -> objetos de cena (feito)
--> botão de confirmar (feito mas melhorar lógica e adicionar coisas para facilitar o uso)
--> mensagens de apoio caso erro e de incentivo caso acerto (fazer)
--> Lógica do jogo(pontuação, quantidade de itens, tempo) (falta pontuação)
--> áudio dos nomes (fazer, mas necessário dos áudios para desenvolver isso)
+-> botão de confirmar (feito)
+-> mensagens de apoio caso erro e de incentivo caso acerto (a pensar)
+-> Lógica do jogo(pontuação, quantidade de itens, tempo) (falta lógica do relatário)
+-> áudio dos nomes (a pensar)
 -> legenda paras os itens (fazer, talvez alguma lógica com a "colisão do mouse e objeto", dar um pop-out de um texto em cima, dá para usar a fonte bonitinha lá)
 
 LÓGICA DAS PRÓXIMAS FASES SERÁ SEMELHANTE A 1, a 3 precisará mudar um pouco mais
