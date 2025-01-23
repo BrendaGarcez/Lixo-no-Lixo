@@ -15,7 +15,7 @@ tela = pygame.display.set_mode((telaLargura, telaAltura))  # Configuração da t
 pygame.display.set_caption("Lixo_No_Lixo")  # Nome do jogo
 
 som_click = pygame.mixer.Sound("sons/somClickMouse/mouseclick.wav")
-som_click.set_volume(0.3)
+som_click.set_volume(0.2)
 somAtivo = True  # Estado inicial do som
 musica_atual = None
 pygame.mixer.init()
@@ -45,14 +45,13 @@ def tocar_musica(nova_musica): # FUNÇÃO DA MÚSICA DE FUNDO
     if musica_atual != nova_musica:  # Só troca se a música for diferente
         pygame.mixer.music.stop()  # Para a música atual
         pygame.mixer.music.load(nova_musica)  # Carrega a nova música
-        pygame.mixer.music.set_volume(0.3)
+        pygame.mixer.music.set_volume(0.2)
         pygame.mixer.music.play(-1)  # Toca em loop
         musica_atual = nova_musica  # Atualiza a música atual
         
 def tocar_efeito_sonoro(efeito):
-    if somAtivo:  # Verifica se os sons estão ativos
-        efeito_sonoro = pygame.mixer.Sound(efeito)
-        efeito_sonoro.play()  # Toca o efeito sonoro sem parar a música de fundo
+    efeito_sonoro = pygame.mixer.Sound(efeito)
+    efeito_sonoro.play()  # Toca o efeito sonoro sem parar a música de fundo
 
 def abrirConfiguracoes():
     global somAtivo
@@ -441,6 +440,28 @@ def iniciarFases():
 
         pygame.display.update()
 
+def exibir_nome_objeto(obj):
+    # Definir a fonte para o nome do objeto
+    fonte_nome = pygame.font.Font("sons/tipografia/LuckiestGuy-Regular.ttf", 24)
+    nome_objeto = obj["nome"]  # Usa o nome extraído da imagem
+    cor_texto = (255, 255, 255)  # Cor do texto (branco)
+
+    # Renderizar o nome com contorno e preenchimento
+    texto_nome_contorno = fonte_nome.render(nome_objeto, True, (0, 0, 0))  # Contorno preto
+    texto_nome_preenchimento = fonte_nome.render(nome_objeto, True, cor_texto)  # Texto branco
+
+    # Posicionar o nome logo acima do objeto
+    posicao_nome = (obj["x"] + 100 - texto_nome_preenchimento.get_width() // 2, obj["y"] + 5)
+
+    # Desenhar o texto com contorno
+    tela.blit(texto_nome_contorno, (posicao_nome[0] - 1, posicao_nome[1]))
+    tela.blit(texto_nome_contorno, (posicao_nome[0] + 1, posicao_nome[1]))
+    tela.blit(texto_nome_contorno, (posicao_nome[0], posicao_nome[1] - 1))
+    tela.blit(texto_nome_contorno, (posicao_nome[0], posicao_nome[1] + 1))
+
+    # Desenhar o texto preenchido
+    tela.blit(texto_nome_preenchimento, posicao_nome)
+
 def fase1():
     global estadoJogo
     fase1Background = pygame.image.load("imagens/fase1/imagemZoologico.jpg")
@@ -466,32 +487,32 @@ def fase1():
 
     # Lista de imagens
     imagensCorretas = [
-        "imagens/fase1/corretas/bichoquecomecupim.png",
-        "imagens/fase1/corretas/capibara.png",
-        "imagens/fase1/corretas/coala.png",
-        "imagens/fase1/corretas/elefante.png",
-        "imagens/fase1/corretas/esquilo.png",
-        "imagens/fase1/corretas/gamba.png",
-        "imagens/fase1/corretas/panda.png",
-        "imagens/fase1/corretas/panda2.png",
-        "imagens/fase1/corretas/passaro.png",
-        "imagens/fase1/corretas/pescoco.png",
-        "imagens/fase1/corretas/raposa.png",
-        "imagens/fase1/corretas/renatogarcia.png",
+        "imagens/fase1/corretas/Tamanduá.png",
+        "imagens/fase1/corretas/Capivara.png",
+        "imagens/fase1/corretas/Preguiça.png",
+        "imagens/fase1/corretas/Elefante.png",
+        "imagens/fase1/corretas/Esquilo.png",
+        "imagens/fase1/corretas/Gambá.png",
+        "imagens/fase1/corretas/Panda.png",
+        "imagens/fase1/corretas/Panda .png",
+        "imagens/fase1/corretas/Pássaro.png",
+        "imagens/fase1/corretas/Girafa.png",
+        "imagens/fase1/corretas/Raposa.png",
+        "imagens/fase1/corretas/Cervo.png",
     ]
 
     imagensIncorretas = [
-        "imagens/fase1/incorretas/caixa.png",
-        "imagens/fase1/incorretas/copoamassado.png",
-        "imagens/fase1/incorretas/frauda.png",
-        "imagens/fase1/incorretas/garrafa.png",
-        "imagens/fase1/incorretas/garrafapet1.png",
-        "imagens/fase1/incorretas/garrafapet2.png",
-        "imagens/fase1/incorretas/latinha.png",
-        "imagens/fase1/incorretas/latinha2.png",
-        "imagens/fase1/incorretas/lixojoão.png",
-        "imagens/fase1/incorretas/papel.png",
-        "imagens/fase1/incorretas/sacodepapel.png",
+        "imagens/fase1/incorretas/Caixa.png",
+        "imagens/fase1/incorretas/Copo Amassado.png",
+        "imagens/fase1/incorretas/Fralda.png",
+        "imagens/fase1/incorretas/Garrafa de Vidro.png",
+        "imagens/fase1/incorretas/Garrafa Pet.png",
+        "imagens/fase1/incorretas/Garrafa Pet .png",
+        "imagens/fase1/incorretas/Latinha.png",
+        "imagens/fase1/incorretas/Latinha .png",
+        "imagens/fase1/incorretas/Lixo.png",
+        "imagens/fase1/incorretas/Papel.png",
+        "imagens/fase1/incorretas/Saco de Papel.png",
     ]
 
     # Selecionando aleatoriamente 6 imagens corretas e 4 incorretas
@@ -517,13 +538,15 @@ def fase1():
         pygame.transform.scale(pygame.image.load("imagens/GUI/vidas/3vidas.png"), (220, 60))
     ]
 
-    # Função auxiliar para posicionar objetos
     def posicionar_objetos(lista_imagens, tipo="correto"):
         imagens_selecionadas = lista_imagens  # Lista de imagens a posicionar
 
         while imagens_selecionadas:
             imagem = imagens_selecionadas.pop(0)
             
+            # Extrair o nome do arquivo da imagem (sem extensão)
+            nome_objeto = imagem.split("/")[-1].split(".")[0].replace("_", " ").capitalize()
+
             posicao_valida = False
             tentativa = 0
             while not posicao_valida and tentativa < 100:  # Limite de tentativas para evitar loop infinito
@@ -545,10 +568,9 @@ def fase1():
             if posicao_valida:
                 # Cria o botão para o objeto
                 botao = criarBotaoImagens(x, y, imagem, imagem)
-                objetos.append({"x": x, "y": y, "botao": botao, "tipo": tipo, "movimento": 0})
+                objetos.append({"x": x, "y": y, "botao": botao, "tipo": tipo, "movimento": 0, "nome": nome_objeto})
             else:
                 print(f"Falha ao posicionar objeto após {tentativa} tentativas: {imagem}")
-
 
     # Posicionar objetos corretos e incorretos
     posicionar_objetos(imagensCorretasSelecionadas, "correto")
@@ -612,9 +634,71 @@ def fase1():
             "imagens/GUI/botaoTentarnovamente/tentarnovamente.png"
         )
 
+        # Criar o botão de "Próxima Fase"
+        proximaFaseBotao = criarBotao(
+            405,  # Centraliza horizontalmente
+            460,  # Posiciona um pouco abaixo do botão "Tentar Novamente"
+            "imagens/GUI/botaoProximaFase/proximafase.png",  # Imagem do botão
+            "imagens/GUI/botaoProximaFase/proximafase.png"  # Imagem do botão (hover)
+        )
+
+        # Criar o botão de "Voltar ao Menu"
+        voltarMenuBotao = criarBotao(
+            405,  # Centraliza horizontalmente
+            540,  # Posiciona um pouco abaixo do botão "Próxima Fase"
+            "imagens/GUI/botaoVoltarMenu/voltaraomenu.png",  # Imagem do botão
+            "imagens/GUI/botaoVoltarMenu/voltaraomenu.png"  # Imagem do botão (hover)
+        )
+
+        voltarMenuBotao2 = criarBotao(
+            405,  # Centraliza horizontalmente
+            460,  # Posiciona um pouco abaixo do botão "Próxima Fase"
+            "imagens/GUI/botaoVoltarMenu/voltaraomenu.png",  # Imagem do botão
+            "imagens/GUI/botaoVoltarMenu/voltaraomenu.png"  # Imagem do botão (hover)
+        )
+
         # Se o jogo foi ganho ou perdido, exibe o tempo total e o número de objetos errados
         if jogoGanhou or jogoPerdeu:
             mostrar_informacoes = False
+            
+            if jogoGanhou:
+                # Exibir o botão de "Próxima Fase" na tela de vitória
+                proximaFaseBotao.atualizarImagem(posicaoMouse)
+                proximaFaseBotao.desenharBotao(tela)
+
+                # Desenhar o botão "Voltar ao Menu"
+                voltarMenuBotao.atualizarImagem(posicaoMouse)
+                voltarMenuBotao.desenharBotao(tela)
+
+                # Verificar clique no botão "Voltar ao Menu"
+                if voltarMenuBotao.clicarBotao(tela):
+                    som_click.play()  # Tocar som de clique
+                    print("Botão 'Voltar ao Menu' clicado.")
+                    estadoJogo = "menu"  # Voltar para o menu
+                    run = False  # Sai do loop atual
+                    menuPrincipal()  # Chama a função do menu principa
+
+            if jogoPerdeu:
+                # Desenhar o botão "Voltar ao Menu"
+                voltarMenuBotao2.atualizarImagem(posicaoMouse)
+                voltarMenuBotao2.desenharBotao(tela)
+
+                # Verificar clique no botão "Voltar ao Menu"
+                if voltarMenuBotao2.clicarBotao(tela):
+                    som_click.play()  # Tocar som de clique
+                    print("Botão 'Voltar ao Menu' clicado.")
+                    estadoJogo = "menu"  # Voltar para o menu
+                    run = False  # Sai do loop atual
+                    menuPrincipal()  # Chama a função do menu principa
+
+            # Verificar clique no botão "Próxima Fase"
+            if proximaFaseBotao.clicarBotao(tela):
+                som_click.play()  # Tocar som de clique
+                print("Botão 'Próxima Fase' clicado.")
+                estadoJogo = "fase2"  # Mudar o estado do jogo para a fase 2
+                run = False  # Sai do loop atual
+                fase2()  # Chama a função para a próxima fase (fase2)
+                
             # Desenhar o botão "Tentar Novamente"
             botaoTentarNovamente.atualizarImagem(posicaoMouse)
             botaoTentarNovamente.desenharBotao(tela)
@@ -625,7 +709,7 @@ def fase1():
                 print("Botão 'Tentar Novamente' clicado.")
                 run = False  # Sai do loop atual
                 fase1()  # Reinicia a fase
-            
+
             tempo_total = tempo_inicial - tempo_restante  # Tempo total que o jogador levou
             erros = imagensIncorretasClicadas  # Número de objetos errados que o jogador clicou
             
@@ -698,6 +782,10 @@ def fase1():
             botao = obj["botao"]
             botao.atualizarImagem(posicaoMouse)
             botao.desenharBotao(tela)
+
+            # Verifica se o mouse está sobre o objeto (hover)
+            if botao.rect.collidepoint(posicaoMouse):  # Verifica se o mouse está sobre o botão
+                exibir_nome_objeto(obj)  # Exibe o nome do objeto acima dele
 
         # Verificar clique nos objetos
         for obj in objetos:
@@ -780,23 +868,23 @@ def fase2():
 
     # Lista de imagens
     imagensCorretas = [
-        "imagens/fase2/corretas/banana.png",
-        "imagens/fase2/corretas/copoamassado.png",
-        "imagens/fase2/corretas/frauda.png",
-        "imagens/fase2/corretas/garrafa.png",
-        "imagens/fase2/corretas/latinha.png",
-        "imagens/fase2/corretas/latinha2.png",
-        "imagens/fase2/corretas/lixojoão.png",
-        "imagens/fase2/corretas/maçacomida.png",
-        "imagens/fase2/corretas/sacodepapel.png",
+        "imagens/fase2/corretas/Banana.png",
+        "imagens/fase2/corretas/Copo Amassado.png",
+        "imagens/fase2/corretas/Fralda.png",
+        "imagens/fase2/corretas/Garrafa de Vidro.png",
+        "imagens/fase2/corretas/Latinha.png",
+        "imagens/fase2/corretas/Latinha .png",
+        "imagens/fase2/corretas/Lixo.png",
+        "imagens/fase2/corretas/Maçã Comida.png",
+        "imagens/fase2/corretas/Saco de Papel.png",
     ]
 
     imagensIncorretas = [
-        "imagens/fase2/incorretas/borra.png",
-        "imagens/fase2/incorretas/estojo.png",
-        "imagens/fase2/incorretas/livros.png",
-        "imagens/fase2/incorretas/objetoescolar.png",
-        "imagens/fase2/incorretas/regua.png",
+        "imagens/fase2/incorretas/Borracha.png",
+        "imagens/fase2/incorretas/Estojo.png",
+        "imagens/fase2/incorretas/Caderno.png",
+        "imagens/fase2/incorretas/Mochila.png",
+        "imagens/fase2/incorretas/Régua.png",
     ]
 
     # Selecionando aleatoriamente 6 imagens corretas e 4 incorretas
@@ -829,6 +917,9 @@ def fase2():
         while imagens_selecionadas:
             imagem = imagens_selecionadas.pop(0)
             
+            # Extrair o nome do arquivo da imagem (sem extensão)
+            nome_objeto = imagem.split("/")[-1].split(".")[0].replace("_", " ").capitalize()
+
             posicao_valida = False
             tentativa = 0
             while not posicao_valida and tentativa < 100:  # Limite de tentativas para evitar loop infinito
@@ -850,7 +941,7 @@ def fase2():
             if posicao_valida:
                 # Cria o botão para o objeto
                 botao = criarBotaoImagens(x, y, imagem, imagem)
-                objetos.append({"x": x, "y": y, "botao": botao, "tipo": tipo, "movimento": 0})
+                objetos.append({"x": x, "y": y, "botao": botao, "tipo": tipo, "movimento": 0, "nome": nome_objeto})
             else:
                 print(f"Falha ao posicionar objeto após {tentativa} tentativas: {imagem}")
 
@@ -918,10 +1009,71 @@ def fase2():
             "imagens/GUI/botaoTentarnovamente/tentarnovamente.png"
         )
 
+        # Criar o botão de "Próxima Fase"
+        proximaFaseBotao = criarBotao(
+            405,  # Centraliza horizontalmente
+            460,  # Posiciona um pouco abaixo do botão "Tentar Novamente"
+            "imagens/GUI/botaoProximaFase/proximafase.png",  # Imagem do botão
+            "imagens/GUI/botaoProximaFase/proximafase.png"  # Imagem do botão (hover)
+        )
+
+        # Criar o botão de "Voltar ao Menu"
+        voltarMenuBotao = criarBotao(
+            405,  # Centraliza horizontalmente
+            540,  # Posiciona um pouco abaixo do botão "Próxima Fase"
+            "imagens/GUI/botaoVoltarMenu/voltaraomenu.png",  # Imagem do botão
+            "imagens/GUI/botaoVoltarMenu/voltaraomenu.png"  # Imagem do botão (hover)
+        )
+
+        voltarMenuBotao2 = criarBotao(
+            405,  # Centraliza horizontalmente
+            460,  # Posiciona um pouco abaixo do botão "Próxima Fase"
+            "imagens/GUI/botaoVoltarMenu/voltaraomenu.png",  # Imagem do botão
+            "imagens/GUI/botaoVoltarMenu/voltaraomenu.png"  # Imagem do botão (hover)
+        )
+
         # Se o jogo foi ganho ou perdido, exibe o tempo total e o número de objetos errados
         if jogoGanhou or jogoPerdeu:
             mostrar_informacoes = False
+            
+            if jogoGanhou:
+                # Exibir o botão de "Próxima Fase" na tela de vitória
+                proximaFaseBotao.atualizarImagem(posicaoMouse)
+                proximaFaseBotao.desenharBotao(tela)
 
+                # Desenhar o botão "Voltar ao Menu"
+                voltarMenuBotao.atualizarImagem(posicaoMouse)
+                voltarMenuBotao.desenharBotao(tela)
+
+                # Verificar clique no botão "Voltar ao Menu"
+                if voltarMenuBotao.clicarBotao(tela):
+                    som_click.play()  # Tocar som de clique
+                    print("Botão 'Voltar ao Menu' clicado.")
+                    estadoJogo = "menu"  # Voltar para o menu
+                    run = False  # Sai do loop atual
+                    menuPrincipal()  # Chama a função do menu principa
+
+            if jogoPerdeu:
+                # Desenhar o botão "Voltar ao Menu"
+                voltarMenuBotao2.atualizarImagem(posicaoMouse)
+                voltarMenuBotao2.desenharBotao(tela)
+
+                # Verificar clique no botão "Voltar ao Menu"
+                if voltarMenuBotao2.clicarBotao(tela):
+                    som_click.play()  # Tocar som de clique
+                    print("Botão 'Voltar ao Menu' clicado.")
+                    estadoJogo = "menu"  # Voltar para o menu
+                    run = False  # Sai do loop atual
+                    menuPrincipal()  # Chama a função do menu principa
+
+            # Verificar clique no botão "Próxima Fase"
+            if proximaFaseBotao.clicarBotao(tela):
+                som_click.play()  # Tocar som de clique
+                print("Botão 'Próxima Fase' clicado.")
+                estadoJogo = "fase2"  # Mudar o estado do jogo para a fase 2
+                run = False  # Sai do loop atual
+                fase3()  # Chama a função para a próxima fase (fase2)
+                
             # Desenhar o botão "Tentar Novamente"
             botaoTentarNovamente.atualizarImagem(posicaoMouse)
             botaoTentarNovamente.desenharBotao(tela)
@@ -1006,6 +1158,10 @@ def fase2():
             botao.atualizarImagem(posicaoMouse)
             botao.desenharBotao(tela)
 
+            # Verifica se o mouse está sobre o objeto (hover)
+            if botao.rect.collidepoint(posicaoMouse):  # Verifica se o mouse está sobre o botão
+                exibir_nome_objeto(obj)  # Exibe o nome do objeto acima dele
+
         # Verificar clique nos objetos
         for obj in objetos:
             if obj["botao"].clicarBotao(tela):
@@ -1085,32 +1241,31 @@ def fase3():
 
     # Lista de imagens
     imagensCorretas = [
-        "imagens/fase3/corretas/baldedeareia.png",
-        "imagens/fase3/corretas/bolsadepraia.png",
-        "imagens/fase3/corretas/coco.png",
-        "imagens/fase3/corretas/coqueiro.png",
-        "imagens/fase3/corretas/guardasol.png",
-        "imagens/fase3/corretas/objetodepraia.png",
-        "imagens/fase3/corretas/ocrusdepraia.png",
-        "imagens/fase3/corretas/toalhadepraia.png",
+        "imagens/fase3/corretas/Balde de Areia.png",
+        "imagens/fase3/corretas/Cadeira de Praia.png",
+        "imagens/fase3/corretas/Coco.png",
+        "imagens/fase3/corretas/Coqueiro.png",
+        "imagens/fase3/corretas/Guarda Sol.png",
+        "imagens/fase3/corretas/Objetos de Praia.png",
+        "imagens/fase3/corretas/Óculos de Praia.png",
+        "imagens/fase3/corretas/Toalha de Praia.png",
     ]
 
     imagensIncorretas = [
-        "imagens/fase3/incorretas/banana.png",
-        "imagens/fase3/incorretas/caixa.png",
-        "imagens/fase3/incorretas/copoamassado.png",
-        "imagens/fase3/incorretas/frauda.png",
-        "imagens/fase3/incorretas/garrafa.png",
-        "imagens/fase3/incorretas/garrafapet1.png",
-        "imagens/fase3/incorretas/garrafapet2.png",
-        "imagens/fase3/incorretas/latinha.png",
-        "imagens/fase3/incorretas/latinha2.png",
-        "imagens/fase3/incorretas/lixojoão.png",
-        "imagens/fase3/incorretas/papel.png",
-        "imagens/fase1/incorretas/maçacomida.png",
-        "imagens/fase3/incorretas/papel.png",
-        "imagens/fase3/incorretas/sacodepapel.png",
-        "imagens/fase3/incorretas/salgadinho.png",
+        "imagens/fase3/incorretas/Banana.png",
+        "imagens/fase3/incorretas/Caixa.png",
+        "imagens/fase3/incorretas/Copo Amassado.png",
+        "imagens/fase3/incorretas/Fralda.png",
+        "imagens/fase3/incorretas/Garrafa de Vidro.png",
+        "imagens/fase3/incorretas/Garrafa Pet.png",
+        "imagens/fase3/incorretas/Latinha.png",
+        "imagens/fase3/incorretas/Latinha .png",
+        "imagens/fase3/incorretas/Lixo.png",
+        "imagens/fase3/incorretas/Papel.png",
+        "imagens/fase3/incorretas/Maçã Comida.png",
+        "imagens/fase3/incorretas/Papel.png",
+        "imagens/fase3/incorretas/Saco de Papel.png",
+        "imagens/fase3/incorretas/Salgadinho.png",
     ]
 
     # Selecionando aleatoriamente 6 imagens corretas e 4 incorretas
@@ -1143,6 +1298,9 @@ def fase3():
         while imagens_selecionadas:
             imagem = imagens_selecionadas.pop(0)
             
+            # Extrair o nome do arquivo da imagem (sem extensão)
+            nome_objeto = imagem.split("/")[-1].split(".")[0].replace("_", " ").capitalize()
+
             posicao_valida = False
             tentativa = 0
             while not posicao_valida and tentativa < 100:  # Limite de tentativas para evitar loop infinito
@@ -1164,7 +1322,7 @@ def fase3():
             if posicao_valida:
                 # Cria o botão para o objeto
                 botao = criarBotaoImagens(x, y, imagem, imagem)
-                objetos.append({"x": x, "y": y, "botao": botao, "tipo": tipo, "movimento": 0})
+                objetos.append({"x": x, "y": y, "botao": botao, "tipo": tipo, "movimento": 0, "nome": nome_objeto})
             else:
                 print(f"Falha ao posicionar objeto após {tentativa} tentativas: {imagem}")
 
@@ -1317,6 +1475,10 @@ def fase3():
             botao = obj["botao"]
             botao.atualizarImagem(posicaoMouse)
             botao.desenharBotao(tela)
+
+            # Verifica se o mouse está sobre o objeto (hover)
+            if botao.rect.collidepoint(posicaoMouse):  # Verifica se o mouse está sobre o botão
+                exibir_nome_objeto(obj)  # Exibe o nome do objeto acima dele
 
         # Verificar clique nos objetos
         for obj in objetos:
