@@ -71,11 +71,17 @@ def abrirConfiguracoes():
     configuracoesBackground = pygame.image.load("imagens/GUI/Backgrounds/configuracoesBackground.jpg")
     tela.blit(configuracoesBackground, (0, 0))
 
-    # Defina o volume atual como o valor de pygame.mixer.music.get_volume(), que é entre 0 e 1
     volume = pygame.mixer.music.get_volume()  # Obter o volume atual
 
-    somLigadoBotao = criarBotao(510, 200, "imagens/GUI/botaoSom/ligado0.png", "imagens/GUI/botaoSom/ligado1.png")
-    somDesligadoBotao = criarBotao(510, 200, "imagens/GUI/botaoSom/desligado0.png", "imagens/GUI/botaoSom/desligado1.png")
+    largura_tela, altura_tela = tela.get_size()  # Dimensões da tela
+    largura_imagem, altura_imagem = 150, 150  # Tamanho das imagens dos botões
+
+    # Calcula as posições para centralizar as imagens
+    som_x = (largura_tela - largura_imagem) // 2
+    som_y = (altura_tela - altura_imagem) // 2 - 50
+
+    somLigadoBotao = criarBotao(som_x, som_y, "imagens/GUI/botaoSom/ligado0.png", "imagens/GUI/botaoSom/ligado1.png")
+    somDesligadoBotao = criarBotao(som_x, som_y, "imagens/GUI/botaoSom/desligado0.png", "imagens/GUI/botaoSom/desligado1.png")
     voltarBotao = criarBotao(20, 650, "imagens/GUI/botaoVoltar/voltar0.png", "imagens/GUI/botaoVoltar/voltar1.png")
 
     run = True
@@ -95,8 +101,8 @@ def abrirConfiguracoes():
         voltarBotao.atualizarImagem(posicaoMouse)
         voltarBotao.desenharBotao(tela)
 
-        # Barra de volume
-        barra_x, barra_y = 400, 300
+        # Barra de volume centralizada horizontalmente
+        barra_x, barra_y = (largura_tela - 300) // 2, som_y + altura_imagem + 50
         barra_largura, barra_altura = 300, 10
         pygame.draw.rect(tela, (100, 100, 100), (barra_x, barra_y, barra_largura, barra_altura))  # Fundo da barra
         pygame.draw.rect(tela, (139, 69, 19), (barra_x, barra_y, int(volume * barra_largura), barra_altura))  # Barra de volume
@@ -107,11 +113,12 @@ def abrirConfiguracoes():
             volume = max(0, min(volume, 1))
             pygame.mixer.music.set_volume(volume)  # Atualiza o volume
 
-        # Texto do volume
+        # Texto do volume abaixo da barra
         fonte = pygame.font.Font(None, 36)
         texto_volume = f"Volume: {int(volume * 100)}%"
         texto_renderizado = fonte.render(texto_volume, True, (255, 255, 255))
-        tela.blit(texto_renderizado, (barra_x + barra_largura + 20, barra_y - 10))
+        texto_rect = texto_renderizado.get_rect(center=(barra_x + barra_largura // 2, barra_y + barra_altura + 30))
+        tela.blit(texto_renderizado, texto_rect.topleft)
 
         # Verificar cliques
         if somAtivo and somLigadoBotao.clicarBotao(tela):
@@ -134,7 +141,6 @@ def abrirConfiguracoes():
                 run = False
 
         pygame.display.update()
-
 
 def abrirInstrucoes():
     global estadoJogo
