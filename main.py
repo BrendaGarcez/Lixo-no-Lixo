@@ -1,7 +1,7 @@
 import pygame  # Importando biblioteca
 import botao  # Importando a classe Botao
 import botaoObjetos
-import image
+import sys
 import random
 import math
 import time
@@ -16,6 +16,7 @@ pygame.display.set_caption("Lixo_No_Lixo")  # Nome do jogo
 
 som_click = pygame.mixer.Sound("sons/somClickMouse/mouseclick.wav")
 som_click.set_volume(0.2)
+clock = pygame.time.Clock()
 somAtivo = True  # Estado inicial do som
 musica_atual = None
 pygame.mixer.init()
@@ -65,6 +66,54 @@ def tocar_efeito_sonoro(efeito):
     efeito_sonoro = pygame.mixer.Sound(efeito)
     efeito_sonoro.play()  # Toca o efeito sonoro sem parar a música de fundo
 
+def confirmar_saida(tela):
+    # Dimensões da janela de confirmação
+    largura = 400
+    altura = 150
+    fonte = pygame.font.SysFont(None, 36)
+
+    # Cria um retângulo centralizado para a janela de diálogo
+    janela_rect = pygame.Rect(
+        (tela.get_width() - largura) // 2, 
+        (tela.get_height() - altura) // 2, 
+        largura, altura
+    )
+
+    # Botões "Sim" e "Não"
+    sim_botao = pygame.Rect(janela_rect.x + 100, janela_rect.y + 80, 80, 40)
+    nao_botao = pygame.Rect(janela_rect.x + 220, janela_rect.y + 80, 80, 40)
+
+    while True:
+        # Preenche a tela de fundo
+        pygame.draw.rect(tela, (200, 200, 200), janela_rect)
+        pygame.draw.rect(tela, (0, 0, 0), janela_rect, 2)
+
+        # Texto da janela
+        texto = fonte.render("Deseja realmente sair?", True, (0, 0, 0))
+        tela.blit(texto, (janela_rect.x + 50, janela_rect.y + 20))
+
+        # Botões "Sim" e "Não"
+        pygame.draw.rect(tela, (0, 200, 0), sim_botao)
+        pygame.draw.rect(tela, (200, 0, 0), nao_botao)
+
+        texto_sim = fonte.render("Sim", True, (255, 255, 255))
+        texto_nao = fonte.render("Não", True, (255, 255, 255))
+        tela.blit(texto_sim, (sim_botao.x + 20, sim_botao.y + 5))
+        tela.blit(texto_nao, (nao_botao.x + 20, nao_botao.y + 5))
+
+        pygame.display.update()
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+            if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+                if sim_botao.collidepoint(event.pos):
+                    pygame.quit()
+                    sys.exit()
+                if nao_botao.collidepoint(event.pos):
+                    return  # Retorna ao jogo
+                
 def abrirConfiguracoes():
     global somAtivo
 
@@ -74,7 +123,7 @@ def abrirConfiguracoes():
     volume = pygame.mixer.music.get_volume()  # Obter o volume atual
 
     largura_tela, altura_tela = tela.get_size()  # Dimensões da tela
-    largura_imagem, altura_imagem = 150, 150  # Tamanho das imagens dos botões
+    largura_imagem, altura_imagem = 96, 96  # Tamanho das imagens dos botões
 
     # Calcula as posições para centralizar as imagens
     som_x = (largura_tela - largura_imagem) // 2
@@ -83,6 +132,7 @@ def abrirConfiguracoes():
     somLigadoBotao = criarBotao(som_x, som_y, "imagens/GUI/botaoSom/ligado0.png", "imagens/GUI/botaoSom/ligado1.png")
     somDesligadoBotao = criarBotao(som_x, som_y, "imagens/GUI/botaoSom/desligado0.png", "imagens/GUI/botaoSom/desligado1.png")
     voltarBotao = criarBotao(20, 650, "imagens/GUI/botaoVoltar/voltar0.png", "imagens/GUI/botaoVoltar/voltar1.png")
+    sairBotao = criarBotao(som_x - 20, 560,"imagens/GUI/botaoSair/Sair0.png", "imagens/GUI/botaoSair/Sair1.png")
 
     run = True
     while run:
@@ -100,6 +150,8 @@ def abrirConfiguracoes():
 
         voltarBotao.atualizarImagem(posicaoMouse)
         voltarBotao.desenharBotao(tela)
+        sairBotao.atualizarImagem(posicaoMouse)
+        sairBotao.desenharBotao(tela)
 
         # Barra de volume centralizada horizontalmente
         barra_x, barra_y = (largura_tela - 300) // 2, som_y + altura_imagem + 50
@@ -132,15 +184,110 @@ def abrirConfiguracoes():
 
         if voltarBotao.clicarBotao(tela):
             som_click.play()  # Som de clique
-            run = False
+            run = False  
+        
+        if sairBotao.clicarBotao(tela):
+            som_click.play()  # Som de clique
+            confirmar_saida(tela)
 
         for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                global rodando
-                rodando = False
-                run = False
+                if event.type == pygame.QUIT:
+                    confirmar_saida(tela)
 
         pygame.display.update()
+        clock.tick(60)
+
+def abrirConfiguracoesFases():
+    global somAtivo
+
+    configuracoesBackground = pygame.image.load("imagens/GUI/Backgrounds/configuracoesBackground.jpg")
+    tela.blit(configuracoesBackground, (0, 0))
+
+    volume = pygame.mixer.music.get_volume()  # Obter o volume atual
+
+    largura_tela, altura_tela = tela.get_size()  # Dimensões da tela
+    largura_imagem, altura_imagem = 96, 96  # Tamanho das imagens dos botões
+
+    # Calcula as posições para centralizar as imagens
+    som_x = (largura_tela - largura_imagem) // 2
+    som_y = (altura_tela - altura_imagem) // 2 - 110
+
+    somLigadoBotao = criarBotao(som_x, som_y, "imagens/GUI/botaoSom/ligado0.png", "imagens/GUI/botaoSom/ligado1.png")
+    somDesligadoBotao = criarBotao(som_x, som_y, "imagens/GUI/botaoSom/desligado0.png", "imagens/GUI/botaoSom/desligado1.png")
+    voltarBotao = criarBotao(som_x - 300, 560, "imagens/GUI/botaoVoltar/continuar0.png", "imagens/GUI/botaoVoltar/continuar1.png")
+    sairBotao = criarBotao(som_x - 130, 560,"imagens/GUI/botaoSair/Sair0.png", "imagens/GUI/botaoSair/Sair1.png")
+    #menuBotao = criarBotao(som_x + 40, 560,"imagens/GUI/botaoSair/Sair0.png", "imagens/GUI/botaoSair/Sair1.png")
+    #fasesBotao = criarBotao(som_x + 210, 560,"imagens/GUI/botaoSair/Sair0.png", "imagens/GUI/botaoSair/Sair1.png")
+    run = True
+    while run:
+        tela.blit(configuracoesBackground, (0, 0))
+        posicaoMouse = pygame.mouse.get_pos()
+        cliqueMouse = pygame.mouse.get_pressed()
+
+        # Atualizar e desenhar botões
+        if somAtivo:
+            somLigadoBotao.atualizarImagem(posicaoMouse)
+            somLigadoBotao.desenharBotao(tela)
+        else:
+            somDesligadoBotao.atualizarImagem(posicaoMouse)
+            somDesligadoBotao.desenharBotao(tela)
+
+        voltarBotao.atualizarImagem(posicaoMouse)
+        voltarBotao.desenharBotao(tela)
+        sairBotao.atualizarImagem(posicaoMouse)
+        sairBotao.desenharBotao(tela)
+        #menuBotao.atualizarImagem(posicaoMouse)
+        #menuBotao.desenharBotao(tela)
+        #fasesBotao.atualizarImagem(posicaoMouse)
+        #fasesBotao.desenharBotao(tela)
+
+        # Barra de volume centralizada horizontalmente
+        barra_x, barra_y = (largura_tela - 300) // 2, som_y + altura_imagem + 50
+        barra_largura, barra_altura = 300, 10
+        pygame.draw.rect(tela, (100, 100, 100), (barra_x, barra_y, barra_largura, barra_altura))  # Fundo da barra
+        pygame.draw.rect(tela, (139, 69, 19), (barra_x, barra_y, int(volume * barra_largura), barra_altura))  # Barra de volume
+        pygame.draw.circle(tela, (139, 50, 17), (barra_x + int(volume * barra_largura), barra_y + barra_altura // 2), 10)  # Indicador do volume
+
+        if cliqueMouse[0] and barra_x <= posicaoMouse[0] <= barra_x + barra_largura and barra_y - 10 <= posicaoMouse[1] <= barra_y + barra_altura + 10:
+            volume = (posicaoMouse[0] - barra_x) / barra_largura
+            volume = max(0, min(volume, 1))
+            pygame.mixer.music.set_volume(volume)  # Atualiza o volume
+
+        # Texto do volume abaixo da barra
+        fonte = pygame.font.Font("sons/tipografia/LuckiestGuy-Regular.ttf", 25)
+        texto_volume = f"Volume: {int(volume * 100)}%"
+        texto_renderizado = fonte.render(texto_volume, True, (255, 255, 255))
+        texto_rect = texto_renderizado.get_rect(center=(barra_x + barra_largura // 2, barra_y + barra_altura + 30))
+        tela.blit(texto_renderizado, texto_rect.topleft)
+
+        # Verificar cliques
+        if somAtivo and somLigadoBotao.clicarBotao(tela):
+            som_click.play()  # Som de clique
+            somAtivo = False
+            pygame.mixer.music.pause()
+        elif not somAtivo and somDesligadoBotao.clicarBotao(tela):
+            som_click.play()  # Som de clique
+            somAtivo = True
+            pygame.mixer.music.unpause()
+
+        if voltarBotao.clicarBotao(tela):
+            som_click.play()  # Som de clique
+            run = False
+        if sairBotao.clicarBotao(tela):
+            som_click.play()  # Som de clique
+            confirmar_saida(tela)
+        #if menuBotao.clicarBotao(tela):
+        #    som_click.play()  # Som de clique
+        #   confirmar_saida(tela)
+        #if fasesBotao.clicarBotao(tela):
+        #   som_click.play()  # Som de clique
+        #   confirmar_saida(tela)
+
+        for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    confirmar_saida(tela)
+        pygame.display.update()
+        clock.tick(60)
 
 def abrirInstrucoes():
     global estadoJogo
@@ -275,15 +422,38 @@ def abrirCreditos():
     voltarBotao = criarBotao(20, 650, "imagens/GUI/botaoVoltar/voltar0.png", "imagens/GUI/botaoVoltar/voltar1.png")
 
     linhas_creditos = [
-        "                                  Desenvolvido por:   ",
+        "Lixo no lixo é um jogo educativo criado para ",
+        "ajudar na conscientização sobre a poluição.",
+        "Este jogo ajuda a lembrarmos que se deve",
+        "jogar lixo no chão para não danificar o ",
+        "meio ambiente!",
+        "Combinando com esse tema, também podemos",
+        "ajudar os jogadores a saberem quais",
+        "objetos pertencem aos lugares como:", 
+        " - Zoológico,",
+        " - Sala de aula,",
+        " - Praia.",
+        "",
+        "Lembre-se: sempre jogue o LIXO NO LIXO!",
+        "",
+        "Jogo produzido por:",
         "- Brenda Amanda da Silva Garcez",
+        "- Nicole Louise Matias Jamuchewski",
         "- João Rafael Moreira Anhaia",
         "- Matheus Vinícius dos Santos Sachinski",
-        "- Nicole Louise Matias Jamuchewski",
         "- Pedro Victor A. M. L. Maciel",
-
-        "                                   Ilustrações por:",
-        "- Nomes",
+        "                                  Desenvolvimento   ",
+        "- Brenda Amanda da Silva Garcez",
+        "- Matheus Vinícius dos Santos Sachinski",
+        "                                   Ilustrações",
+        "- João Rafael Moreira Anhaia",
+        "- Nicole Louise Matias Jamuchewski",
+        "                                   Audio e Vídeo",
+        "- Brenda Amanda da Silva Garcez",
+        "- Matheus Vinícius dos Santos Sachinski",
+        "- Nicole Louise Matias Jamuchewski",
+        "                                   Documentação",
+        "- Pedro Victor A. M. L. Maciel",
         "                                         Fontes por:",
         "- 'Luckiest' Guy por Astigmatic (Google Fonts)",
         "                             Obrigado por jogar!",
@@ -403,15 +573,22 @@ def iniciarFases():
     fasesBackground = pygame.image.load("imagens/GUI/Backgrounds/menuBackground.jpg")
     tela.blit(fasesBackground,(0,0))
     
+    largura_tela = tela.get_width()
+
     if somAtivo:
         tocar_musica("sons/musicaMenu/musicafundo.mp3")
         
-    # Criando botões para as fases
-    fase1Botao = criarBotao(80, 200, "imagens/GUI/botaoFases/botaoZoo0.png", "imagens/GUI/botaoFases/botaoZoo1.png")
-    fase2Botao = criarBotao(580, 200, "imagens/GUI/botaoFases/botaoSala0.png", "imagens/GUI/botaoFases/botaoSala1.png")
-    fase3Botao = criarBotao(400, 450, "imagens/GUI/botaoFases/botaoPraia0.png", "imagens/GUI/botaoFases/botaoPraia1.png")
-    voltarBotao = criarBotao(20, 650, "imagens/GUI/botaoVoltar/voltar0.png", "imagens/GUI/botaoVoltar/voltar1.png")
+    margem_lateral = (largura_tela - (2 * 430)) // 3  # Espaço entre as bordas e os botões
+    posicao_fase1 = (margem_lateral, 200)  # Primeiro botão na parte superior esquerda
+    posicao_fase2 = (margem_lateral + 430 + margem_lateral, 200)  # Segundo botão na parte superior direita
+    posicao_fase3 = ((largura_tela - 430) // 2, 450)  # Terceiro botão centralizado abaixo
+    posicao_voltar = (30, 630)  # Botão voltar no canto inferior esquerdo
 
+    # Criando botões para as fases
+    fase1Botao = criarBotao(posicao_fase1[0] + 5, posicao_fase1[1], "imagens/GUI/botaoFases/botaoZoo0.png", "imagens/GUI/botaoFases/botaoZoo1.png")
+    fase2Botao = criarBotao(posicao_fase2[0], posicao_fase2[1], "imagens/GUI/botaoFases/botaoSala0.png", "imagens/GUI/botaoFases/botaoSala1.png")
+    fase3Botao = criarBotao(posicao_fase3[0]+ 15, posicao_fase3[1], "imagens/GUI/botaoFases/botaoPraia0.png", "imagens/GUI/botaoFases/botaoPraia1.png")
+    voltarBotao = criarBotao(posicao_voltar[0], posicao_voltar[1], "imagens/GUI/botaoVoltar/voltar0.png", "imagens/GUI/botaoVoltar/voltar1.png")
     run = True
     while run:
         tela.blit(fasesBackground, (0, 0))
@@ -451,12 +628,11 @@ def iniciarFases():
             run = False
 
         for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                global rodando
-                rodando = False
-                run = False
+                if event.type == pygame.QUIT:
+                    confirmar_saida(tela)
 
         pygame.display.update()
+        clock.tick(60)
 
 def exibir_nome_objeto(obj):
     # Definir a fonte para o nome do objeto
@@ -847,15 +1023,13 @@ def fase1():
         if configuracoesBotao.clicarBotao(tela):
             som_click.play()  # Som de clique
             print("Configurações clicado")
-            abrirConfiguracoes()
+            abrirConfiguracoesFases()
         for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                global rodando
-                rodando = False
-                run = False
+                if event.type == pygame.QUIT:
+                    confirmar_saida(tela)
 
-        # Atualiza a tela
         pygame.display.update()
+        clock.tick(60)
 
 def fase2():
     global estadoJogo
@@ -1225,13 +1399,11 @@ def fase2():
             abrirConfiguracoes()
 
         for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                global rodando
-                rodando = False
-                run = False
+                if event.type == pygame.QUIT:
+                    confirmar_saida(tela)
 
-        # Atualiza a tela
         pygame.display.update()
+        clock.tick(60)
 
 def fase3():
     global estadoJogo
@@ -1663,7 +1835,7 @@ def menuPrincipal():
     instrucoesBotao = criarBotao(400, 425, "imagens/GUI/botaoInicio/instrucoes1.png", "imagens/GUI/botaoInicio/instrucoes01.png")
     sairBotao = criarBotao(40, 50, "imagens/GUI/botaoSair/sair0.png", "imagens/GUI/botaoSair/sair1.png")
     creditosBotao = criarBotao(1000, 640, "imagens/GUI/botaoConfiguracoes/info0.png", "imagens/GUI/botaoConfiguracoes/info1.png")  
-
+    pontuacaoBotao = criarBotao(402, 550, "imagens/GUI/botaoPontuacao/pontuacao0.png", "imagens/GUI/botaoPontuacao/pontuacao1.png")
     run = True
     while run:
         tela.blit(menuBackground, (0, 0))
@@ -1675,12 +1847,14 @@ def menuPrincipal():
         instrucoesBotao.atualizarImagem(posicaoMouse)
         sairBotao.atualizarImagem(posicaoMouse)
         creditosBotao.atualizarImagem(posicaoMouse)
+        pontuacaoBotao.atualizarImagem(posicaoMouse)
 
         jogarBotao.desenharBotao(tela)
         configuracoesBotao.desenharBotao(tela)
         instrucoesBotao.desenharBotao(tela)
         sairBotao.desenharBotao(tela)
         creditosBotao.desenharBotao(tela)
+        pontuacaoBotao.desenharBotao(tela)
 
         # Verificar cliques
         if jogarBotao.clicarBotao(tela):
@@ -1715,11 +1889,11 @@ def menuPrincipal():
             run = False
 
         for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                rodando = False
-                run = False
+                if event.type == pygame.QUIT:
+                    confirmar_saida(tela)
 
         pygame.display.update()
+        clock.tick(60)
 
 # Loop principal do jogo
 while rodando:
