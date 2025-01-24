@@ -1419,10 +1419,11 @@ def fase3():
             if tempo_restante == 0:
                 jogoPerdeu = True
 
-
-        # No loop principal, substituir o desenho dos retângulos pelas imagens
-        tela.blit(imagem_area_PRAIA, posicao_area_PRAIA)  # Exibir a área errada
-        tela.blit(imagem_area_LIXO, posicao_area_LIXO)  # Exibir a área correta
+        # Apenas processa o botão confirmar se o jogo ainda não foi ganho ou perdido
+        if not jogoGanhou and not jogoPerdeu:
+            # No loop principal, substituir o desenho dos retângulos pelas imagens
+            tela.blit(imagem_area_PRAIA, posicao_area_PRAIA)  # Exibir a área errada
+            tela.blit(imagem_area_LIXO, posicao_area_LIXO)  # Exibir a área correta
         
         # Exibir as vidas
         tela.blit(vida_imagens[vidas], (440, 640))  # Exibe a imagem das vidas no canto superior esquerdo
