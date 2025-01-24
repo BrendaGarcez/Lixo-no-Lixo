@@ -40,6 +40,18 @@ def criarBotaoImagens(x, y, imagem, imagemAlterada):
     
     return botaoObjetos.BotaoObjetos(x, y, imagem, imagemAlterada)
 
+def criarBotaoImagensFASE3(x, y, imagem, imagemAlterada):
+    imagem = pygame.image.load(imagem).convert_alpha()
+    imagemAlterada = pygame.image.load(imagemAlterada).convert_alpha()
+    
+    # Redimensionar as imagens
+    largura, altura = 160, 100  # Exemplo de tamanho, ajuste conforme necessário
+    imagem = pygame.transform.scale(imagem, (largura, altura))
+    imagemAlterada = pygame.transform.scale(imagemAlterada, (largura, altura))
+    
+    return botaoObjetos.BotaoObjetos(x, y, imagem, imagemAlterada)
+
+
 def tocar_musica(nova_musica): # FUNÇÃO DA MÚSICA DE FUNDO
     global musica_atual
     if musica_atual != nova_musica:  # Só troca se a música for diferente
@@ -1215,7 +1227,6 @@ def fase2():
         # Atualiza a tela
         pygame.display.update()
 
-
 def fase3():
     global estadoJogo
     fase1Background = pygame.image.load("imagens/fase3/imagemPraia.jpg")
@@ -1224,8 +1235,8 @@ def fase3():
     if somAtivo:
         tocar_musica("sons/musicaPraia/fundoPraia.mp3")  # Toca a primeira música
 
-    voltarBotao = criarBotao(20, 650, "imagens/GUI/botaoVoltar/voltar0.png", "imagens/GUI/botaoVoltar/voltar1.png")
-    configuracoesBotao = criarBotao(940, 660, "imagens/GUI/botaoConfiguracoes/configuracoes0.png", "imagens/GUI/botaoConfiguracoes/configuracoes1.png")
+    voltarBotao = criarBotao(20, 20, "imagens/GUI/botaoVoltar/voltar0.png", "imagens/GUI/botaoVoltar/voltar1.png")
+    configuracoesBotao = criarBotao(940, 20, "imagens/GUI/botaoConfiguracoes/configuracoes0.png", "imagens/GUI/botaoConfiguracoes/configuracoes1.png")
     
     # Configurações para o texto do temporizador
     fonte = pygame.font.Font("sons/tipografia/LuckiestGuy-Regular.ttf", 36)
@@ -1234,10 +1245,10 @@ def fase3():
     # Configurações para objetos
     largura_tela, altura_tela = tela.get_size()
     centro_x = largura_tela // 3 + 30
-    centro_y = altura_tela // 2 - 20
-    raio_x = largura_tela // 3 + 40
-    raio_y = altura_tela // 4
-    distancia_minima = 140  # Distância mínima entre objetos
+    centro_y = altura_tela // 2 - 80
+    raio_x = largura_tela // 3 + 10
+    raio_y = altura_tela // 4 - 20
+    distancia_minima = 120  # Distância mínima entre objetos
 
     # Lista de imagens
     imagensCorretas = [
@@ -1265,22 +1276,19 @@ def fase3():
         "imagens/fase3/incorretas/Maçã Comida.png",
         "imagens/fase3/incorretas/Papel.png",
         "imagens/fase3/incorretas/Saco de Papel.png",
-        "imagens/fase3/incorretas/Salgadinho.png",
     ]
 
     # Selecionando aleatoriamente 6 imagens corretas e 4 incorretas
-    imagensCorretasSelecionadas = random.sample(imagensCorretas, 6)  # Seleciona 6 imagens corretas aleatórias
-    imagensIncorretasSelecionadas = random.sample(imagensIncorretas, 4)  # Seleciona 4 imagens incorretas aleatórias
+    imagensCorretasSelecionadas = random.sample(imagensCorretas, 5)  # Seleciona 6 imagens corretas aleatórias
+    imagensIncorretasSelecionadas = random.sample(imagensIncorretas, 5)  # Seleciona 4 imagens incorretas aleatórias
 
     objetos = []
 
     imagensCorretasClicadas = 0  # Contador de imagens corretas clicadas
     imagensIncorretasClicadas = 0  # Contador de imagens incorretas clicadas
-
+    todasImagens = 0
     jogoGanhou = False  # variável para rastrear se o jogo foi vencido
     jogoPerdeu = False  # variável para rastrear se o jogo foi perdido
-
-    objetosSelecionados = []  # Lista para armazenar objetos selecionados
 
     # Definir o número de vidas
     vidas = 3  # O jogo começa com 3 vidas
@@ -1291,7 +1299,54 @@ def fase3():
         pygame.transform.scale(pygame.image.load("imagens/GUI/vidas/3vidas.png"), (220, 60))
     ]
 
-    # Função auxiliar para posicionar objetos
+    # Carregar as imagens das áreas
+    imagem_area_PRAIA = pygame.image.load("imagens/fase3/areas/areaPRAIA.png")
+    imagem_area_LIXO = pygame.image.load("imagens/fase3/areas/areaLIXO.png")
+
+    # Obter o tamanho original das imagens
+    tamanho_area_PRAIA = imagem_area_PRAIA.get_rect().size
+    tamanho_area_LIXO = imagem_area_LIXO.get_rect().size
+
+    # Fator de escala para diminuir o tamanho
+    fator_escala = 0.5
+
+    # Calcular o novo tamanho das imagens
+    novo_tamanho_area_PRAIA = (int(tamanho_area_PRAIA[0] * fator_escala), int(tamanho_area_PRAIA[1] * fator_escala))
+    novo_tamanho_area_LIXO = (int(tamanho_area_LIXO[0] * fator_escala), int(tamanho_area_LIXO[1] * fator_escala))
+
+    # Escalar as imagens
+    imagem_area_PRAIA = pygame.transform.scale(imagem_area_PRAIA, novo_tamanho_area_PRAIA)
+    imagem_area_LIXO = pygame.transform.scale(imagem_area_LIXO, novo_tamanho_area_LIXO)
+
+    # Posicionar as áreas na tela
+    posicao_area_PRAIA = (largura_tela - novo_tamanho_area_PRAIA[0] - 40, altura_tela - novo_tamanho_area_PRAIA[1] - 20)
+    posicao_area_LIXO = (40, altura_tela - novo_tamanho_area_LIXO[1] - 20)
+
+    # Criar os objetos de área (Rect) para facilitar a colisão
+    rect_area_PRAIA = pygame.Rect(posicao_area_PRAIA, novo_tamanho_area_PRAIA)
+    rect_area_LIXO = pygame.Rect(posicao_area_LIXO, novo_tamanho_area_LIXO)
+
+    # Função para verificar se o objeto está dentro da área da praia
+    def colisao_com_area_PRAIA(objeto):
+        # Criar o retângulo do objeto (assumindo que o objeto tem a posição 'x' e 'y' e a imagem do botão)
+        rect_objeto = pygame.Rect(objeto["x"], objeto["y"], objeto["botao"].imagem.get_width(), objeto["botao"].imagem.get_height())
+        
+        # Verificar se o objeto está completamente dentro da área da praia
+        if rect_area_PRAIA.colliderect(rect_objeto):
+            return True
+        return False
+
+    # Função para verificar se o objeto está dentro da área do lixo
+    def colisao_com_area_LIXO(objeto):
+        # Criar o retângulo do objeto (assumindo que o objeto tem a posição 'x' e 'y' e a imagem do botão)
+        rect_objeto = pygame.Rect(objeto["x"], objeto["y"], objeto["botao"].imagem.get_width(), objeto["botao"].imagem.get_height())
+        
+        # Verificar se o objeto está completamente dentro da área do lixo
+        if rect_area_LIXO.colliderect(rect_objeto):
+            return True
+        return False
+
+
     def posicionar_objetos(lista_imagens, tipo="correto"):
         imagens_selecionadas = lista_imagens  # Lista de imagens a posicionar
 
@@ -1319,32 +1374,34 @@ def fase3():
                         posicao_valida = False
                         break
 
+                # Verifica se está longe o suficiente das áreas de "correto" e "errado"
+                distancia_area_correta = math.sqrt((x - posicao_area_PRAIA[0])**2 + (y - posicao_area_PRAIA[1])**2)
+                distancia_area_errada = math.sqrt((x - posicao_area_LIXO[0])**2 + (y - posicao_area_LIXO[1])**2)
+                
+                if distancia_area_correta < distancia_minima or distancia_area_errada < distancia_minima:
+                    posicao_valida = False  # Se o objeto estiver muito perto das áreas, a posição é inválida
+
             if posicao_valida:
                 # Cria o botão para o objeto
-                botao = criarBotaoImagens(x, y, imagem, imagem)
+                botao = criarBotaoImagensFASE3(x, y, imagem, imagem)
                 objetos.append({"x": x, "y": y, "botao": botao, "tipo": tipo, "movimento": 0, "nome": nome_objeto})
             else:
                 print(f"Falha ao posicionar objeto após {tentativa} tentativas: {imagem}")
 
-
     # Posicionar objetos corretos e incorretos
     posicionar_objetos(imagensCorretasSelecionadas, "correto")
     posicionar_objetos(imagensIncorretasSelecionadas, "incorreto")
-
-    # Calcular a posição centralizada para o botão de confirmar na parte inferior
-    largura_botao_confirmar = 56  # Tamanho estimado do botão (ajuste conforme necessário)
-    altura_botao_confirmar = 56    # Altura estimada do botão (ajuste conforme necessário)
-    x_botao_confirmar = (largura_tela - 60 - largura_botao_confirmar) // 2  # Centraliza na horizontal
-    y_botao_confirmar = altura_tela - altura_botao_confirmar - 35      # Posiciona perto da parte inferior
-    
-    # Criar o botão de confirmar no centro inferior da tela
-    confirmarBotao = criarBotao(x_botao_confirmar, y_botao_confirmar, "imagens/GUI/botaoConfirmar/confirmar1.png", "imagens/GUI/botaoConfirmar/confirmar2.png")
 
      # Configurações do temporizador
     tempo_inicial = 120  # Tempo inicial em segundos
     tempo_restante = tempo_inicial
     tempo_inicializado = pygame.time.get_ticks()  # Registrar o momento em que o temporizador começa
     
+    # Variáveis para controle de arrasto
+    arrastando_objeto = None  # O objeto que está sendo arrastado
+    deslocamento_x = 0
+    deslocamento_y = 0
+
     mostrar_informacoes = True
     run = True
     while run:
@@ -1362,15 +1419,20 @@ def fase3():
             if tempo_restante == 0:
                 jogoPerdeu = True
 
+
+        # No loop principal, substituir o desenho dos retângulos pelas imagens
+        tela.blit(imagem_area_PRAIA, posicao_area_PRAIA)  # Exibir a área errada
+        tela.blit(imagem_area_LIXO, posicao_area_LIXO)  # Exibir a área correta
+        
         # Exibir as vidas
-        tela.blit(vida_imagens[vidas], (140, 640))  # Exibe a imagem das vidas no canto superior esquerdo
+        tela.blit(vida_imagens[vidas], (440, 640))  # Exibe a imagem das vidas no canto superior esquerdo
         # Configurações para o texto de "VIDAS"
         texto_vidas = "VIDAS"
         texto_vidas_contorno = fonte.render(texto_vidas, True, (0, 0, 0))  # Contorno preto
         texto_vidas_preenchimento = fonte.render(texto_vidas, True, cor_texto)  # Texto branco
 
         # Posição do texto "VIDAS" ajustada
-        posicao_vidas = (largura_tela // 4 - texto_vidas_contorno.get_width() // 1.32, altura_tela - 34)
+        posicao_vidas = (largura_tela // 2 - texto_vidas_contorno.get_width() + 65 // 1.32, altura_tela - 34)
 
         # Desenhar o texto com contorno
         tela.blit(texto_vidas_contorno, (posicao_vidas[0] - 1, posicao_vidas[1]))
@@ -1389,9 +1451,29 @@ def fase3():
             "imagens/GUI/botaoTentarnovamente/tentarnovamente.png"
         )
 
+        # Criar o botão de "Voltar ao Menu"
+        voltarMenuBotao = criarBotao(
+            405,  # Centraliza horizontalmente
+            469,  # Posiciona um pouco abaixo do botão "Próxima Fase"
+            "imagens/GUI/botaoVoltarMenu/voltaraomenu.png",  # Imagem do botão
+            "imagens/GUI/botaoVoltarMenu/voltaraomenu.png"  # Imagem do botão (hover)
+        )
+
         # Se o jogo foi ganho ou perdido, exibe o tempo total e o número de objetos errados
         if jogoGanhou or jogoPerdeu:
             mostrar_informacoes = False
+            
+            voltarMenuBotao.atualizarImagem(posicaoMouse)
+            voltarMenuBotao.desenharBotao(tela)
+
+            # Verificar clique no botão "Voltar ao Menu"
+            if voltarMenuBotao.clicarBotao(tela):
+                som_click.play()  # Tocar som de clique
+                print("Botão 'Voltar ao Menu' clicado.")
+                estadoJogo = "menu"  # Voltar para o menu
+                run = False  # Sai do loop atual
+                menuPrincipal()  # Chama a função do menu principa
+
             # Desenhar o botão "Tentar Novamente"
             botaoTentarNovamente.atualizarImagem(posicaoMouse)
             botaoTentarNovamente.desenharBotao(tela)
@@ -1401,8 +1483,8 @@ def fase3():
                 som_click.play()  # Tocar o som de clique
                 print("Botão 'Tentar Novamente' clicado.")
                 run = False  # Sai do loop atual
-                fase1()  # Reinicia a fase
-            
+                fase3()  # Reinicia a fase
+
             tempo_total = tempo_inicial - tempo_restante  # Tempo total que o jogador levou
             erros = imagensIncorretasClicadas  # Número de objetos errados que o jogador clicou
             
@@ -1443,8 +1525,8 @@ def fase3():
             tela.blit(texto_preenchimento_tempo, posicao_tempo)
 
             # Renderiza o texto do contador com contorno
-            texto_contorno = fonte.render(f"TOTAL DE OBJETOS: {imagensCorretasClicadas}/6", True, (0, 0, 0))  # Preto para o contorno
-            texto_preenchimento = fonte.render(f"TOTAL DE OBJETOS: {imagensCorretasClicadas}/6", True, cor_texto)  # Cor original
+            texto_contorno = fonte.render(f"TOTAL DE OBJETOS: {imagensCorretasClicadas}/10", True, (0, 0, 0))  # Preto para o contorno
+            texto_preenchimento = fonte.render(f"TOTAL DE OBJETOS: {imagensCorretasClicadas}/10", True, cor_texto)  # Cor original
 
             posicao_texto = (120, 130)  # Posição no canto superior esquerdo
 
@@ -1465,54 +1547,6 @@ def fase3():
         voltarBotao.desenharBotao(tela)
         configuracoesBotao.desenharBotao(tela)
 
-        # Apenas processa o botão confirmar se o jogo ainda não foi ganho ou perdido
-        if not jogoGanhou and not jogoPerdeu:
-            confirmarBotao.atualizarImagem(posicaoMouse)  # Atualiza a imagem do botão de confirmar
-            confirmarBotao.desenharBotao(tela)  # Desenha o botão de confirmar
-
-        # Atualizar e desenhar objetos com movimento
-        for obj in objetos:
-            botao = obj["botao"]
-            botao.atualizarImagem(posicaoMouse)
-            botao.desenharBotao(tela)
-
-            # Verifica se o mouse está sobre o objeto (hover)
-            if botao.rect.collidepoint(posicaoMouse):  # Verifica se o mouse está sobre o botão
-                exibir_nome_objeto(obj)  # Exibe o nome do objeto acima dele
-
-        # Verificar clique nos objetos
-        for obj in objetos:
-            if obj["botao"].clicarBotao(tela):
-                som_click.play()  # Som de clique
-                # Substituir o objeto selecionado
-                if objetosSelecionados:
-                    print(f"Objeto {objetosSelecionados[0]['tipo']} desmarcado.")
-                    objetosSelecionados.clear()  # Limpa a seleção atual
-
-                objetosSelecionados.append(obj)  # Seleciona o novo objeto
-                print(f"Objeto {obj['tipo']} selecionado na posição ({obj['x']}, {obj['y']})!")
-
-        # Verificar clique no botão de confirmar
-        if confirmarBotao.clicarBotao(tela):
-            som_click.play()  # Som de clique
-            for obj in objetosSelecionados:
-                if obj["tipo"] == "correto":
-                    imagensCorretasClicadas += 1
-                    if imagensCorretasClicadas == 6:  # Clicou em todas as imagens corretas
-                        jogoGanhou = True
-                    # Tocar som de resposta certa
-                    tocar_efeito_sonoro("sons/somObjetoCorreto/respostaCerta.mp3")
-                elif obj["tipo"] == "incorreto":
-                    imagensIncorretasClicadas += 1
-                    vidas -= 1  # Perde uma vida a cada erro
-                    if vidas == 0:
-                        jogoPerdeu = True
-                    # Tocar som de resposta errada
-                    tocar_efeito_sonoro("sons/somObjetoIncorreto/respostaErrada.mp3")
-                objetos.remove(obj)  # Remove o objeto selecionado
-            objetosSelecionados.clear()  # Limpa a lista de objetos selecionados
-            print("Seleção confirmada. Você pode selecionar outro objeto.")
-
         if voltarBotao.clicarBotao(tela):
             som_click.play()  # Som de clique
             print("Voltar clicado")
@@ -1523,14 +1557,90 @@ def fase3():
             som_click.play()  # Som de clique
             print("Configurações clicado")
             abrirConfiguracoes()
+
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 global rodando
                 rodando = False
                 run = False
 
-        # Atualiza a tela
-        pygame.display.update()
+            # Quando o mouse é pressionado (click) e um objeto é clicado
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if event.button == 1:  # Verifica se o botão pressionado é o esquerdo
+                    posicaoMouse = pygame.mouse.get_pos()
+                    som_click.play()  # Tocar o som de clique
+
+                    for obj in objetos:
+                        if obj["botao"].rect.collidepoint(posicaoMouse):  # Verifica se o mouse clicou no objeto
+                            arrastando_objeto = obj  # Inicia o arraste do objeto
+                            deslocamento_x = posicaoMouse[0] - obj["x"]  # Calcula o deslocamento
+                            deslocamento_y = posicaoMouse[1] - obj["y"]
+
+            # Durante o movimento do mouse, se estiver arrastando
+            elif event.type == pygame.MOUSEMOTION:
+                if arrastando_objeto and pygame.mouse.get_pressed()[0]:  # Verifica se o botão esquerdo está pressionado
+                    posicaoMouse = pygame.mouse.get_pos()
+                    # Atualiza a posição do objeto e o texto associado ao objeto
+                    arrastando_objeto["x"] = posicaoMouse[0] - deslocamento_x
+                    arrastando_objeto["y"] = posicaoMouse[1] - deslocamento_y
+
+            # Quando o mouse é solto, para o arraste
+            elif event.type == pygame.MOUSEBUTTONUP:
+                if event.button == 1:  # Verifica se o botão solto é o esquerdo
+                    if arrastando_objeto:
+                        # Verifica se o objeto foi colocado na área correta ou incorreta
+                        if colisao_com_area_PRAIA(arrastando_objeto):
+                            if arrastando_objeto["tipo"] == "correto":
+                                objetos.remove(arrastando_objeto)  # Remove o objeto da lista
+                                imagensCorretasClicadas += 1  # Incrementa a pontuação de objetos corretos
+                                todasImagens += 1
+                                tocar_efeito_sonoro("sons/somObjetoCorreto/respostaCerta.mp3")
+                            elif arrastando_objeto["tipo"] == "incorreto":
+                                objetos.remove(arrastando_objeto)  # Remove o objeto da lista
+                                imagensIncorretasClicadas += 1  # Incrementa a pontuação de objetos incorretos
+                                todasImagens += 1
+                                vidas -= 1
+                                if vidas == 0:
+                                    jogoPerdeu = True
+                                tocar_efeito_sonoro("sons/somObjetoIncorreto/respostaErrada.mp3")
+                        elif colisao_com_area_LIXO(arrastando_objeto):
+                            if arrastando_objeto["tipo"] == "correto":
+                                objetos.remove(arrastando_objeto)  # Remove o objeto da lista
+                                imagensIncorretasClicadas += 1  # Incrementa a pontuação de objetos incorretos
+                                todasImagens += 1
+                                vidas -= 1
+                                if vidas == 0:
+                                    jogoPerdeu = True
+                                tocar_efeito_sonoro("sons/somObjetoIncorreto/respostaErrada.mp3")
+                            elif arrastando_objeto["tipo"] == "incorreto":
+                                objetos.remove(arrastando_objeto)  # Remove o objeto da lista
+                                imagensCorretasClicadas += 1  # Incrementa a pontuação de objetos corretos
+                                todasImagens += 1
+                                tocar_efeito_sonoro("sons/somObjetoCorreto/respostaCerta.mp3")
+
+                        if imagensCorretasClicadas == 10:
+                            jogoGanhou = True
+                        elif imagensCorretasClicadas >= 5 and todasImagens == 10:
+                            jogoGanhou = True
+                        elif imagensCorretasClicadas < 5 and todasImagens == 10:
+                            jogoPerdeu = True
+                        
+                        # Para o arraste ao soltar o botão do mouse
+                        arrastando_objeto = None
+
+            # Atualizar e desenhar os objetos com as novas posições
+            for obj in objetos:
+                botao = obj["botao"]
+                botao.rect.topleft = (obj["x"], obj["y"])  # Atualiza a posição do objeto gráfico
+                botao.atualizarImagem(posicaoMouse)  # Atualiza a imagem do objeto (se necessário)
+                botao.desenharBotao(tela)  # Desenha o objeto na nova posição
+
+                # Verifica se o mouse está sobre o objeto (hover)
+                if botao.rect.collidepoint(posicaoMouse):
+                    exibir_nome_objeto(obj)  # Exibe o nome do objeto acima dele
+
+            # Atualiza a tela
+            pygame.display.update() 
 
 # Função para o menu principal
 def menuPrincipal():
