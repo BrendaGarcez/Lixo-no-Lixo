@@ -8,14 +8,9 @@ Geral de Trabalho
 
 ---- Mudanças professora ----
 -Layout detalhes p/professor 
--Sobre o jogo + créditos 
--Info de total objetos por fase (feito)
 -Alterar botão confirmar (feito, mas falta imagem)       
 -Mudar o você perdeu (pedir imagem novas)
 -Visibilidade dos itens melhor (feito?)
--Mostrar quantos itens tem que selecionar nas fases (feito)
--Colocar limite de tempo (feito)
-
 
 Geral de aplicativo
 -->>> Design de Lixos, Botões e Tutoriais
@@ -34,40 +29,31 @@ Telas:
 - Organizar tamanhos 
 
 -----Créditos-----
-- particularmente pronto  (corrigir algumas coisas lá)
+- Pronto
 
 -----Configurações-----
--Estética
+- Estética
 
 -----Sons-----
--Todos(escolher)
-	- Sons de movimentação (??)
-	- Musica de fundo (em andamento)
-	- Nome dos objetos falados (a pensar)
+- Nome dos objetos falados 
 
 -----Fase 1-----
--> objetos de cena (feito)
 -> botão de confirmar (feito)
 -> mensagens de apoio caso erro e de incentivo caso acerto (a pensar)
 -> Lógica do jogo(pontuação, quantidade de itens, tempo) (falta lógica do relatário)
 -> áudio dos nomes (a pensar)
--> legenda paras os itens (fazer, talvez alguma lógica com a "colisão do mouse e objeto", dar um pop-out de um texto em cima, dá para usar a fonte bonitinha lá)
 
 LÓGICA DAS PRÓXIMAS FASES SERÁ SEMELHANTE A 1, a 3 precisará mudar um pouco mais
 
 -----Fase 2-----
--> objetos de cena
 -> botão de confirmar
 -> mensagens de apoio caso erro e de incentivo caso acerto
--> Lógica do jogo(pontuação, quantidade de itens, tempo)
+-> Lógica do jogo(para relatório)
 -> áudio dos nomes
--> legenda paras os itens
 
 -----Fase 3-----
--> objetos de cena
 -> área de lixo e de coisas da praia
 -> mensagens de apoio caso erro e de incentivo caso acerto
--> Lógica do jogo(pontuação, quantidade de itens, tempo)
+-> Lógica do jogo(para relatório)
 -> áudio dos nomes
--> legenda paras os itens
 

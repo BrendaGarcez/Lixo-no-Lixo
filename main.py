@@ -4,7 +4,6 @@ import botaoObjetos
 import sys
 import random
 import math
-import time
 
 pygame.init()  # Inicializa os módulos do pygame
 pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_HAND)  # Muda o cursor para a mão
