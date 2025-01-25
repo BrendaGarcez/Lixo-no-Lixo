@@ -253,7 +253,7 @@ def abrirConfiguracoesFases():
             pygame.mixer.music.set_volume(volume)  # Atualiza o volume
 
         # Texto do volume abaixo da barra
-        fonte = pygame.font.Font("sons/tipografia/LuckiestGuy-Regular.ttf", 25)
+        fonte = pygame.font.Font("LuckiestGuy-Regular.ttf", 25)
         texto_volume = f"Volume: {int(volume * 100)}%"
         texto_renderizado = fonte.render(texto_volume, True, (255, 255, 255))
         texto_rect = texto_renderizado.get_rect(center=(barra_x + barra_largura // 2, barra_y + barra_altura + 30))
@@ -310,7 +310,7 @@ def abrirInstrucoes():
         "Boa sorte e divirta-se!",
     ]
 
-    fonte = pygame.font.Font("sons/tipografia/LuckiestGuy-Regular.ttf", 20)
+    fonte = pygame.font.Font("LuckiestGuy-Regular.ttf", 20)
     cor_texto = (255, 255, 255)
     espacamento = 40
 
@@ -458,7 +458,7 @@ def abrirCreditos():
         "                             Obrigado por jogar!",
     ]
 
-    fonte = pygame.font.Font("sons/tipografia/LuckiestGuy-Regular.ttf", 26)  # 40 é o tamanho da fonte
+    fonte = pygame.font.Font("LuckiestGuy-Regular.ttf", 26)  # 40 é o tamanho da fonte
     cor_texto = (255, 255, 255)  # Cor do texto
     espacamento = 50  # Espaçamento entre linhas
 
@@ -635,7 +635,7 @@ def iniciarFases():
 
 def exibir_nome_objeto(obj):
     # Definir a fonte para o nome do objeto
-    fonte_nome = pygame.font.Font("sons/tipografia/LuckiestGuy-Regular.ttf", 24)
+    fonte_nome = pygame.font.Font("LuckiestGuy-Regular.ttf", 24)
     nome_objeto = obj["nome"]  # Usa o nome extraído da imagem
     cor_texto = (255, 255, 255)  # Cor do texto (branco)
 
@@ -667,7 +667,7 @@ def fase1():
     configuracoesBotao = criarBotao(940, 660, "imagens/GUI/botaoConfiguracoes/configuracoes0.png", "imagens/GUI/botaoConfiguracoes/configuracoes1.png")
     
     # Configurações para o texto do temporizador
-    fonte = pygame.font.Font("sons/tipografia/LuckiestGuy-Regular.ttf", 36)
+    fonte = pygame.font.Font("LuckiestGuy-Regular.ttf", 36)
     cor_texto = (255, 255, 255)  # Branco
     
     # Configurações para objetos
@@ -1042,7 +1042,7 @@ def fase2():
     configuracoesBotao = criarBotao(940, 660, "imagens/GUI/botaoConfiguracoes/configuracoes0.png", "imagens/GUI/botaoConfiguracoes/configuracoes1.png")
     
     # Configurações para o texto do temporizador
-    fonte = pygame.font.Font("sons/tipografia/LuckiestGuy-Regular.ttf", 36)
+    fonte = pygame.font.Font("LuckiestGuy-Regular.ttf", 36)
     cor_texto = (255, 255, 255)  # Branco
     
     # Configurações para objetos
@@ -1054,7 +1054,7 @@ def fase2():
     distancia_minima = 140  # Distância mínima entre objetos
 
     # Inicializa a fonte para o texto do contador
-    fonte = pygame.font.Font("sons/tipografia/LuckiestGuy-Regular.ttf", 36)  # 'None' usa a fonte padrão; 36 é o tamanho 
+    fonte = pygame.font.Font("LuckiestGuy-Regular.ttf", 36)  # 'None' usa a fonte padrão; 36 é o tamanho 
     cor_texto = (255, 255, 255)  # Cor do texto (branco)
 
     # Lista de imagens
@@ -1416,7 +1416,7 @@ def fase3():
     configuracoesBotao = criarBotao(940, 20, "imagens/GUI/botaoConfiguracoes/configuracoes0.png", "imagens/GUI/botaoConfiguracoes/configuracoes1.png")
     
     # Configurações para o texto do temporizador
-    fonte = pygame.font.Font("sons/tipografia/LuckiestGuy-Regular.ttf", 36)
+    fonte = pygame.font.Font("LuckiestGuy-Regular.ttf", 36)
     cor_texto = (255, 255, 255)  # Branco
     
     # Configurações para objetos
