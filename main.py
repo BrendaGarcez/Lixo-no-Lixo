@@ -224,6 +224,7 @@ def abrirConfiguracoes():
 
 def abrirConfiguracoesFases():
     global somAtivo
+    global estadoJogo
 
     configuracoesBackground = pygame.image.load("imagens/GUI/Backgrounds/configuracoesBackground.jpg")
     tela.blit(configuracoesBackground, (0, 0))
@@ -303,7 +304,9 @@ def abrirConfiguracoesFases():
             confirmar_saida(tela)
         if menuBotao.clicarBotao(tela):
             som_click.play()  # Som de clique
-            menuPrincipal()
+            estadoJogo = "menu"  # Voltar para o menu
+            run = False  # Sai do loop atual
+            menuPrincipal()  # Chama a função do menu principa
         if fasesBotao.clicarBotao(tela):
            som_click.play()  # Som de clique
            iniciarFases()
