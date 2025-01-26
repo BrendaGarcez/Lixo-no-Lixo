@@ -156,7 +156,7 @@ def abrirConfiguracoes():
 
     somLigadoBotao = criarBotao(som_x, som_y, "imagens/GUI/botaoSom/ligado0.png", "imagens/GUI/botaoSom/ligado1.png")
     somDesligadoBotao = criarBotao(som_x, som_y, "imagens/GUI/botaoSom/desligado0.png", "imagens/GUI/botaoSom/desligado1.png")
-    voltarBotao = criarBotao(20, 650, "imagens/GUI/botaoVoltar/voltar0.png", "imagens/GUI/botaoVoltar/voltar1.png")
+    voltarBotao = criarBotao(20, 660, "imagens/GUI/botaoVoltar/voltar0.png", "imagens/GUI/botaoVoltar/voltar1.png")
     sairBotao = criarBotao(som_x - 20, 560,"imagens/GUI/botaoSair/Sair0.png", "imagens/GUI/botaoSair/Sair1.png")
 
     run = True
@@ -444,7 +444,7 @@ def abrirInstrucoes():
 def abrirCreditos():
     global estadoJogo
     creditosBackground = pygame.image.load("imagens/GUI/Backgrounds/creditos.jpg")
-    voltarBotao = criarBotao(20, 650, "imagens/GUI/botaoVoltar/voltar0.png", "imagens/GUI/botaoVoltar/voltar1.png")
+    voltarBotao = criarBotao(20, 660, "imagens/GUI/botaoVoltar/voltar0.png", "imagens/GUI/botaoVoltar/voltar1.png")
 
     linhas_creditos = [
         "Lixo no lixo é um jogo educativo criado para ",
@@ -599,7 +599,7 @@ def relatorio():
     tela.blit(fasesBackground, (0, 0))
 
     # Botões
-    voltarBotao = criarBotao(20, 650, "imagens/GUI/botaoVoltar/voltar0.png", "imagens/GUI/botaoVoltar/voltar1.png")
+    voltarBotao = criarBotao(20, 660, "imagens/GUI/botaoVoltar/voltar0.png", "imagens/GUI/botaoVoltar/voltar1.png")
     configuracoesBotao = criarBotao(940, 660, "imagens/GUI/botaoConfiguracoes/configuracoes0.png", "imagens/GUI/botaoConfiguracoes/configuracoes1.png")
 
     # Fonte para exibir o texto
@@ -764,7 +764,7 @@ def fase1():
     if somAtivo:
         tocar_musica("sons/musicaZoo/fundoZoo.mp3")  # Toca a primeira música
 
-    voltarBotao = criarBotao(20, 650, "imagens/GUI/botaoVoltar/voltar0.png", "imagens/GUI/botaoVoltar/voltar1.png")
+    voltarBotao = criarBotao(20, 660, "imagens/GUI/botaoVoltar/voltar0.png", "imagens/GUI/botaoVoltar/voltar1.png")
     configuracoesBotao = criarBotao(940, 660, "imagens/GUI/botaoConfiguracoes/configuracoes0.png", "imagens/GUI/botaoConfiguracoes/configuracoes1.png")
     
     # Configurações para o texto do temporizador
@@ -1152,7 +1152,7 @@ def fase2():
     if somAtivo:
         tocar_musica("sons/musicaSala/fundoSala.mp3")  # Toca a primeira música
 
-    voltarBotao = criarBotao(20, 650, "imagens/GUI/botaoVoltar/voltar0.png", "imagens/GUI/botaoVoltar/voltar1.png")
+    voltarBotao = criarBotao(20, 660, "imagens/GUI/botaoVoltar/voltar0.png", "imagens/GUI/botaoVoltar/voltar1.png")
     configuracoesBotao = criarBotao(940, 660, "imagens/GUI/botaoConfiguracoes/configuracoes0.png", "imagens/GUI/botaoConfiguracoes/configuracoes1.png")
     
     # Configurações para o texto do temporizador
