@@ -1306,7 +1306,7 @@ def fase2():
         # Desenhar o texto preenchido no centro
         tela.blit(texto_vidas_preenchimento, posicao_vidas)
 
-        # Adicionar o botão "Tentar Novamente" para as telas de vitória e derrota
+         # Adicionar o botão "Tentar Novamente" para as telas de vitória e derrota
         botaoTentarNovamente = criarBotao(
             402,  # Centraliza horizontalmente
             350,  # Posiciona um pouco abaixo do texto
@@ -1316,7 +1316,7 @@ def fase2():
 
         # Criar o botão de "Próxima Fase"
         proximaFaseBotao = criarBotao(
-            405,  # Centraliza horizontalmente
+            410,  # Centraliza horizontalmente
             460,  # Posiciona um pouco abaixo do botão "Tentar Novamente"
             "imagens/GUI/botaoProximaFase/proximafase0.png",  # Imagem do botão
             "imagens/GUI/botaoProximaFase/proximafase1.png"  # Imagem do botão (hover)
@@ -1325,7 +1325,7 @@ def fase2():
         # Criar o botão de "Voltar ao Menu"
         voltarMenuBotao = criarBotao(
             405,  # Centraliza horizontalmente
-            540,  # Posiciona um pouco abaixo do botão "Próxima Fase"
+            550,  # Posiciona um pouco abaixo do botão "Próxima Fase"
             "imagens/GUI/botaoVoltarMenu/voltaraomenu.png",  # Imagem do botão
             "imagens/GUI/botaoVoltarMenu/voltaraomenu1.png"  # Imagem do botão (hover)
         )
