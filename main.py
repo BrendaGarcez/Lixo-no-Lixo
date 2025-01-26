@@ -758,7 +758,7 @@ def fase1():
     global estadoJogo, jogoConcluido, pontuacao_fase1
     pontuacao_fase1 = 0
     jogoConcluido = False
-    fase1Background = pygame.image.load("imagens/fase1/imagemZoologico.jpg")
+    fase1Background = pygame.image.load("imagens/fase1/imagemZoologico.png")
 
     # Verificar som
     if somAtivo:
@@ -925,30 +925,30 @@ def fase1():
             402,  # Centraliza horizontalmente
             350,  # Posiciona um pouco abaixo do texto
             "imagens/GUI/botaoTentarnovamente/tentarnovamente.png",
-            "imagens/GUI/botaoTentarnovamente/tentarnovamente.png"
+            "imagens/GUI/botaoTentarnovamente/tentarnovamente1.png"
         )
 
         # Criar o botão de "Próxima Fase"
         proximaFaseBotao = criarBotao(
-            405,  # Centraliza horizontalmente
+            410,  # Centraliza horizontalmente
             460,  # Posiciona um pouco abaixo do botão "Tentar Novamente"
-            "imagens/GUI/botaoProximaFase/proximafase.png",  # Imagem do botão
-            "imagens/GUI/botaoProximaFase/proximafase.png"  # Imagem do botão (hover)
+            "imagens/GUI/botaoProximaFase/proximafase0.png",  # Imagem do botão
+            "imagens/GUI/botaoProximaFase/proximafase1.png"  # Imagem do botão (hover)
         )
 
         # Criar o botão de "Voltar ao Menu"
         voltarMenuBotao = criarBotao(
             405,  # Centraliza horizontalmente
-            540,  # Posiciona um pouco abaixo do botão "Próxima Fase"
+            550,  # Posiciona um pouco abaixo do botão "Próxima Fase"
             "imagens/GUI/botaoVoltarMenu/voltaraomenu.png",  # Imagem do botão
-            "imagens/GUI/botaoVoltarMenu/voltaraomenu.png"  # Imagem do botão (hover)
+            "imagens/GUI/botaoVoltarMenu/voltaraomenu1.png"  # Imagem do botão (hover)
         )
 
         voltarMenuBotao2 = criarBotao(
             405,  # Centraliza horizontalmente
             460,  # Posiciona um pouco abaixo do botão "Próxima Fase"
             "imagens/GUI/botaoVoltarMenu/voltaraomenu.png",  # Imagem do botão
-            "imagens/GUI/botaoVoltarMenu/voltaraomenu.png"  # Imagem do botão (hover)
+            "imagens/GUI/botaoVoltarMenu/voltaraomenu1.png"  # Imagem do botão (hover)
         )
 
         # Se o jogo foi ganho ou perdido, exibe o tempo total e o número de objetos errados
@@ -1146,7 +1146,7 @@ def fase2():
     global estadoJogo, jogoConcluido, pontuacao_fase2
     pontuacao_fase2 = 0
     jogoConcluido = False
-    fase1Background = pygame.image.load("imagens/fase2/imagemSaladeAula.jpg")
+    fase1Background = pygame.image.load("imagens/fase2/imagemSaladeAula.png")
 
     # Verificar som
     if somAtivo:
@@ -1311,15 +1311,15 @@ def fase2():
             402,  # Centraliza horizontalmente
             350,  # Posiciona um pouco abaixo do texto
             "imagens/GUI/botaoTentarnovamente/tentarnovamente.png",
-            "imagens/GUI/botaoTentarnovamente/tentarnovamente.png"
+            "imagens/GUI/botaoTentarnovamente/tentarnovamente1.png"
         )
 
         # Criar o botão de "Próxima Fase"
         proximaFaseBotao = criarBotao(
             405,  # Centraliza horizontalmente
             460,  # Posiciona um pouco abaixo do botão "Tentar Novamente"
-            "imagens/GUI/botaoProximaFase/proximafase.png",  # Imagem do botão
-            "imagens/GUI/botaoProximaFase/proximafase.png"  # Imagem do botão (hover)
+            "imagens/GUI/botaoProximaFase/proximafase0.png",  # Imagem do botão
+            "imagens/GUI/botaoProximaFase/proximafase1.png"  # Imagem do botão (hover)
         )
 
         # Criar o botão de "Voltar ao Menu"
@@ -1327,14 +1327,14 @@ def fase2():
             405,  # Centraliza horizontalmente
             540,  # Posiciona um pouco abaixo do botão "Próxima Fase"
             "imagens/GUI/botaoVoltarMenu/voltaraomenu.png",  # Imagem do botão
-            "imagens/GUI/botaoVoltarMenu/voltaraomenu.png"  # Imagem do botão (hover)
+            "imagens/GUI/botaoVoltarMenu/voltaraomenu1.png"  # Imagem do botão (hover)
         )
 
         voltarMenuBotao2 = criarBotao(
             405,  # Centraliza horizontalmente
             460,  # Posiciona um pouco abaixo do botão "Próxima Fase"
             "imagens/GUI/botaoVoltarMenu/voltaraomenu.png",  # Imagem do botão
-            "imagens/GUI/botaoVoltarMenu/voltaraomenu.png"  # Imagem do botão (hover)
+            "imagens/GUI/botaoVoltarMenu/voltaraomenu1.png"  # Imagem do botão (hover)
         )
 
         # Se o jogo foi ganho ou perdido, exibe o tempo total e o número de objetos errados
@@ -1755,7 +1755,7 @@ def fase3():
             402,  # Centraliza horizontalmente
             350,  # Posiciona um pouco abaixo do texto
             "imagens/GUI/botaoTentarnovamente/tentarnovamente.png",
-            "imagens/GUI/botaoTentarnovamente/tentarnovamente.png"
+            "imagens/GUI/botaoTentarnovamente/tentarnovamente1.png"
         )
 
         # Criar o botão de "Voltar ao Menu"
@@ -1763,7 +1763,7 @@ def fase3():
             405,  # Centraliza horizontalmente
             469,  # Posiciona um pouco abaixo do botão "Próxima Fase"
             "imagens/GUI/botaoVoltarMenu/voltaraomenu.png",  # Imagem do botão
-            "imagens/GUI/botaoVoltarMenu/voltaraomenu.png"  # Imagem do botão (hover)
+            "imagens/GUI/botaoVoltarMenu/voltaraomenu1.png"  # Imagem do botão (hover)
         )
 
         # Se o jogo foi ganho ou perdido, exibe o tempo total e o número de objetos errados
@@ -1967,7 +1967,7 @@ def menuPrincipal():
     # Criando botões do menu
     jogarBotao = criarBotao(400, 300, "imagens/GUI/botaoJogar/jogar0.png", "imagens/GUI/botaoJogar/jogar1.png")
     configuracoesBotao = criarBotao(900, 50, "imagens/GUI/botaoConfiguracoes/configuracoes0.png", "imagens/GUI/botaoConfiguracoes/configuracoes1.png")
-    instrucoesBotao = criarBotao(400, 425, "imagens/GUI/botaoInicio/instrucoes1.png", "imagens/GUI/botaoInicio/instrucoes01.png")
+    instrucoesBotao = criarBotao(410, 425, "imagens/GUI/botaoInicio/instrucoes1.png", "imagens/GUI/botaoInicio/instrucoes01.png")
     sairBotao = criarBotao(40, 50, "imagens/GUI/botaoSair/sair0.png", "imagens/GUI/botaoSair/sair1.png")
     creditosBotao = criarBotao(1000, 640, "imagens/GUI/botaoConfiguracoes/info0.png", "imagens/GUI/botaoConfiguracoes/info1.png")  
     pontuacaoBotao = criarBotao(402, 550, "imagens/GUI/botaoPontuacao/pontuacao0.png", "imagens/GUI/botaoPontuacao/pontuacao1.png")
