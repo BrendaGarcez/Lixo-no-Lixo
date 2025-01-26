@@ -7,8 +7,7 @@ Geral de Trabalho
 
 
 ---- Mudanças professora ----
--Layout detalhes p/professor 
--Alterar botão confirmar (feito, mas falta imagem)       
+-Layout detalhes p/professor       
 -Mudar o você perdeu (pedir imagem novas)
 -Visibilidade dos itens melhor (feito?)
 
@@ -23,22 +22,18 @@ Telas:
 - Tela de Pontuação (Ainda verificar como fara a área do avaliador)
 
 -----Instruções----- 
-- FALTA ARRUMAR TUDO AQUI PRATICAMENTE
-- Troca de tela quando clica no botão de cada fase
-- Tamanho dos botões
-- Organizar tamanhos 
+- Pronto
 
 -----Créditos-----
 - Pronto
 
 -----Configurações-----
-- Estética
+- Pronto
 
 -----Sons-----
 - Nome dos objetos falados 
 
 -----Fase 1-----
--> botão de confirmar (feito)
 -> mensagens de apoio caso erro e de incentivo caso acerto (a pensar)
 -> Lógica do jogo(pontuação, quantidade de itens, tempo) (falta lógica do relatário)
 -> áudio dos nomes (a pensar)
@@ -46,7 +41,6 @@ Telas:
 LÓGICA DAS PRÓXIMAS FASES SERÁ SEMELHANTE A 1, a 3 precisará mudar um pouco mais
 
 -----Fase 2-----
--> botão de confirmar
 -> mensagens de apoio caso erro e de incentivo caso acerto
 -> Lógica do jogo(para relatório)
 -> áudio dos nomes

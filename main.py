@@ -239,10 +239,10 @@ def abrirConfiguracoesFases():
 
     somLigadoBotao = criarBotao(som_x, som_y, "imagens/GUI/botaoSom/ligado0.png", "imagens/GUI/botaoSom/ligado1.png")
     somDesligadoBotao = criarBotao(som_x, som_y, "imagens/GUI/botaoSom/desligado0.png", "imagens/GUI/botaoSom/desligado1.png")
-    voltarBotao = criarBotao(som_x - 300, 560, "imagens/GUI/botaoVoltar/continuar0.png", "imagens/GUI/botaoVoltar/continuar1.png")
-    sairBotao = criarBotao(som_x - 130, 560,"imagens/GUI/botaoSair/Sair0.png", "imagens/GUI/botaoSair/Sair1.png")
-    #menuBotao = criarBotao(som_x + 40, 560,"imagens/GUI/botaoSair/Sair0.png", "imagens/GUI/botaoSair/Sair1.png")
-    #fasesBotao = criarBotao(som_x + 210, 560,"imagens/GUI/botaoSair/Sair0.png", "imagens/GUI/botaoSair/Sair1.png")
+    voltarBotao = criarBotao(som_x - 275, 540, "imagens/GUI/botaoVoltar/continuar0.png", "imagens/GUI/botaoVoltar/continuar1.png")
+    sairBotao = criarBotao(som_x - 105, 540,"imagens/GUI/botaoSair/Sair0.png", "imagens/GUI/botaoSair/Sair1.png")
+    menuBotao = criarBotao(som_x + 65, 540,"imagens/GUI/botaoInicio/botaoHome.png", "imagens/GUI/botaoInicio/botaoHome.png")
+    fasesBotao = criarBotao(som_x + 235, 540,"imagens/GUI/botaoFases/botaoFases.png", "imagens/GUI/botaoFases/botaoFases.png")
     run = True
     while run:
         tela.blit(configuracoesBackground, (0, 0))
@@ -261,10 +261,10 @@ def abrirConfiguracoesFases():
         voltarBotao.desenharBotao(tela)
         sairBotao.atualizarImagem(posicaoMouse)
         sairBotao.desenharBotao(tela)
-        #menuBotao.atualizarImagem(posicaoMouse)
-        #menuBotao.desenharBotao(tela)
-        #fasesBotao.atualizarImagem(posicaoMouse)
-        #fasesBotao.desenharBotao(tela)
+        menuBotao.atualizarImagem(posicaoMouse)
+        menuBotao.desenharBotao(tela)
+        fasesBotao.atualizarImagem(posicaoMouse)
+        fasesBotao.desenharBotao(tela)
 
         # Barra de volume centralizada horizontalmente
         barra_x, barra_y = (largura_tela - 300) // 2, som_y + altura_imagem + 50
@@ -301,12 +301,12 @@ def abrirConfiguracoesFases():
         if sairBotao.clicarBotao(tela):
             som_click.play()  # Som de clique
             confirmar_saida(tela)
-        #if menuBotao.clicarBotao(tela):
-        #    som_click.play()  # Som de clique
-        #   confirmar_saida(tela)
-        #if fasesBotao.clicarBotao(tela):
-        #   som_click.play()  # Som de clique
-        #   confirmar_saida(tela)
+        if menuBotao.clicarBotao(tela):
+            som_click.play()  # Som de clique
+            menuPrincipal()
+        if fasesBotao.clicarBotao(tela):
+           som_click.play()  # Som de clique
+           iniciarFases()
 
         for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -323,20 +323,72 @@ def abrirInstrucoes():
     fase2Botao = criarBotao(20, 370, "imagens/fase2/faseBotao2.png", "imagens/fase2/faseBotao2.png")
     fase3Botao = criarBotao(20, 490, "imagens/fase3/faseBotao3.png", "imagens/fase3/faseBotao3.png")
 
-    instrucoes_texto = [
+    # Textos das fases
+    texto_fase1 = [
         "",
-        "Bem-vindo ao jogo!",
+        "                           Bem-vindo à Fase 1!",
+        " Nesta fase estamos no zoológico,",
+        " O zoológico é um lugar que protege os ",
+        " animais que não podem estar na cidade,",
+        " voce pode ajudar a identificar quais ",
+        " são os animais que devem ir para suas",
+        " jaulas?",
         "",
-        "Instruções:",
-        "- Utilize as setas do teclado para movimentar o personagem.",
-        "- Colete os itens correspondentes para marcar pontos.",
-        "- Evite os obstáculos para não perder vidas.",
-        "- Use o botão de 'Pause' para pausar o jogo.",
+        " Objetivo:",
+        " - Selecione os animais.",
+        " - Evite os lixos.",
         "",
-        "Boa sorte e divirta-se!",
+        " Boa sorte!"
+    ]
+    texto_fase2 = [
+        "",
+        "                           Bem-vindo à Fase 2!",
+        " Nesta fase estamos na sala de aula,",
+        " Alguem espalhou lixo pela sala inteira!",
+        " Não podemos deixar a sala suja ",
+        " desse jeito, selecione todos",
+        " os objetos que nao deveria estar na",
+        " sala de aula",
+        "",
+        " Objetivo:",
+        " - Selecione o Lixo!",
+        " - Evite os que pertence a Sala de Aula.",
+        "",
+        " Boa sorte!"
+    ]
+    texto_fase3 = [
+        "",
+        "                           Bem-vindo à Fase 3!",
+        " Nesta fase estamos na praia,",
+        " Alguem espalhou lixo pela praia toda!",
+        " Não podemos deixar tudo se misturar ",
+        " dessa forma, arraste todos os objetos ",
+        " que nao deveriam estar na praia ",
+        " para o lixo, e os nossos itens de ",
+        " praia para a cesta de praia!",
+        "",
+        " Objetivo:",
+        " - Arraste o lixo para a área do lixo",
+        " na tela.",
+        " - Arraste os itens de praia para a área ",
+        " da cesta na tela.",
+        "",
+        " Boa sorte!"
     ]
 
-    fonte = pygame.font.Font("tipografia/LuckiestGuy-Regular.ttf", 20)
+    texto_atual = [
+        "",
+        "                           Bem-vindo ao Jogo!",
+        " Informações Gerais: ",
+        " - Informe seu nome para sua pontuação ",
+        " ficar salva",
+        " - Clique nos itens para ouvir o nome ",
+        " deles",
+        " - Passe o mouse por cima dos itens ",
+        " para saber o nome deles"
+    ]
+
+    fonte = pygame.font.Font("tipografia/LuckiestGuy-Regular.ttf", 30)
     cor_texto = (255, 255, 255)
     espacamento = 40
 
@@ -344,7 +396,7 @@ def abrirInstrucoes():
     altura_quadro = 480
     posicao_quadro = (330, 180)
 
-    altura_conteudo = len(instrucoes_texto) * espacamento
+    altura_conteudo = len(texto_atual) * espacamento
     deslocamento = 0  # Posição inicial
     clicando_na_barra = False
 
@@ -371,47 +423,55 @@ def abrirInstrucoes():
         fase3Botao.desenharBotao(tela)
 
         # Superfície para instruções
-        superficie_instrucoes = pygame.Surface((largura_quadro, max(altura_conteudo, altura_quadro)), pygame.SRCALPHA)
+        superficie_instrucoes = pygame.Surface((largura_quadro, max(len(texto_atual) * espacamento, altura_quadro)), pygame.SRCALPHA)
         superficie_instrucoes.fill((131, 69, 31))  # Fundo do quadro
 
-        # Renderizar o texto com contorno
-        for i, linha in enumerate(instrucoes_texto):
+        # Renderizar o texto
+        for i, linha in enumerate(texto_atual):
             texto_contorno = fonte.render(linha, True, (0, 0, 0))  # Contorno preto
             texto_preenchimento = fonte.render(linha, True, cor_texto)  # Texto branco
             x, y = 20, i * espacamento
-            # Desenhar contorno
             superficie_instrucoes.blit(texto_contorno, (x - 1, y))
             superficie_instrucoes.blit(texto_contorno, (x + 1, y))
             superficie_instrucoes.blit(texto_contorno, (x, y - 1))
             superficie_instrucoes.blit(texto_contorno, (x, y + 1))
-            # Desenhar texto principal
             superficie_instrucoes.blit(texto_preenchimento, (x, y))
 
-        # Garantir que o deslocamento esteja dentro dos limites
-        deslocamento = max(0, min(deslocamento, altura_conteudo - altura_quadro))
-
-        # Recorte da parte visível
+        deslocamento = max(0, min(deslocamento, len(texto_atual) * espacamento - altura_quadro))
         recorte = superficie_instrucoes.subsurface((0, deslocamento, largura_quadro, altura_quadro))
         tela.blit(recorte, posicao_quadro)
 
         # Barra de rolagem
         trilho_x = barra_x
         trilho_altura = altura_quadro
-        pygame.draw.rect(tela, (50, 50, 50), (trilho_x, posicao_quadro[1], barra_largura, trilho_altura))  # Trilho
-        barra_y = posicao_quadro[1] + (deslocamento / max(altura_conteudo, 1)) * altura_quadro
-        pygame.draw.rect(tela, (70, 130, 180), (barra_x, barra_y, barra_largura, barra_altura), border_radius=5)  # Barra
+        pygame.draw.rect(tela, (50, 50, 50), (trilho_x, posicao_quadro[1], barra_largura, trilho_altura))
+        barra_y = posicao_quadro[1] + (deslocamento / max(len(texto_atual) * espacamento, 1)) * altura_quadro
+        pygame.draw.rect(tela, (70, 130, 180), (barra_x, barra_y, barra_largura, barra_altura), border_radius=5)
 
         # Verificar cliques nos botões
         if voltarBotao.clicarBotao(tela):
-            som_click.play()  # Som de clique
-            print("Voltando ao menu principal")
+            som_click.play()
             estadoJogo = "menu"
             run = False
 
         if configuracoesBotao.clicarBotao(tela):
-            som_click.play()  # Som de clique
-            print("Configurações clicado")
+            som_click.play()
             abrirConfiguracoes()
+
+        if fase1Botao.clicarBotao(tela):
+            som_click.play()
+            texto_atual = texto_fase1  # Atualiza texto para Fase 1
+            deslocamento = 0  # Reseta o deslocamento
+
+        if fase2Botao.clicarBotao(tela):
+            som_click.play()
+            texto_atual = texto_fase2  # Atualiza texto para Fase 2
+            deslocamento = 0
+
+        if fase3Botao.clicarBotao(tela):
+            som_click.play()
+            texto_atual = texto_fase3  # Atualiza texto para Fase 3
+            deslocamento = 0
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -420,14 +480,14 @@ def abrirInstrucoes():
                 run = False
 
             elif event.type == pygame.MOUSEBUTTONDOWN:
-                if event.button == 1:  # Clique esquerdo
+                if event.button == 1:
                     if trilho_x <= posicaoMouse[0] <= trilho_x + barra_largura and barra_y <= posicaoMouse[1] <= barra_y + barra_altura:
                         clicando_na_barra = True
 
-                elif event.button == 4:  # Rolar para cima
+                elif event.button == 4:
                     deslocamento = max(deslocamento - 20, 0)
-                elif event.button == 5:  # Rolar para baixo
-                    deslocamento = min(deslocamento + 20, altura_conteudo - altura_quadro)
+                elif event.button == 5:
+                    deslocamento = min(deslocamento + 20, len(texto_atual) * espacamento - altura_quadro)
 
             elif event.type == pygame.MOUSEBUTTONUP:
                 if event.button == 1:
@@ -435,10 +495,12 @@ def abrirInstrucoes():
 
             elif event.type == pygame.MOUSEMOTION:
                 if clicando_na_barra:
-                    deslocamento = max(0, min(altura_conteudo - altura_quadro,
-                                              (event.pos[1] - posicao_quadro[1]) * (altura_conteudo / altura_quadro)))
+                    deslocamento = max(0, min(len(texto_atual) * espacamento - altura_quadro,
+                                              (event.pos[1] - posicao_quadro[1]) * (len(texto_atual) * espacamento / altura_quadro)))
+            confirmar_saida(tela)
 
         pygame.display.update()
+
 
 
 def abrirCreditos():
@@ -588,6 +650,7 @@ def abrirCreditos():
                     # Atualizar a posição do deslocamento com base no movimento do mouse
                     deslocamento = max(0, min(altura_conteudo - altura_quadro,
                                               (event.pos[1] - posicao_quadro[1]) * (altura_conteudo / altura_quadro)))
+            confirmar_saida(tela)
 
         pygame.display.update()
 
@@ -690,7 +753,7 @@ def relatorio():
 # Função para as fases
 def iniciarFases():
     global estadoJogo
-    fasesBackground = pygame.image.load("imagens/GUI/Backgrounds/menuBackground.jpg")
+    fasesBackground = pygame.image.load("imagens/GUI/Backgrounds/fasesBackground.jpg")
     tela.blit(fasesBackground,(0,0))
     
     largura_tela = tela.get_width()
@@ -1877,8 +1940,7 @@ def fase3():
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 global rodando
-                rodando = False
-                run = False
+                confirmar_saida(tela)
 
             # Quando o mouse é pressionado (click) e um objeto é clicado
             if event.type == pygame.MOUSEBUTTONDOWN:
@@ -1945,7 +2007,7 @@ def fase3():
 
                         # Para o arraste ao soltar o botão do mouse
                         arrastando_objeto = None
-
+            
             # Atualizar e desenhar os objetos com as novas posições
             for obj in objetos:
                 botao = obj["botao"]
@@ -1956,7 +2018,7 @@ def fase3():
                 # Verifica se o mouse está sobre o objeto (hover)
                 if botao.rect.collidepoint(posicaoMouse):
                     exibir_nome_objeto(obj)  # Exibe o nome do objeto acima dele
-
+            
             # Atualiza a tela
             pygame.display.update() 
 
