@@ -23,6 +23,11 @@ pygame.mixer.init()
 estadoJogo = "menu"  # situação atual do jogo, para rastrear as telas
 rodando = True  # Controla se o programa deve continuar rodando
 
+jogoConcluido = False
+pontuacao_fase1 = 0
+pontuacao_fase2 = 0
+pontuacao_fase3 = 0
+
 # Função para criar botões
 def criarBotao(x, y, imagem, imagemAlterada):
     imagem = pygame.image.load(imagem).convert_alpha()
@@ -51,6 +56,27 @@ def criarBotaoImagensFASE3(x, y, imagem, imagemAlterada):
     
     return botaoObjetos.BotaoObjetos(x, y, imagem, imagemAlterada)
 
+def exibir_nome_objeto(obj):
+    # Definir a fonte para o nome do objeto
+    fonte_nome = pygame.font.Font("tipografia/LuckiestGuy-Regular.ttf", 24)
+    nome_objeto = obj["nome"]  # Usa o nome extraído da imagem
+    cor_texto = (255, 255, 255)  # Cor do texto (branco)
+
+    # Renderizar o nome com contorno e preenchimento
+    texto_nome_contorno = fonte_nome.render(nome_objeto, True, (0, 0, 0))  # Contorno preto
+    texto_nome_preenchimento = fonte_nome.render(nome_objeto, True, cor_texto)  # Texto branco
+
+    # Posicionar o nome logo acima do objeto
+    posicao_nome = (obj["x"] + 100 - texto_nome_preenchimento.get_width() // 2, obj["y"] + 5)
+
+    # Desenhar o texto com contorno
+    tela.blit(texto_nome_contorno, (posicao_nome[0] - 1, posicao_nome[1]))
+    tela.blit(texto_nome_contorno, (posicao_nome[0] + 1, posicao_nome[1]))
+    tela.blit(texto_nome_contorno, (posicao_nome[0], posicao_nome[1] - 1))
+    tela.blit(texto_nome_contorno, (posicao_nome[0], posicao_nome[1] + 1))
+
+    # Desenhar o texto preenchido
+    tela.blit(texto_nome_preenchimento, posicao_nome)
 
 def tocar_musica(nova_musica): # FUNÇÃO DA MÚSICA DE FUNDO
     global musica_atual
@@ -89,7 +115,7 @@ def confirmar_saida(tela):
 
         # Texto da janela
         texto = fonte.render("Deseja realmente sair?", True, (0, 0, 0))
-        tela.blit(texto, (janela_rect.x + 50, janela_rect.y + 20))
+        tela.blit(texto, (janela_rect.x + 68, janela_rect.y + 20))
 
         # Botões "Sim" e "Não"
         pygame.draw.rect(tela, (0, 200, 0), sim_botao)
@@ -253,7 +279,7 @@ def abrirConfiguracoesFases():
             pygame.mixer.music.set_volume(volume)  # Atualiza o volume
 
         # Texto do volume abaixo da barra
-        fonte = pygame.font.Font("LuckiestGuy-Regular.ttf", 25)
+        fonte = pygame.font.Font("tipografia/LuckiestGuy-Regular.ttf", 25)
         texto_volume = f"Volume: {int(volume * 100)}%"
         texto_renderizado = fonte.render(texto_volume, True, (255, 255, 255))
         texto_rect = texto_renderizado.get_rect(center=(barra_x + barra_largura // 2, barra_y + barra_altura + 30))
@@ -310,7 +336,7 @@ def abrirInstrucoes():
         "Boa sorte e divirta-se!",
     ]
 
-    fonte = pygame.font.Font("LuckiestGuy-Regular.ttf", 20)
+    fonte = pygame.font.Font("tipografia/LuckiestGuy-Regular.ttf", 20)
     cor_texto = (255, 255, 255)
     espacamento = 40
 
@@ -458,7 +484,7 @@ def abrirCreditos():
         "                             Obrigado por jogar!",
     ]
 
-    fonte = pygame.font.Font("LuckiestGuy-Regular.ttf", 26)  # 40 é o tamanho da fonte
+    fonte = pygame.font.Font("tipografia/LuckiestGuy-Regular.ttf", 26)  # 40 é o tamanho da fonte
     cor_texto = (255, 255, 255)  # Cor do texto
     espacamento = 50  # Espaçamento entre linhas
 
@@ -565,7 +591,102 @@ def abrirCreditos():
 
         pygame.display.update()
 
+def relatorio():
+    global estadoJogo, pontuacao_fase1, pontuacao_fase2, pontuacao_fase3
 
+    # Carregar o fundo
+    fasesBackground = pygame.image.load("imagens/GUI/Backgrounds/menuBackground.jpg")
+    tela.blit(fasesBackground, (0, 0))
+
+    # Botões
+    voltarBotao = criarBotao(20, 650, "imagens/GUI/botaoVoltar/voltar0.png", "imagens/GUI/botaoVoltar/voltar1.png")
+    configuracoesBotao = criarBotao(940, 660, "imagens/GUI/botaoConfiguracoes/configuracoes0.png", "imagens/GUI/botaoConfiguracoes/configuracoes1.png")
+
+    # Fonte para exibir o texto
+    fonte = pygame.font.Font("tipografia/LuckiestGuy-Regular.ttf", 36)
+    cor_texto = (255, 255, 255)  # Cor branca
+    cor_contorno = (0, 0, 0)  # Cor preta para o contorno
+    largura_tela = tela.get_width()  # Largura da tela
+    altura_fase = 320  # Altura para exibir o texto das fases
+    altura_pontuacao = altura_fase + 40  # Altura para exibir as pontuações
+
+    # Fases e pontuações
+    fases = ["FASE 1", "FASE 2", "FASE 3"]
+    pontuacoes = [pontuacao_fase1, pontuacao_fase2, pontuacao_fase3] 
+
+    # Posições horizontais
+    posicoes_x = [
+        largura_tela // 6,  # Esquerda
+        largura_tela // 2,  # Centro
+        largura_tela * 5 // 6  # Direita
+    ]
+
+    run = True
+    while run:
+        tela.blit(fasesBackground, (0, 0))
+        posicaoMouse = pygame.mouse.get_pos()
+
+        # Desenhar os botões
+        voltarBotao.atualizarImagem(posicaoMouse)
+        configuracoesBotao.atualizarImagem(posicaoMouse)
+
+        voltarBotao.desenharBotao(tela)
+        configuracoesBotao.desenharBotao(tela)
+
+        # Exibir as fases e pontuações com contorno
+        for i, fase in enumerate(fases):
+            # Renderizar textos
+            texto_fase = fonte.render(fase, True, cor_texto)
+            texto_fase_contorno = fonte.render(fase, True, cor_contorno)
+            texto_pontuacao = fonte.render(f"Pontuação: {pontuacoes[i]}", True, cor_texto)
+            texto_pontuacao_contorno = fonte.render(f"Pontuação: {pontuacoes[i]}", True, cor_contorno)
+
+            # Posições calculadas
+            x_fase = posicoes_x[i] - texto_fase.get_width() // 2
+            y_fase = altura_fase
+            x_pontuacao = posicoes_x[i] - texto_pontuacao.get_width() // 2
+            y_pontuacao = altura_pontuacao
+
+            # Desenhar contorno para o texto da fase
+            tela.blit(texto_fase_contorno, (x_fase - 1, y_fase))
+            tela.blit(texto_fase_contorno, (x_fase + 1, y_fase))
+            tela.blit(texto_fase_contorno, (x_fase, y_fase - 1))
+            tela.blit(texto_fase_contorno, (x_fase, y_fase + 1))
+
+            # Desenhar o texto preenchido da fase
+            tela.blit(texto_fase, (x_fase, y_fase))
+
+            # Desenhar contorno para o texto da pontuação
+            tela.blit(texto_pontuacao_contorno, (x_pontuacao - 1, y_pontuacao))
+            tela.blit(texto_pontuacao_contorno, (x_pontuacao + 1, y_pontuacao))
+            tela.blit(texto_pontuacao_contorno, (x_pontuacao, y_pontuacao - 1))
+            tela.blit(texto_pontuacao_contorno, (x_pontuacao, y_pontuacao + 1))
+
+            # Desenhar o texto preenchido da pontuação
+            tela.blit(texto_pontuacao, (x_pontuacao, y_pontuacao))
+
+        # Verificar cliques nos botões
+        if voltarBotao.clicarBotao(tela):
+            som_click.play()  # Som de clique
+            print("Voltar clicado")
+            estadoJogo = "menu"
+            run = False
+
+        if configuracoesBotao.clicarBotao(tela):
+            som_click.play()  # Som de clique
+            print("Configurações clicado")
+            abrirConfiguracoes()
+
+        # Eventos
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                confirmar_saida(tela)
+
+        pygame.display.update()
+        clock.tick(60)
+
+
+    
 # Função para as fases
 def iniciarFases():
     global estadoJogo
@@ -633,30 +754,10 @@ def iniciarFases():
         pygame.display.update()
         clock.tick(60)
 
-def exibir_nome_objeto(obj):
-    # Definir a fonte para o nome do objeto
-    fonte_nome = pygame.font.Font("LuckiestGuy-Regular.ttf", 24)
-    nome_objeto = obj["nome"]  # Usa o nome extraído da imagem
-    cor_texto = (255, 255, 255)  # Cor do texto (branco)
-
-    # Renderizar o nome com contorno e preenchimento
-    texto_nome_contorno = fonte_nome.render(nome_objeto, True, (0, 0, 0))  # Contorno preto
-    texto_nome_preenchimento = fonte_nome.render(nome_objeto, True, cor_texto)  # Texto branco
-
-    # Posicionar o nome logo acima do objeto
-    posicao_nome = (obj["x"] + 100 - texto_nome_preenchimento.get_width() // 2, obj["y"] + 5)
-
-    # Desenhar o texto com contorno
-    tela.blit(texto_nome_contorno, (posicao_nome[0] - 1, posicao_nome[1]))
-    tela.blit(texto_nome_contorno, (posicao_nome[0] + 1, posicao_nome[1]))
-    tela.blit(texto_nome_contorno, (posicao_nome[0], posicao_nome[1] - 1))
-    tela.blit(texto_nome_contorno, (posicao_nome[0], posicao_nome[1] + 1))
-
-    # Desenhar o texto preenchido
-    tela.blit(texto_nome_preenchimento, posicao_nome)
-
 def fase1():
-    global estadoJogo
+    global estadoJogo, jogoConcluido, pontuacao_fase1
+    pontuacao_fase1 = 0
+    jogoConcluido = False
     fase1Background = pygame.image.load("imagens/fase1/imagemZoologico.jpg")
 
     # Verificar som
@@ -667,7 +768,7 @@ def fase1():
     configuracoesBotao = criarBotao(940, 660, "imagens/GUI/botaoConfiguracoes/configuracoes0.png", "imagens/GUI/botaoConfiguracoes/configuracoes1.png")
     
     # Configurações para o texto do temporizador
-    fonte = pygame.font.Font("LuckiestGuy-Regular.ttf", 36)
+    fonte = pygame.font.Font("tipografia/LuckiestGuy-Regular.ttf", 36)
     cor_texto = (255, 255, 255)  # Branco
     
     # Configurações para objetos
@@ -772,8 +873,8 @@ def fase1():
     # Calcular a posição centralizada para o botão de confirmar na parte inferior
     largura_botao_confirmar = 56  # Tamanho estimado do botão (ajuste conforme necessário)
     altura_botao_confirmar = 56    # Altura estimada do botão (ajuste conforme necessário)
-    x_botao_confirmar = (largura_tela - 60 - largura_botao_confirmar) // 2  # Centraliza na horizontal
-    y_botao_confirmar = altura_tela - altura_botao_confirmar - 35      # Posiciona perto da parte inferior
+    x_botao_confirmar = (largura_tela - 65 - largura_botao_confirmar) // 2  # Centraliza na horizontal
+    y_botao_confirmar = altura_tela - altura_botao_confirmar - 25     # Posiciona perto da parte inferior
     
     # Criar o botão de confirmar no centro inferior da tela
     confirmarBotao = criarBotao(x_botao_confirmar, y_botao_confirmar, "imagens/GUI/botaoConfirmar/confirmar1.png", "imagens/GUI/botaoConfirmar/confirmar2.png")
@@ -801,14 +902,14 @@ def fase1():
                 jogoPerdeu = True
 
         # Exibir as vidas
-        tela.blit(vida_imagens[vidas], (140, 640))  # Exibe a imagem das vidas no canto superior esquerdo
+        tela.blit(vida_imagens[vidas], (220, 640))  # Exibe a imagem das vidas no canto superior esquerdo
         # Configurações para o texto de "VIDAS"
         texto_vidas = "VIDAS"
         texto_vidas_contorno = fonte.render(texto_vidas, True, (0, 0, 0))  # Contorno preto
         texto_vidas_preenchimento = fonte.render(texto_vidas, True, cor_texto)  # Texto branco
 
         # Posição do texto "VIDAS" ajustada
-        posicao_vidas = (largura_tela // 4 - texto_vidas_contorno.get_width() // 1.32, altura_tela - 34)
+        posicao_vidas = (largura_tela // 3.85 - texto_vidas_contorno.get_width() // 80, altura_tela - 34)
 
         # Desenhar o texto com contorno
         tela.blit(texto_vidas_contorno, (posicao_vidas[0] - 1, posicao_vidas[1]))
@@ -852,9 +953,15 @@ def fase1():
 
         # Se o jogo foi ganho ou perdido, exibe o tempo total e o número de objetos errados
         if jogoGanhou or jogoPerdeu:
+            jogoConcluido = True
             mostrar_informacoes = False
-            
             if jogoGanhou:
+                if pontuacao_fase1 == 6:
+                    pontuacao_fase1 = 10
+                elif pontuacao_fase1 == 5:
+                    pontuacao_fase1 = 9
+                elif pontuacao_fase1 == 4:
+                    pontuacao_fase1 = 8
                 # Exibir o botão de "Próxima Fase" na tela de vitória
                 proximaFaseBotao.atualizarImagem(posicaoMouse)
                 proximaFaseBotao.desenharBotao(tela)
@@ -872,6 +979,7 @@ def fase1():
                     menuPrincipal()  # Chama a função do menu principa
 
             if jogoPerdeu:
+                pontuacao_fase1 = 0
                 # Desenhar o botão "Voltar ao Menu"
                 voltarMenuBotao2.atualizarImagem(posicaoMouse)
                 voltarMenuBotao2.desenharBotao(tela)
@@ -998,12 +1106,14 @@ def fase1():
             for obj in objetosSelecionados:
                 if obj["tipo"] == "correto":
                     imagensCorretasClicadas += 1
+                    pontuacao_fase1 += 1
                     if imagensCorretasClicadas == 6:  # Clicou em todas as imagens corretas
                         jogoGanhou = True
                     # Tocar som de resposta certa
                     tocar_efeito_sonoro("sons/somObjetoCorreto/respostaCerta.mp3")
                 elif obj["tipo"] == "incorreto":
                     imagensIncorretasClicadas += 1
+                    pontuacao_fase1 -= 1
                     vidas -= 1  # Perde uma vida a cada erro
                     if vidas == 0:
                         jogoPerdeu = True
@@ -1017,6 +1127,8 @@ def fase1():
             som_click.play()  # Som de clique
             print("Voltar clicado")
             estadoJogo = "jogando"
+            if jogoConcluido == False:
+                pontuacao_fase1 = 0
             run = False
 
         if configuracoesBotao.clicarBotao(tela):
@@ -1031,7 +1143,9 @@ def fase1():
         clock.tick(60)
 
 def fase2():
-    global estadoJogo
+    global estadoJogo, jogoConcluido, pontuacao_fase2
+    pontuacao_fase2 = 0
+    jogoConcluido = False
     fase1Background = pygame.image.load("imagens/fase2/imagemSaladeAula.jpg")
 
     # Verificar som
@@ -1042,7 +1156,7 @@ def fase2():
     configuracoesBotao = criarBotao(940, 660, "imagens/GUI/botaoConfiguracoes/configuracoes0.png", "imagens/GUI/botaoConfiguracoes/configuracoes1.png")
     
     # Configurações para o texto do temporizador
-    fonte = pygame.font.Font("LuckiestGuy-Regular.ttf", 36)
+    fonte = pygame.font.Font("tipografia/LuckiestGuy-Regular.ttf", 36)
     cor_texto = (255, 255, 255)  # Branco
     
     # Configurações para objetos
@@ -1054,7 +1168,7 @@ def fase2():
     distancia_minima = 140  # Distância mínima entre objetos
 
     # Inicializa a fonte para o texto do contador
-    fonte = pygame.font.Font("LuckiestGuy-Regular.ttf", 36)  # 'None' usa a fonte padrão; 36 é o tamanho 
+    fonte = pygame.font.Font("tipografia/LuckiestGuy-Regular.ttf", 36)  # 'None' usa a fonte padrão; 36 é o tamanho 
     cor_texto = (255, 255, 255)  # Cor do texto (branco)
 
     # Lista de imagens
@@ -1142,10 +1256,10 @@ def fase2():
     posicionar_objetos(imagensIncorretasSelecionadas, "incorreto")
 
     # Calcular a posição centralizada para o botão de confirmar na parte inferior
-    largura_botao_confirmar = 200  # Tamanho estimado do botão (ajuste conforme necessário)
-    altura_botao_confirmar = 50    # Altura estimada do botão (ajuste conforme necessário)
-    x_botao_confirmar = (largura_tela - 60 - largura_botao_confirmar) // 2  # Centraliza na horizontal
-    y_botao_confirmar = altura_tela - altura_botao_confirmar - 35      # Posiciona perto da parte inferior
+    largura_botao_confirmar = 56  # Tamanho estimado do botão (ajuste conforme necessário)
+    altura_botao_confirmar = 56    # Altura estimada do botão (ajuste conforme necessário)
+    x_botao_confirmar = (largura_tela - 65 - largura_botao_confirmar) // 2  # Centraliza na horizontal
+    y_botao_confirmar = altura_tela - altura_botao_confirmar - 25     # Posiciona perto da parte inferior
     
     # Criar o botão de confirmar no centro inferior da tela
     confirmarBotao = criarBotao(x_botao_confirmar, y_botao_confirmar, "imagens/GUI/botaoConfirmar/confirmar1.png", "imagens/GUI/botaoConfirmar/confirmar2.png")
@@ -1174,14 +1288,14 @@ def fase2():
                 jogoPerdeu = True
 
          # Exibir as vidas
-        tela.blit(vida_imagens[vidas], (140, 640))  # Exibe a imagem das vidas no canto superior esquerdo
+        tela.blit(vida_imagens[vidas], (220, 640))  # Exibe a imagem das vidas no canto superior esquerdo
         # Configurações para o texto de "VIDAS"
         texto_vidas = "VIDAS"
         texto_vidas_contorno = fonte.render(texto_vidas, True, (0, 0, 0))  # Contorno preto
         texto_vidas_preenchimento = fonte.render(texto_vidas, True, cor_texto)  # Texto branco
 
         # Posição do texto "VIDAS" ajustada
-        posicao_vidas = (largura_tela // 4 - texto_vidas_contorno.get_width() // 1.32, altura_tela - 34)
+        posicao_vidas = (largura_tela // 3.85 - texto_vidas_contorno.get_width() // 80, altura_tela - 34)
 
         # Desenhar o texto com contorno
         tela.blit(texto_vidas_contorno, (posicao_vidas[0] - 1, posicao_vidas[1]))
@@ -1225,9 +1339,15 @@ def fase2():
 
         # Se o jogo foi ganho ou perdido, exibe o tempo total e o número de objetos errados
         if jogoGanhou or jogoPerdeu:
+            jogoConcluido = True
             mostrar_informacoes = False
-            
             if jogoGanhou:
+                if pontuacao_fase2 == 6:
+                    pontuacao_fase2 = 10
+                elif pontuacao_fase2 == 5:
+                    pontuacao_fase2 = 9
+                elif pontuacao_fase2 == 4:
+                    pontuacao_fase2 = 8
                 # Exibir o botão de "Próxima Fase" na tela de vitória
                 proximaFaseBotao.atualizarImagem(posicaoMouse)
                 proximaFaseBotao.desenharBotao(tela)
@@ -1245,6 +1365,7 @@ def fase2():
                     menuPrincipal()  # Chama a função do menu principa
 
             if jogoPerdeu:
+                pontuacao_fase2 = 0
                 # Desenhar o botão "Voltar ao Menu"
                 voltarMenuBotao2.atualizarImagem(posicaoMouse)
                 voltarMenuBotao2.desenharBotao(tela)
@@ -1371,12 +1492,14 @@ def fase2():
             for obj in objetosSelecionados:
                 if obj["tipo"] == "correto":
                     imagensCorretasClicadas += 1
+                    pontuacao_fase2 += 1
                     if imagensCorretasClicadas == 6:  # Clicou em todas as imagens corretas
                         jogoGanhou = True
                     # Tocar som de resposta certa
                     tocar_efeito_sonoro("sons/somObjetoCorreto/respostaCerta.mp3")
                 elif obj["tipo"] == "incorreto":
                     imagensIncorretasClicadas += 1
+                    pontuacao_fase2 -= 1
                     vidas -= 1  # Perde uma vida a cada erro
                     if vidas == 0:
                         jogoPerdeu = True
@@ -1390,7 +1513,10 @@ def fase2():
             som_click.play()  # Som de clique
             print("Voltar clicado")
             estadoJogo = "jogando"
+            if jogoConcluido == False:
+                pontuacao_fase2 = 0
             run = False
+
 
         if configuracoesBotao.clicarBotao(tela):
             som_click.play()  # Som de clique
@@ -1405,7 +1531,10 @@ def fase2():
         clock.tick(60)
 
 def fase3():
-    global estadoJogo
+    global estadoJogo, jogoConcluido, pontuacao_fase3
+    pontuacao_fase3 = 0
+    jogoConcluido = False
+
     fase1Background = pygame.image.load("imagens/fase3/imagemPraia.jpg")
 
     # Verificar som
@@ -1416,7 +1545,7 @@ def fase3():
     configuracoesBotao = criarBotao(940, 20, "imagens/GUI/botaoConfiguracoes/configuracoes0.png", "imagens/GUI/botaoConfiguracoes/configuracoes1.png")
     
     # Configurações para o texto do temporizador
-    fonte = pygame.font.Font("LuckiestGuy-Regular.ttf", 36)
+    fonte = pygame.font.Font("tipografia/LuckiestGuy-Regular.ttf", 36)
     cor_texto = (255, 255, 255)  # Branco
     
     # Configurações para objetos
@@ -1640,7 +1769,10 @@ def fase3():
         # Se o jogo foi ganho ou perdido, exibe o tempo total e o número de objetos errados
         if jogoGanhou or jogoPerdeu:
             mostrar_informacoes = False
+            jogoConcluido = True
             
+            if jogoPerdeu:
+                pontuacao_fase3 = 0    
             voltarMenuBotao.atualizarImagem(posicaoMouse)
             voltarMenuBotao.desenharBotao(tela)
 
@@ -1729,6 +1861,8 @@ def fase3():
             som_click.play()  # Som de clique
             print("Voltar clicado")
             estadoJogo = "jogando"
+            if jogoConcluido == False:
+                pontuacao_fase3 = 0
             run = False
 
         if configuracoesBotao.clicarBotao(tela):
@@ -1771,6 +1905,7 @@ def fase3():
                             if arrastando_objeto["tipo"] == "correto":
                                 objetos.remove(arrastando_objeto)  # Remove o objeto da lista
                                 imagensCorretasClicadas += 1  # Incrementa a pontuação de objetos corretos
+                                pontuacao_fase3 += 1
                                 todasImagens += 1
                                 tocar_efeito_sonoro("sons/somObjetoCorreto/respostaCerta.mp3")
                             elif arrastando_objeto["tipo"] == "incorreto":
@@ -1793,6 +1928,7 @@ def fase3():
                             elif arrastando_objeto["tipo"] == "incorreto":
                                 objetos.remove(arrastando_objeto)  # Remove o objeto da lista
                                 imagensCorretasClicadas += 1  # Incrementa a pontuação de objetos corretos
+                                pontuacao_fase3 += 1
                                 todasImagens += 1
                                 tocar_efeito_sonoro("sons/somObjetoCorreto/respostaCerta.mp3")
 
@@ -1802,7 +1938,7 @@ def fase3():
                             jogoGanhou = True
                         elif imagensCorretasClicadas < 5 and todasImagens == 10:
                             jogoPerdeu = True
-                        
+
                         # Para o arraste ao soltar o botão do mouse
                         arrastando_objeto = None
 
@@ -1885,6 +2021,12 @@ def menuPrincipal():
             print("Sair clicado")
             global rodando
             rodando = False
+            run = False
+
+        if pontuacaoBotao.clicarBotao(tela):
+            som_click.play()  # Som de clique
+            print("relatório clicado")
+            relatorio()
             run = False
 
         for event in pygame.event.get():
