@@ -2019,8 +2019,9 @@ def menuPrincipal():
         if sairBotao.clicarBotao(tela):
             som_click.play()  # Som de clique
             print("Sair clicado")
+            confirmar_saida(tela)
             global rodando
-            rodando = False
+            rodando = True
             run = False
 
         if pontuacaoBotao.clicarBotao(tela):
@@ -2030,8 +2031,8 @@ def menuPrincipal():
             run = False
 
         for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    confirmar_saida(tela)
+            if event.type == pygame.QUIT:
+                confirmar_saida(tela)
 
         pygame.display.update()
         clock.tick(60)
