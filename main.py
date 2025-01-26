@@ -702,7 +702,7 @@ def iniciarFases():
     posicao_fase1 = (margem_lateral, 200)  # Primeiro botão na parte superior esquerda
     posicao_fase2 = (margem_lateral + 430 + margem_lateral, 200)  # Segundo botão na parte superior direita
     posicao_fase3 = ((largura_tela - 430) // 2, 450)  # Terceiro botão centralizado abaixo
-    posicao_voltar = (30, 630)  # Botão voltar no canto inferior esquerdo
+    posicao_voltar = (20, 660)  # Botão voltar no canto inferior esquerdo
 
     # Criando botões para as fases
     fase1Botao = criarBotao(posicao_fase1[0] + 5, posicao_fase1[1], "imagens/GUI/botaoFases/botaoZoo0.png", "imagens/GUI/botaoFases/botaoZoo1.png")
@@ -922,8 +922,8 @@ def fase1():
 
         # Adicionar o botão "Tentar Novamente" para as telas de vitória e derrota
         botaoTentarNovamente = criarBotao(
-            405,  # Centraliza horizontalmente
-            380,  # Posiciona um pouco abaixo do texto
+            402,  # Centraliza horizontalmente
+            350,  # Posiciona um pouco abaixo do texto
             "imagens/GUI/botaoTentarnovamente/tentarnovamente.png",
             "imagens/GUI/botaoTentarnovamente/tentarnovamente.png"
         )
@@ -1308,8 +1308,8 @@ def fase2():
 
         # Adicionar o botão "Tentar Novamente" para as telas de vitória e derrota
         botaoTentarNovamente = criarBotao(
-            405,  # Centraliza horizontalmente
-            380,  # Posiciona um pouco abaixo do texto
+            402,  # Centraliza horizontalmente
+            350,  # Posiciona um pouco abaixo do texto
             "imagens/GUI/botaoTentarnovamente/tentarnovamente.png",
             "imagens/GUI/botaoTentarnovamente/tentarnovamente.png"
         )
@@ -1752,8 +1752,8 @@ def fase3():
 
         # Adicionar o botão "Tentar Novamente" para as telas de vitória e derrota
         botaoTentarNovamente = criarBotao(
-            405,  # Centraliza horizontalmente
-            380,  # Posiciona um pouco abaixo do texto
+            402,  # Centraliza horizontalmente
+            350,  # Posiciona um pouco abaixo do texto
             "imagens/GUI/botaoTentarnovamente/tentarnovamente.png",
             "imagens/GUI/botaoTentarnovamente/tentarnovamente.png"
         )
