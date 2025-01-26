@@ -901,24 +901,26 @@ def fase1():
             if tempo_restante == 0:
                 jogoPerdeu = True
 
-        # Exibir as vidas
-        tela.blit(vida_imagens[vidas], (220, 640))  # Exibe a imagem das vidas no canto superior esquerdo
-        # Configurações para o texto de "VIDAS"
-        texto_vidas = "VIDAS"
-        texto_vidas_contorno = fonte.render(texto_vidas, True, (0, 0, 0))  # Contorno preto
-        texto_vidas_preenchimento = fonte.render(texto_vidas, True, cor_texto)  # Texto branco
+        
+        if not jogoGanhou and not jogoPerdeu:
+            # Exibir as vidas
+            tela.blit(vida_imagens[vidas], (220, 640))  # Exibe a imagem das vidas no canto superior esquerdo
+            # Configurações para o texto de "VIDAS"
+            texto_vidas = "VIDAS"
+            texto_vidas_contorno = fonte.render(texto_vidas, True, (0, 0, 0))  # Contorno preto
+            texto_vidas_preenchimento = fonte.render(texto_vidas, True, cor_texto)  # Texto branco
 
-        # Posição do texto "VIDAS" ajustada
-        posicao_vidas = (largura_tela // 3.85 - texto_vidas_contorno.get_width() // 80, altura_tela - 34)
+            # Posição do texto "VIDAS" ajustada
+            posicao_vidas = (largura_tela // 3.85 - texto_vidas_contorno.get_width() // 80, altura_tela - 34)
 
-        # Desenhar o texto com contorno
-        tela.blit(texto_vidas_contorno, (posicao_vidas[0] - 1, posicao_vidas[1]))
-        tela.blit(texto_vidas_contorno, (posicao_vidas[0] + 1, posicao_vidas[1]))
-        tela.blit(texto_vidas_contorno, (posicao_vidas[0], posicao_vidas[1] - 1))
-        tela.blit(texto_vidas_contorno, (posicao_vidas[0], posicao_vidas[1] + 1))
+            # Desenhar o texto com contorno
+            tela.blit(texto_vidas_contorno, (posicao_vidas[0] - 1, posicao_vidas[1]))
+            tela.blit(texto_vidas_contorno, (posicao_vidas[0] + 1, posicao_vidas[1]))
+            tela.blit(texto_vidas_contorno, (posicao_vidas[0], posicao_vidas[1] - 1))
+            tela.blit(texto_vidas_contorno, (posicao_vidas[0], posicao_vidas[1] + 1))
 
-        # Desenhar o texto preenchido no centro
-        tela.blit(texto_vidas_preenchimento, posicao_vidas)
+            # Desenhar o texto preenchido no centro
+            tela.blit(texto_vidas_preenchimento, posicao_vidas)
 
         # Adicionar o botão "Tentar Novamente" para as telas de vitória e derrota
         botaoTentarNovamente = criarBotao(
@@ -1287,24 +1289,25 @@ def fase2():
             if tempo_restante == 0:
                 jogoPerdeu = True
 
-         # Exibir as vidas
-        tela.blit(vida_imagens[vidas], (220, 640))  # Exibe a imagem das vidas no canto superior esquerdo
-        # Configurações para o texto de "VIDAS"
-        texto_vidas = "VIDAS"
-        texto_vidas_contorno = fonte.render(texto_vidas, True, (0, 0, 0))  # Contorno preto
-        texto_vidas_preenchimento = fonte.render(texto_vidas, True, cor_texto)  # Texto branco
+        if not jogoGanhou and not jogoPerdeu:
+            # Exibir as vidas
+            tela.blit(vida_imagens[vidas], (220, 640))  # Exibe a imagem das vidas no canto superior esquerdo
+            # Configurações para o texto de "VIDAS"
+            texto_vidas = "VIDAS"
+            texto_vidas_contorno = fonte.render(texto_vidas, True, (0, 0, 0))  # Contorno preto
+            texto_vidas_preenchimento = fonte.render(texto_vidas, True, cor_texto)  # Texto branco
 
-        # Posição do texto "VIDAS" ajustada
-        posicao_vidas = (largura_tela // 3.85 - texto_vidas_contorno.get_width() // 80, altura_tela - 34)
+            # Posição do texto "VIDAS" ajustada
+            posicao_vidas = (largura_tela // 3.85 - texto_vidas_contorno.get_width() // 80, altura_tela - 34)
 
-        # Desenhar o texto com contorno
-        tela.blit(texto_vidas_contorno, (posicao_vidas[0] - 1, posicao_vidas[1]))
-        tela.blit(texto_vidas_contorno, (posicao_vidas[0] + 1, posicao_vidas[1]))
-        tela.blit(texto_vidas_contorno, (posicao_vidas[0], posicao_vidas[1] - 1))
-        tela.blit(texto_vidas_contorno, (posicao_vidas[0], posicao_vidas[1] + 1))
+            # Desenhar o texto com contorno
+            tela.blit(texto_vidas_contorno, (posicao_vidas[0] - 1, posicao_vidas[1]))
+            tela.blit(texto_vidas_contorno, (posicao_vidas[0] + 1, posicao_vidas[1]))
+            tela.blit(texto_vidas_contorno, (posicao_vidas[0], posicao_vidas[1] - 1))
+            tela.blit(texto_vidas_contorno, (posicao_vidas[0], posicao_vidas[1] + 1))
 
-        # Desenhar o texto preenchido no centro
-        tela.blit(texto_vidas_preenchimento, posicao_vidas)
+            # Desenhar o texto preenchido no centro
+            tela.blit(texto_vidas_preenchimento, posicao_vidas)
 
          # Adicionar o botão "Tentar Novamente" para as telas de vitória e derrota
         botaoTentarNovamente = criarBotao(
@@ -1731,24 +1734,25 @@ def fase3():
             tela.blit(imagem_area_PRAIA, posicao_area_PRAIA)  # Exibir a área errada
             tela.blit(imagem_area_LIXO, posicao_area_LIXO)  # Exibir a área correta
         
-        # Exibir as vidas
-        tela.blit(vida_imagens[vidas], (440, 640))  # Exibe a imagem das vidas no canto superior esquerdo
-        # Configurações para o texto de "VIDAS"
-        texto_vidas = "VIDAS"
-        texto_vidas_contorno = fonte.render(texto_vidas, True, (0, 0, 0))  # Contorno preto
-        texto_vidas_preenchimento = fonte.render(texto_vidas, True, cor_texto)  # Texto branco
+        if not jogoGanhou and not jogoPerdeu:
+            # Exibir as vidas
+            tela.blit(vida_imagens[vidas], (440, 640))  # Exibe a imagem das vidas no canto superior esquerdo
+            # Configurações para o texto de "VIDAS"
+            texto_vidas = "VIDAS"
+            texto_vidas_contorno = fonte.render(texto_vidas, True, (0, 0, 0))  # Contorno preto
+            texto_vidas_preenchimento = fonte.render(texto_vidas, True, cor_texto)  # Texto branco
 
-        # Posição do texto "VIDAS" ajustada
-        posicao_vidas = (largura_tela // 2 - texto_vidas_contorno.get_width() + 65 // 1.32, altura_tela - 34)
+            # Posição do texto "VIDAS" ajustada
+            posicao_vidas = (largura_tela // 2 - texto_vidas_contorno.get_width() + 65 // 1.32, altura_tela - 34)
 
-        # Desenhar o texto com contorno
-        tela.blit(texto_vidas_contorno, (posicao_vidas[0] - 1, posicao_vidas[1]))
-        tela.blit(texto_vidas_contorno, (posicao_vidas[0] + 1, posicao_vidas[1]))
-        tela.blit(texto_vidas_contorno, (posicao_vidas[0], posicao_vidas[1] - 1))
-        tela.blit(texto_vidas_contorno, (posicao_vidas[0], posicao_vidas[1] + 1))
+            # Desenhar o texto com contorno
+            tela.blit(texto_vidas_contorno, (posicao_vidas[0] - 1, posicao_vidas[1]))
+            tela.blit(texto_vidas_contorno, (posicao_vidas[0] + 1, posicao_vidas[1]))
+            tela.blit(texto_vidas_contorno, (posicao_vidas[0], posicao_vidas[1] - 1))
+            tela.blit(texto_vidas_contorno, (posicao_vidas[0], posicao_vidas[1] + 1))
 
-        # Desenhar o texto preenchido no centro
-        tela.blit(texto_vidas_preenchimento, posicao_vidas)
+            # Desenhar o texto preenchido no centro
+            tela.blit(texto_vidas_preenchimento, posicao_vidas)
 
         # Adicionar o botão "Tentar Novamente" para as telas de vitória e derrota
         botaoTentarNovamente = criarBotao(
