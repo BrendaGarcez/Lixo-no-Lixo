@@ -1215,7 +1215,7 @@ def fase1():
         elif configuracoesBotao.clicarBotao(tela):
             som_click.play()  # Som de clique
             print("Configurações clicado")
-            estadoJogo = "ConfigFases"
+            abrirConfiguracoesFases()
             run = False
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -2139,8 +2139,6 @@ while rodando:
         fase2()
     elif estadoJogo == "fase3":
         fase3()
-    elif estadoJogo == "ConfigFases":
-        abrirConfiguracoesFases()
     
 
 # Finaliza o pygame
