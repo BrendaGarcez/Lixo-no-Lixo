@@ -91,6 +91,7 @@ def tocar_efeito_sonoro(efeito):
     efeito_sonoro = pygame.mixer.Sound(efeito)
     efeito_sonoro.play()  # Toca o efeito sonoro sem parar a música de fundo
 
+
 def confirmar_saida(tela):
     # Dimensões da janela de confirmação
     largura = 400
@@ -110,11 +111,11 @@ def confirmar_saida(tela):
 
     while True:
         # Preenche a tela de fundo
-        pygame.draw.rect(tela, (200, 200, 200), janela_rect)
+        pygame.draw.rect(tela, (120, 64, 8), janela_rect)
         pygame.draw.rect(tela, (0, 0, 0), janela_rect, 2)
 
         # Texto da janela
-        texto = fonte.render("Deseja realmente sair?", True, (0, 0, 0))
+        texto = fonte.render("Deseja realmente sair?", True, (255, 255, 255))
         tela.blit(texto, (janela_rect.x + 68, janela_rect.y + 20))
 
         # Botões "Sim" e "Não"
@@ -222,7 +223,7 @@ def abrirConfiguracoes():
         pygame.display.update()
         clock.tick(60)
 
-def abrirConfiguracoesFases(): # função com conflito (remover ou ajustar)
+def abrirConfiguracoesFases():
     global somAtivo
     global estadoJogo
 
@@ -244,6 +245,7 @@ def abrirConfiguracoesFases(): # função com conflito (remover ou ajustar)
     sairBotao = criarBotao(som_x - 105, 540,"imagens/GUI/botaoSair/Sair0.png", "imagens/GUI/botaoSair/Sair1.png")
     menuBotao = criarBotao(som_x + 65, 540,"imagens/GUI/botaoInicio/botaoHome.png", "imagens/GUI/botaoInicio/botaoHome.png")
     fasesBotao = criarBotao(som_x + 235, 540,"imagens/GUI/botaoFases/botaoFases.png", "imagens/GUI/botaoFases/botaoFases.png")
+
     run = True
     while run:
         tela.blit(configuracoesBackground, (0, 0))
@@ -286,7 +288,7 @@ def abrirConfiguracoesFases(): # função com conflito (remover ou ajustar)
         texto_rect = texto_renderizado.get_rect(center=(barra_x + barra_largura // 2, barra_y + barra_altura + 30))
         tela.blit(texto_renderizado, texto_rect.topleft)
 
-        # Verificar cliques
+        # Verificar cliques nos botões
         if somAtivo and somLigadoBotao.clicarBotao(tela):
             som_click.play()  # Som de clique
             somAtivo = False
@@ -298,24 +300,32 @@ def abrirConfiguracoesFases(): # função com conflito (remover ou ajustar)
 
         if voltarBotao.clicarBotao(tela):
             som_click.play()  # Som de clique
-            run = False
+            run = False  # Sai do loop para voltar para a tela anterior
+
         if sairBotao.clicarBotao(tela):
             som_click.play()  # Som de clique
-            confirmar_saida(tela)
-        if menuBotao.clicarBotao(tela):
-            som_click.play()  # Som de clique
-            estadoJogo = "menu"  # Voltar para o menu
-            run = False  # Sai do loop atual
-            menuPrincipal()  # Chama a função do menu principa
-        if fasesBotao.clicarBotao(tela):
-           som_click.play()  # Som de clique
-           iniciarFases()
+            confirmar_saida(tela)  # Chama a função para confirmar a saída
 
+        if menuBotao.clicarBotao(tela):
+            som_click.play()  
+            menuPrincipal()  
+            run = False  
+            return  
+
+        if fasesBotao.clicarBotao(tela):
+            som_click.play()  
+            iniciarFases()  
+            run = False  
+            return  
+
+        # Controle de eventos do Pygame
         for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    confirmar_saida(tela)
+            if event.type == pygame.QUIT:
+                confirmar_saida(tela)
+
         pygame.display.update()
         clock.tick(60)
+
 
 def abrirInstrucoes():
     global estadoJogo
@@ -479,6 +489,7 @@ def abrirInstrucoes():
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 global rodando
+                confirmar_saida(tela)
                 rodando = False
                 run = False
 
@@ -500,7 +511,7 @@ def abrirInstrucoes():
                 if clicando_na_barra:
                     deslocamento = max(0, min(len(texto_atual) * espacamento - altura_quadro,
                                               (event.pos[1] - posicao_quadro[1]) * (len(texto_atual) * espacamento / altura_quadro)))
-            confirmar_saida(tela) # não entendi isso aqui, tá no lugar errado e bugando o Como Jogar
+             
 
         pygame.display.update()
 
@@ -626,6 +637,7 @@ def abrirCreditos():
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 global rodando
+                confirmar_saida(tela)
                 rodando = False
                 run = False
 
@@ -651,7 +663,7 @@ def abrirCreditos():
                     # Atualizar a posição do deslocamento com base no movimento do mouse
                     deslocamento = max(0, min(altura_conteudo - altura_quadro,
                                               (event.pos[1] - posicao_quadro[1]) * (altura_conteudo / altura_quadro)))
-            confirmar_saida(tela)
+            
 
         pygame.display.update()
 
@@ -795,25 +807,28 @@ def iniciarFases():
             print("Fase 1 selecionada")
             estadoJogo = "fase1"
             run = False
-        if fase2Botao.clicarBotao(tela):
+            return "fase1"
+        elif fase2Botao.clicarBotao(tela):
             som_click.play()  # Som de clique
             print("Fase 2 selecionada")
             estadoJogo = "fase2"
             run = False
-        if fase3Botao.clicarBotao(tela):
+            return "fase2"
+        elif fase3Botao.clicarBotao(tela):
             som_click.play()  # Som de clique
             print("Fase 3 selecionada")
             estadoJogo = "fase3"
             run = False
-        if voltarBotao.clicarBotao(tela):
+            return "fase3"
+        elif voltarBotao.clicarBotao(tela):
             som_click.play()  # Som de clique
             print("Voltar clicado")
             estadoJogo = "menu"
             run = False
 
         for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    confirmar_saida(tela)
+            if event.type == pygame.QUIT:
+                confirmar_saida(tela)
 
         pygame.display.update()
         clock.tick(60)
@@ -1197,13 +1212,14 @@ def fase1():
                 pontuacao_fase1 = 0
             run = False
 
-        if configuracoesBotao.clicarBotao(tela):
+        elif configuracoesBotao.clicarBotao(tela):
             som_click.play()  # Som de clique
             print("Configurações clicado")
-            abrirConfiguracoesFases()
+            estadoJogo = "ConfigFases"
+            run = False
         for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    confirmar_saida(tela)
+            if event.type == pygame.QUIT:
+                confirmar_saida(tela)
 
         pygame.display.update()
         clock.tick(60)
@@ -1595,8 +1611,8 @@ def fase2():
             abrirConfiguracoes()
 
         for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    confirmar_saida(tela)
+            if event.type == pygame.QUIT:
+                confirmar_saida(tela)
 
         pygame.display.update()
         clock.tick(60)
@@ -2123,6 +2139,9 @@ while rodando:
         fase2()
     elif estadoJogo == "fase3":
         fase3()
+    elif estadoJogo == "ConfigFases":
+        abrirConfiguracoesFases()
+    
 
 # Finaliza o pygame
 pygame.quit()
