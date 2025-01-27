@@ -1,9 +1,14 @@
+from moviepy import VideoFileClip
 import pygame  # Importando biblioteca
 import botao  # Importando a classe Botao
 import botaoObjetos
 import sys
 import random
 import math
+import tkinter as tk
+from tkinter import Label
+import os
+
 
 pygame.init()  # Inicializa os módulos do pygame
 pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_HAND)  # Muda o cursor para a mão
@@ -77,6 +82,62 @@ def exibir_nome_objeto(obj):
 
     # Desenhar o texto preenchido
     tela.blit(texto_nome_preenchimento, posicao_nome)
+
+
+tutorial_videos = {
+    1: "tutoriais/Souto.mp4",  
+    2: "tutorial_fase2.mp4",
+    3: "tutorial_fase3.mp4"
+}
+
+def mostrar_video(fase):
+    if fase not in tutorial_videos:
+        print(f"Sem tutorial para a fase {fase}")
+        return
+
+    video_path = tutorial_videos[fase]
+    
+    try:
+        clip = VideoFileClip(video_path)
+        
+        # Create a temporary Tkinter window for the video
+        video_window = tk.Toplevel()
+        video_window.title(f"Tutorial - Phase {fase}")
+        
+        window_width = 400
+        window_height = 300
+        screen_width = video_window.winfo_screenwidth()
+        screen_height = video_window.winfo_screenheight()
+        x = (screen_width - window_width) // 2
+        y = (screen_height - window_height) // 2
+        video_window.geometry(f"{window_width}x{window_height}+{x}+{y}")
+        
+        # Create a label for the video
+        video_label = Label(video_window)
+        video_label.pack(expand=True, fill="both")
+        
+        
+        clip.preview()
+        
+        pygame.quit()
+        clip.close()
+        video_window.destroy()
+        
+        # Reinitialize pygame for the main game
+        pygame.init()
+        pygame.display.set_mode((telaLargura, telaAltura))
+        pygame.display.set_caption("Lixo_No_Lixo")
+        
+    except Exception as e:
+        print(f"Error playing video: {e}")
+        if 'clip' in locals():
+            clip.close()
+        if 'video_window' in locals():
+            video_window.destroy()
+        pygame.init()
+        pygame.display.set_mode((telaLargura, telaAltura))
+        pygame.display.set_caption("Lixo_No_Lixo")
+
 
 def tocar_musica(nova_musica): # FUNÇÃO DA MÚSICA DE FUNDO
     global musica_atual
@@ -838,6 +899,8 @@ def fase1():
     pontuacao_fase1 = 0
     jogoConcluido = False
     fase1Background = pygame.image.load("imagens/fase1/imagemZoologico.png")
+
+    mostrar_video(1)
 
     # Verificar som
     if somAtivo:
