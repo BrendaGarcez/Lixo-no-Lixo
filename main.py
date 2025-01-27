@@ -222,7 +222,7 @@ def abrirConfiguracoes():
         pygame.display.update()
         clock.tick(60)
 
-def abrirConfiguracoesFases():
+def abrirConfiguracoesFases(): # função com conflito (remover ou ajustar)
     global somAtivo
 
     configuracoesBackground = pygame.image.load("imagens/GUI/Backgrounds/configuracoesBackground.jpg")
@@ -497,11 +497,9 @@ def abrirInstrucoes():
                 if clicando_na_barra:
                     deslocamento = max(0, min(len(texto_atual) * espacamento - altura_quadro,
                                               (event.pos[1] - posicao_quadro[1]) * (len(texto_atual) * espacamento / altura_quadro)))
-            confirmar_saida(tela)
+            confirmar_saida(tela) # não entendi isso aqui, tá no lugar errado e bugando o Como Jogar
 
         pygame.display.update()
-
-
 
 def abrirCreditos():
     global estadoJogo
@@ -1254,7 +1252,11 @@ def fase2():
         "imagens/fase2/incorretas/Estojo.png",
         "imagens/fase2/incorretas/Caderno.png",
         "imagens/fase2/incorretas/Mochila.png",
-        "imagens/fase2/incorretas/Régua.png",
+        "imagens/fase2/incorretas/Caneta.png",
+        "imagens/fase2/incorretas/Apontador.png",
+        "imagens/fase2/incorretas/Lápis.png",
+        "imagens/fase2/incorretas/Tesoura.png",
+
     ]
 
     # Selecionando aleatoriamente 6 imagens corretas e 4 incorretas
@@ -1936,7 +1938,7 @@ def fase3():
             som_click.play()  # Som de clique
             print("Configurações clicado")
             abrirConfiguracoes()
-
+        
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 global rodando
@@ -2008,20 +2010,21 @@ def fase3():
                         # Para o arraste ao soltar o botão do mouse
                         arrastando_objeto = None
             
-            # Atualizar e desenhar os objetos com as novas posições
-            for obj in objetos:
-                botao = obj["botao"]
-                botao.rect.topleft = (obj["x"], obj["y"])  # Atualiza a posição do objeto gráfico
-                botao.atualizarImagem(posicaoMouse)  # Atualiza a imagem do objeto (se necessário)
-                botao.desenharBotao(tela)  # Desenha o objeto na nova posição
+        # Atualizar e desenhar os objetos com as novas posições
+        for obj in objetos:
+            botao = obj["botao"]
+            botao.rect.topleft = (obj["x"], obj["y"])  # Atualiza a posição do objeto gráfico
+            botao.atualizarImagem(posicaoMouse)  # Atualiza a imagem do objeto (se necessário)
+            botao.desenharBotao(tela)  # Desenha o objeto na nova posição
 
-                # Verifica se o mouse está sobre o objeto (hover)
-                if botao.rect.collidepoint(posicaoMouse):
-                    exibir_nome_objeto(obj)  # Exibe o nome do objeto acima dele
+            # Verifica se o mouse está sobre o objeto (hover)
+            if botao.rect.collidepoint(posicaoMouse):
+                exibir_nome_objeto(obj)  # Exibe o nome do objeto acima dele
             
             # Atualiza a tela
-            pygame.display.update() 
-
+        pygame.display.update() 
+        clock.tick(60)
+        
 # Função para o menu principal
 def menuPrincipal():
     global estadoJogo
