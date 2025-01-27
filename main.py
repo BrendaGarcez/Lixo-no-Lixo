@@ -1604,11 +1604,11 @@ def fase2():
                 pontuacao_fase2 = 0
             run = False
 
-
-        if configuracoesBotao.clicarBotao(tela):
+        elif configuracoesBotao.clicarBotao(tela):
             som_click.play()  # Som de clique
             print("Configurações clicado")
-            abrirConfiguracoes()
+            abrirConfiguracoesFases()
+            run = False
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -1956,7 +1956,8 @@ def fase3():
         if configuracoesBotao.clicarBotao(tela):
             som_click.play()  # Som de clique
             print("Configurações clicado")
-            abrirConfiguracoes()
+            abrirConfiguracoesFases()
+            run = False
         
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
