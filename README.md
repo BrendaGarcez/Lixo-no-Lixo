@@ -8,10 +8,9 @@ Este projeto é um jogo educacional voltado para pessoas com deficiência intele
 Este jogo foi desenvolvido como parte da disciplina de **Engenharia de Software I(na UTFPR, no crso de Ciência da Computação)**, com foco no levantamento de requisitos e no gerenciamento de projetos de software. O desenvolvimento foi realizado utilizando a metodologia ágil **Scrum**, com sprints semanais e revisão contínua.
 
 ## Equipe de Desenvolvimento  
-- **Nicole Jamuchewski** – Product Owner  
-- **Brenda Garcez** – Scrum Master  
+- **Pedro Victor** – Documentação  
 - **Brenda Garcez e Matheus** – Desenvolvedores   
-- **João Rafael e Nicole Jamuchewski** – Design   
+- **João Rafael e Nicole Jamuchewski** – Design e Video
 
 ## Tecnologias Utilizadas  
 - **Python**  
