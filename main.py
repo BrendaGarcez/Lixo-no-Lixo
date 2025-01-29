@@ -1111,7 +1111,7 @@ def fase1():
 
             posicao_valida = False
             tentativa = 0
-            while not posicao_valida and tentativa < 100:  # Limite de tentativas para evitar loop infinito
+            while not posicao_valida and tentativa < 300:  # Limite de tentativas para evitar loop infinito
                 tentativa += 1
                 
                 # Gerar posição aleatória
@@ -1505,7 +1505,7 @@ def fase2():
 
             posicao_valida = False
             tentativa = 0
-            while not posicao_valida and tentativa < 100:  # Limite de tentativas para evitar loop infinito
+            while not posicao_valida and tentativa < 300:  # Limite de tentativas para evitar loop infinito
                 tentativa += 1
                 
                 # Gerar posição aleatória
@@ -1944,7 +1944,7 @@ def fase3():
 
             posicao_valida = False
             tentativa = 0
-            while not posicao_valida and tentativa < 100:  # Limite de tentativas para evitar loop infinito
+            while not posicao_valida and tentativa < 300:  # Limite de tentativas para evitar loop infinito
                 tentativa += 1
                 
                 # Gerar posição aleatória
