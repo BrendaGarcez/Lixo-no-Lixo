@@ -7,7 +7,7 @@ import random
 import math
 import tkinter as tk
 import cv2
-import PIL.Image, PIL.ImageTk
+from PIL import Image, ImageTk
 import json
 import os
 
@@ -28,6 +28,7 @@ pygame.mixer.init()
 
 estadoJogo = "menu"  # situação atual do jogo, para rastrear as telas
 rodando = True  # Controla se o programa deve continuar rodando
+fase_ativa = False
 
 jogoConcluido = False
 pontuacao_fase1 = 0
@@ -45,7 +46,7 @@ def criarBotaoImagens(x, y, imagem, imagemAlterada):
     imagemAlterada = pygame.image.load(imagemAlterada).convert_alpha()
     
     # Redimensionar as imagens
-    largura, altura = 200, 120  # Exemplo de tamanho, ajuste conforme necessário
+    largura, altura = 180, 100  # Exemplo de tamanho, ajuste conforme necessário
     imagem = pygame.transform.scale(imagem, (largura, altura))
     imagemAlterada = pygame.transform.scale(imagemAlterada, (largura, altura))
     
@@ -406,6 +407,7 @@ def abrirConfiguracoes():
         clock.tick(60)
 
 def abrirConfiguracoesFases():
+    global fase_ativa
     global somAtivo
     global estadoJogo
 
@@ -491,13 +493,15 @@ def abrirConfiguracoesFases():
         if menuBotao.clicarBotao(tela):
             som_click.play()  
             menuPrincipal()  
-            run = False  
+            run = False 
+            fase_ativa = False
             return  
 
         if fasesBotao.clicarBotao(tela):
             som_click.play()  
             iniciarFases()  
             run = False  
+            fase_ativa = False
             return  
 
         # Controle de eventos do Pygame
@@ -1016,7 +1020,7 @@ def iniciarFases():
         clock.tick(60)
 
 def fase1():
-    global estadoJogo, jogoConcluido, pontuacao_fase1
+    global estadoJogo, jogoConcluido, pontuacao_fase1, fase_ativa
     pontuacao_fase1 = 0
     jogoConcluido = False
     fase1Background = pygame.image.load("imagens/fase1/imagemZoologico.png")
@@ -1149,9 +1153,9 @@ def fase1():
     tempo_inicializado = pygame.time.get_ticks()  # Registrar o momento em que o temporizador começa
     
     mostrar_informacoes = True
-    run = True
+    fase_ativa = True
     
-    while run:
+    while fase_ativa:
         tela.blit(fase1Background, (0, 0))
         
         if jogoPerdeu:
@@ -1242,7 +1246,7 @@ def fase1():
                     som_click.play()  # Tocar som de clique
                     print("Botão 'Voltar ao Menu' clicado.")
                     estadoJogo = "menu"  # Voltar para o menu
-                    run = False  # Sai do loop atual
+                    fase_ativa = False  # Sai do loop atual
                     menuPrincipal()  # Chama a função do menu principa
 
             if jogoPerdeu:
@@ -1256,7 +1260,7 @@ def fase1():
                     som_click.play()  # Tocar som de clique
                     print("Botão 'Voltar ao Menu' clicado.")
                     estadoJogo = "menu"  # Voltar para o menu
-                    run = False  # Sai do loop atual
+                    fase_ativa = False  # Sai do loop atual
                     menuPrincipal()  # Chama a função do menu principa
 
             # Verificar clique no botão "Próxima Fase"
@@ -1264,7 +1268,7 @@ def fase1():
                 som_click.play()  # Tocar som de clique
                 print("Botão 'Próxima Fase' clicado.")
                 estadoJogo = "fase2"  # Mudar o estado do jogo para a fase 2
-                run = False  # Sai do loop atual
+                fase_ativa = False  # Sai do loop atual
                 fase2()  # Chama a função para a próxima fase (fase2)
                 
             # Desenhar o botão "Tentar Novamente"
@@ -1275,7 +1279,7 @@ def fase1():
             if botaoTentarNovamente.clicarBotao(tela):
                 som_click.play()  # Tocar o som de clique
                 print("Botão 'Tentar Novamente' clicado.")
-                run = False  # Sai do loop atual
+                fase_ativa = False  # Sai do loop atual
                 fase1()  # Reinicia a fase
 
             tempo_total = tempo_inicial - tempo_restante  # Tempo total que o jogador levou
@@ -1396,13 +1400,13 @@ def fase1():
             estadoJogo = "jogando"
             if jogoConcluido == False:
                 pontuacao_fase1 = 0
-            run = False
+            fase_ativa = False
 
         elif configuracoesBotao.clicarBotao(tela):
             som_click.play()  # Som de clique
             print("Configurações clicado")
             abrirConfiguracoesFases()
-            run = False
+
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 confirmar_saida(tela)
@@ -1411,7 +1415,7 @@ def fase1():
         clock.tick(60)
 
 def fase2():
-    global estadoJogo, jogoConcluido, pontuacao_fase2
+    global estadoJogo, jogoConcluido, pontuacao_fase2, fase_ativa
     pontuacao_fase2 = 0
     jogoConcluido = False
     fase1Background = pygame.image.load("imagens/fase2/imagemSaladeAula.png")
@@ -1431,10 +1435,10 @@ def fase2():
     
     # Configurações para objetos
     largura_tela, altura_tela = tela.get_size()
-    centro_x = largura_tela // 3 + 30
-    centro_y = altura_tela // 2 - 20
+    centro_x = largura_tela // 3
+    centro_y = altura_tela // 2 - 40
     raio_x = largura_tela // 3 + 40
-    raio_y = altura_tela // 4
+    raio_y = altura_tela // 4 + 20
     distancia_minima = 140  # Distância mínima entre objetos
 
     # Inicializa a fonte para o texto do contador
@@ -1543,10 +1547,10 @@ def fase2():
     tempo_restante = tempo_inicial
     tempo_inicializado = pygame.time.get_ticks()  # Registrar o momento em que o temporizador começa
 
-    run = True
+    fase_ativa = True
     mostrar_informacoes = True
 
-    while run:
+    while fase_ativa:
         tela.blit(fase1Background, (0, 0))
         if jogoPerdeu:
             tela.blit(pygame.image.load("imagens/fase2/perdeuSaladeAula.jpg"), (0, 0))
@@ -1636,7 +1640,7 @@ def fase2():
                     som_click.play()  # Tocar som de clique
                     print("Botão 'Voltar ao Menu' clicado.")
                     estadoJogo = "menu"  # Voltar para o menu
-                    run = False  # Sai do loop atual
+                    fase_ativa = False  # Sai do loop atual
                     menuPrincipal()  # Chama a função do menu principa
 
             if jogoPerdeu:
@@ -1650,7 +1654,7 @@ def fase2():
                     som_click.play()  # Tocar som de clique
                     print("Botão 'Voltar ao Menu' clicado.")
                     estadoJogo = "menu"  # Voltar para o menu
-                    run = False  # Sai do loop atual
+                    fase_ativa = False  # Sai do loop atual
                     menuPrincipal()  # Chama a função do menu principa
 
             # Verificar clique no botão "Próxima Fase"
@@ -1658,7 +1662,7 @@ def fase2():
                 som_click.play()  # Tocar som de clique
                 print("Botão 'Próxima Fase' clicado.")
                 estadoJogo = "fase2"  # Mudar o estado do jogo para a fase 2
-                run = False  # Sai do loop atual
+                fase_ativa = False  # Sai do loop atual
                 fase3()  # Chama a função para a próxima fase (fase2)
                 
             # Desenhar o botão "Tentar Novamente"
@@ -1669,7 +1673,7 @@ def fase2():
             if botaoTentarNovamente.clicarBotao(tela):
                 som_click.play()  # Tocar o som de clique
                 print("Botão 'Tentar Novamente' clicado.")
-                run = False  # Sai do loop atual
+                fase_ativa = False  # Sai do loop atual
                 fase2()  # Reinicia a fase
 
             tempo_total = tempo_inicial - tempo_restante  # Tempo total que o jogador levou
@@ -1790,13 +1794,13 @@ def fase2():
             estadoJogo = "jogando"
             if jogoConcluido == False:
                 pontuacao_fase2 = 0
-            run = False
+            fase_ativa = False
 
         elif configuracoesBotao.clicarBotao(tela):
             som_click.play()  # Som de clique
             print("Configurações clicado")
             abrirConfiguracoesFases()
-            run = False
+            
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -1806,7 +1810,7 @@ def fase2():
         clock.tick(60)
 
 def fase3():
-    global estadoJogo, jogoConcluido, pontuacao_fase3
+    global estadoJogo, jogoConcluido, pontuacao_fase3, fase_ativa
     pontuacao_fase3 = 0
     jogoConcluido = False
     fase1Background = pygame.image.load("imagens/fase3/imagemPraia.jpg")
@@ -1985,8 +1989,8 @@ def fase3():
     deslocamento_y = 0
 
     mostrar_informacoes = True
-    run = True
-    while run:
+    fase_ativa = True
+    while fase_ativa:
         tela.blit(fase1Background, (0, 0))
         if jogoPerdeu:
             tela.blit(pygame.image.load("imagens/fase3/perdeuPraia.jpg"), (0, 0))
@@ -2058,7 +2062,7 @@ def fase3():
                 som_click.play()  # Tocar som de clique
                 print("Botão 'Voltar ao Menu' clicado.")
                 estadoJogo = "menu"  # Voltar para o menu
-                run = False  # Sai do loop atual
+                fase_ativa = False  # Sai do loop atual
                 menuPrincipal()  # Chama a função do menu principa
 
             # Desenhar o botão "Tentar Novamente"
@@ -2069,7 +2073,7 @@ def fase3():
             if botaoTentarNovamente.clicarBotao(tela):
                 som_click.play()  # Tocar o som de clique
                 print("Botão 'Tentar Novamente' clicado.")
-                run = False  # Sai do loop atual
+                fase_ativa = False  # Sai do loop atual
                 fase3()  # Reinicia a fase
 
             tempo_total = tempo_inicial - tempo_restante  # Tempo total que o jogador levou
@@ -2140,13 +2144,12 @@ def fase3():
             estadoJogo = "jogando"
             if jogoConcluido == False:
                 pontuacao_fase3 = 0
-            run = False
+            fase_ativa = False
 
         if configuracoesBotao.clicarBotao(tela):
             som_click.play()  # Som de clique
             print("Configurações clicado")
             abrirConfiguracoesFases()
-            run = False
         
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
