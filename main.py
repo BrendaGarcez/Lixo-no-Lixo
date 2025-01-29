@@ -97,7 +97,7 @@ def verificar_clique_botao(x, y, largura, altura):
 """Dados para relatório"""
 def adicionar_jogador(nome):
     jogadores = carregar_dados_jogadores()
-    
+ 
     # Verifica se o jogador já existe
     if buscar_jogador(nome):
         print(f"O jogador {nome} já está registrado.")
@@ -108,23 +108,20 @@ def adicionar_jogador(nome):
             "pontuacoes": [{"fase": 1, "pontuacao": 0}, {"fase": 2, "pontuacao": 0}, {"fase": 3, "pontuacao": 0}]
         }
         jogadores.append(novo_jogador)
-        
+     
         # Salva a lista de jogadores de volta no arquivo JSON
         with open('jogadores.json', 'w') as arquivo:
             json.dump({"jogadores": jogadores}, arquivo, indent=4)
-        
+     
         print(f"O jogador {nome} foi adicionado com sucesso!")
 
-jogadores_iniciais = []
 
-with open('jogadores.json', 'w') as arquivo:
-    json.dump(jogadores_iniciais, arquivo)
 
 def carregar_dados_jogadores():
     try:
         with open('jogadores.json', 'r') as arquivo:
             dados = json.load(arquivo)
-        return dados
+        return dados.get("jogadores", [])  # Acessa a chave "jogadores" no JSON
     except (json.JSONDecodeError, FileNotFoundError) as e:
         print(f"Erro ao carregar o arquivo JSON: {e}")
         return []  # Retorna uma lista vazia ou algum valor padrão
@@ -147,10 +144,10 @@ def pedir_nome():
     active = False
     text = ''
     clock = pygame.time.Clock()
-    
+ 
     while True:
         tela.fill((30, 30, 30))
-        
+     
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
@@ -164,20 +161,21 @@ def pedir_nome():
             if event.type == pygame.KEYDOWN:
                 if active:
                     if event.key == pygame.K_RETURN:
-                        return text
+                        return text  # Retorna o texto quando "Enter" for pressionado
                     elif event.key == pygame.K_BACKSPACE:
                         text = text[:-1]
                     else:
                         text += event.unicode
-        
+     
         txt_surface = font.render(text, True, color)
         width = max(400, txt_surface.get_width()+10)
         input_box.w = width
         tela.blit(txt_surface, (input_box.x+5, input_box.y+5))
         pygame.draw.rect(tela, color, input_box, 2)
-        
+     
         pygame.display.flip()
         clock.tick(30)
+
 
 def mostrarVideo(video_path, video_width, video_height, imagem_fundo_path, audio_path):
     # Abrir o vídeo com OpenCV
