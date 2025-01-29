@@ -1,4 +1,4 @@
-from moviepy import VideoFileClip
+from turtle import Screen
 import pygame  # Importando biblioteca
 import botao  # Importando a classe Botao
 import botaoObjetos
@@ -8,8 +8,8 @@ import math
 import tkinter as tk
 import cv2
 import PIL.Image, PIL.ImageTk
-
-
+import json
+import os
 
 pygame.init()  # Inicializa os módulos do pygame
 pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_HAND)  # Muda o cursor para a mão
@@ -94,6 +94,91 @@ def verificar_clique_botao(x, y, largura, altura):
             return True
     return False
 
+"""Dados para relatório"""
+def adicionar_jogador(nome):
+    jogadores = carregar_dados_jogadores()
+    
+    # Verifica se o jogador já existe
+    if buscar_jogador(nome):
+        print(f"O jogador {nome} já está registrado.")
+    else:
+        # Se não existir, cria um novo jogador com pontuação inicial
+        novo_jogador = {
+            "nome": nome,
+            "pontuacoes": [{"fase": 1, "pontuacao": 0}, {"fase": 2, "pontuacao": 0}, {"fase": 3, "pontuacao": 0}]
+        }
+        jogadores.append(novo_jogador)
+        
+        # Salva a lista de jogadores de volta no arquivo JSON
+        with open('jogadores.json', 'w') as arquivo:
+            json.dump({"jogadores": jogadores}, arquivo, indent=4)
+        
+        print(f"O jogador {nome} foi adicionado com sucesso!")
+
+jogadores_iniciais = []
+
+with open('jogadores.json', 'w') as arquivo:
+    json.dump(jogadores_iniciais, arquivo)
+
+def carregar_dados_jogadores():
+    try:
+        with open('jogadores.json', 'r') as arquivo:
+            dados = json.load(arquivo)
+        return dados
+    except (json.JSONDecodeError, FileNotFoundError) as e:
+        print(f"Erro ao carregar o arquivo JSON: {e}")
+        return []  # Retorna uma lista vazia ou algum valor padrão
+
+    
+def buscar_jogador(nome):
+    jogadores = carregar_dados_jogadores()  # Carrega os jogadores
+    for jogador in jogadores:
+        if jogador['nome'].lower() == nome.lower():  # Compara o nome ignorando maiúsculas/minúsculas
+            return jogador  # Retorna o jogador encontrado
+    return None  # Retorna None caso o jogador não seja encontrado
+
+
+def pedir_nome():
+    font = pygame.font.SysFont('Arial', 30)
+    input_box = pygame.Rect(100, 100, 400, 40)
+    color_inactive = pygame.Color('lightskyblue3')
+    color_active = pygame.Color('dodgerblue2')
+    color = color_inactive
+    active = False
+    text = ''
+    clock = pygame.time.Clock()
+    
+    while True:
+        tela.fill((30, 30, 30))
+        
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                return None
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if input_box.collidepoint(event.pos):
+                    active = not active
+                else:
+                    active = False
+                color = color_active if active else color_inactive
+            if event.type == pygame.KEYDOWN:
+                if active:
+                    if event.key == pygame.K_RETURN:
+                        return text
+                    elif event.key == pygame.K_BACKSPACE:
+                        text = text[:-1]
+                    else:
+                        text += event.unicode
+        
+        txt_surface = font.render(text, True, color)
+        width = max(400, txt_surface.get_width()+10)
+        input_box.w = width
+        tela.blit(txt_surface, (input_box.x+5, input_box.y+5))
+        pygame.draw.rect(tela, color, input_box, 2)
+        
+        pygame.display.flip()
+        clock.tick(30)
+
 def mostrarVideo(video_path, video_width, video_height, imagem_fundo_path, audio_path):
     # Abrir o vídeo com OpenCV
     cap = cv2.VideoCapture(video_path)
@@ -175,9 +260,6 @@ def mostrarVideo(video_path, video_width, video_height, imagem_fundo_path, audio
 
     # Liberar os recursos do vídeo
     cap.release()
-
-
-
 
 
 def tocar_musica(nova_musica): # FUNÇÃO DA MÚSICA DE FUNDO
@@ -2194,6 +2276,8 @@ def menuPrincipal():
             som_click.play()  # Som de clique
             print("Jogar clicado")
             estadoJogo = "jogando"
+            """nome_jogador = pedir_nome()
+            adicionar_jogador(nome_jogador)"""
             run = False
             
         if configuracoesBotao.clicarBotao(tela):
