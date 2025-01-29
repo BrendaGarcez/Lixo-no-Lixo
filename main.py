@@ -6,8 +6,9 @@ import sys
 import random
 import math
 import tkinter as tk
-from tkinter import Label
-import os
+import cv2
+import PIL.Image, PIL.ImageTk
+
 
 
 pygame.init()  # Inicializa os módulos do pygame
@@ -84,59 +85,99 @@ def exibir_nome_objeto(obj):
     tela.blit(texto_nome_preenchimento, posicao_nome)
 
 
-tutorial_videos = {
-    1: "tutoriais/Souto.mp4",  
-    2: "tutorial_fase2.mp4",
-    3: "tutorial_fase3.mp4"
-}
+# Função para verificar se o botão foi clicado
+def verificar_clique_botao(x, y, largura, altura):
+    mouse_pos = pygame.mouse.get_pos()
+    mouse_pressed = pygame.mouse.get_pressed()
+    if x <= mouse_pos[0] <= x + largura and y <= mouse_pos[1] <= y + altura:
+        if mouse_pressed[0]:  # Se o botão esquerdo do mouse foi pressionado
+            return True
+    return False
 
-def mostrar_video(fase):
-    if fase not in tutorial_videos:
-        print(f"Sem tutorial para a fase {fase}")
+def mostrarVideo(video_path, video_width, video_height, imagem_fundo_path, audio_path):
+    # Abrir o vídeo com OpenCV
+    cap = cv2.VideoCapture(video_path)
+    
+    # Inicializar o mixer do Pygame para áudio
+    pygame.mixer.init()
+
+    posicaoMouse = pygame.mouse.get_pos()
+
+    # Criar o botão de voltar
+    voltarBotao = criarBotao(477.5 , 520,"imagens/GUI/imagensExtra/botaoPular0.png", "imagens/GUI/imagensExtra/botaoPular1.png")
+    avatarBotao = criarBotao(786, 485, "imagens/GUI/imagensExtra/avatar.png", "imagens/GUI/imagensExtra/avatar.png")
+     
+    if not cap.isOpened():
+        print("Erro ao abrir o vídeo:", video_path)
         return
 
-    video_path = tutorial_videos[fase]
-    
-    try:
-        clip = VideoFileClip(video_path)
+    # Carregar a imagem de fundo
+    fundo_imagem = pygame.image.load(imagem_fundo_path)
+
+    # Carregar e tocar o áudio
+    pygame.mixer.music.load(audio_path)
+    pygame.mixer.music.play(-1, 0.0)  # Tocar o áudio de forma contínua (-1) desde o início (0.0)
+
+    # Calcular a posição central do vídeo na tela
+    x_center = (telaLargura - video_width) // 2
+    y_center = (telaAltura - video_height) // 2
+
+    # Posição e tamanho do botão de "Voltar"
+    botao_largura, botao_altura = 145, 47
+
+    # Loop principal do vídeo
+    run = True
+    while run:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                run = False
+                pygame.quit()
+                sys.exit()
+
+        # Verificar se o botão foi clicado
+        if verificar_clique_botao(477.5 , 520, botao_largura, botao_altura):
+            print("Botão de voltar clicado!")
+            run = False
+            cap.set(cv2.CAP_PROP_POS_FRAMES, 0)  # Voltar ao início do vídeo
+
+        # Ler o próximo frame do vídeo
+        ret, frame = cap.read()
+        if not ret:
+            print("Fim do vídeo ou erro ao ler frame!")
+            break
+
+        # Redimensionar o frame para o tamanho definido (video_width x video_height)
+        frame = cv2.resize(frame, (video_width, video_height))
+        frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+        frame_surface = pygame.surfarray.make_surface(frame.swapaxes(0, 1))
+
+        # Renderizar o fundo da fase (imagem de fundo)
+        tela.blit(fundo_imagem, (0, 0))  # Colocar a imagem de fundo
+
+        # Renderizar o vídeo no centro da tela
+        tela.blit(frame_surface, (x_center, y_center))
+
+        # Atualizar a posição do mouse
+        posicaoMouse = pygame.mouse.get_pos()
         
-        # Create a temporary Tkinter window for the video
-        video_window = tk.Toplevel()
-        video_window.title(f"Tutorial - Phase {fase}")
+        avatarBotao.desenharBotao(tela)
+        # Verificar se o mouse está sobre o botão e alterar a imagem para o hover
+        if 200 <= posicaoMouse[0] <= 200 + botao_largura and 660 <= posicaoMouse[1] <= 660 + botao_altura:
+            voltarBotao.desenharBotao(tela)  # Desenhar o botão hover
+        else:
+            voltarBotao.desenharBotao(tela)
         
-        window_width = 400
-        window_height = 300
-        screen_width = video_window.winfo_screenwidth()
-        screen_height = video_window.winfo_screenheight()
-        x = (screen_width - window_width) // 2
-        y = (screen_height - window_height) // 2
-        video_window.geometry(f"{window_width}x{window_height}+{x}+{y}")
-        
-        # Create a label for the video
-        video_label = Label(video_window)
-        video_label.pack(expand=True, fill="both")
-        
-        
-        clip.preview()
-        
-        pygame.quit()
-        clip.close()
-        video_window.destroy()
-        
-        # Reinitialize pygame for the main game
-        pygame.init()
-        pygame.display.set_mode((telaLargura, telaAltura))
-        pygame.display.set_caption("Lixo_No_Lixo")
-        
-    except Exception as e:
-        print(f"Error playing video: {e}")
-        if 'clip' in locals():
-            clip.close()
-        if 'video_window' in locals():
-            video_window.destroy()
-        pygame.init()
-        pygame.display.set_mode((telaLargura, telaAltura))
-        pygame.display.set_caption("Lixo_No_Lixo")
+        pygame.display.update()
+        pygame.time.Clock().tick(30)
+
+    # Parar o áudio quando o vídeo terminar
+    pygame.mixer.music.stop()
+
+    # Liberar os recursos do vídeo
+    cap.release()
+
+
+
 
 
 def tocar_musica(nova_musica): # FUNÇÃO DA MÚSICA DE FUNDO
@@ -899,8 +940,9 @@ def fase1():
     pontuacao_fase1 = 0
     jogoConcluido = False
     fase1Background = pygame.image.load("imagens/fase1/imagemZoologico.png")
+     
 
-    mostrar_video(1)
+    mostrarVideo("seu_video.mp4", 600, 300, "imagens/fase1/imagemTutorialZoo.png", "seu_audio.wav")
 
     # Verificar som
     if somAtivo:
@@ -1028,8 +1070,10 @@ def fase1():
     
     mostrar_informacoes = True
     run = True
+    
     while run:
         tela.blit(fase1Background, (0, 0))
+        
         if jogoPerdeu:
             tela.blit(pygame.image.load("imagens/fase1/perdeuZoologico.jpg"), (0, 0))
             objetos.clear()  # Limpa todos os objetos
@@ -1043,7 +1087,6 @@ def fase1():
             if tempo_restante == 0:
                 jogoPerdeu = True
 
-        
         if not jogoGanhou and not jogoPerdeu:
             # Exibir as vidas
             tela.blit(vida_imagens[vidas], (220, 640))  # Exibe a imagem das vidas no canto superior esquerdo
