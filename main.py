@@ -942,7 +942,7 @@ def fase1():
     fase1Background = pygame.image.load("imagens/fase1/imagemZoologico.png")
      
 
-    mostrarVideo("fase1.mp4", 600, 300, "imagens/fase1/imagemTutorialZoo.png", "fase1.wav")
+    mostrarVideo("video/fase1.mp4", 600, 300, "imagens/fase1/imagemTutorialZoo.png", "sons/tutorial/fase1.wav")
 
     # Verificar som
     if somAtivo:
@@ -1336,7 +1336,7 @@ def fase2():
     jogoConcluido = False
     fase1Background = pygame.image.load("imagens/fase2/imagemSaladeAula.png")
 
-    mostrarVideo("fase2.mp4", 600, 300, "imagens/fase2/imagemTutorialSala.png", "fase2.wav")
+    mostrarVideo("video/fase2.mp4", 600, 300, "imagens/fase2/imagemTutorialSala.png", "sons/tutorial/fase2.wav")
 
     # Verificar som
     if somAtivo:
@@ -1731,7 +1731,7 @@ def fase3():
     jogoConcluido = False
     fase1Background = pygame.image.load("imagens/fase3/imagemPraia.jpg")
 
-    mostrarVideo("fase3.mp4", 600, 300, "imagens/fase3/imagemTutorialPraia.png", "fase3.wav")
+    mostrarVideo("video/fase3.mp4", 600, 300, "imagens/fase3/imagemTutorialPraia.png", "sons/tutorial/fase3.wav")
 
     # Verificar som
     if somAtivo:
