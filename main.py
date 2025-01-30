@@ -1908,31 +1908,41 @@ def fase3():
     posicao_area_PRAIA = (largura_tela - novo_tamanho_area_PRAIA[0] - 40, altura_tela - novo_tamanho_area_PRAIA[1] - 20)
     posicao_area_LIXO = (40, altura_tela - novo_tamanho_area_LIXO[1] - 20)
 
-    # Criar os objetos de área (Rect) para facilitar a colisão
-    rect_area_PRAIA = pygame.Rect(posicao_area_PRAIA, novo_tamanho_area_PRAIA)
-    rect_area_LIXO = pygame.Rect(posicao_area_LIXO, novo_tamanho_area_LIXO)
-
     # Função para verificar se o objeto está dentro da área da praia
     def colisao_com_area_PRAIA(objeto):
-        # Criar o retângulo do objeto (assumindo que o objeto tem a posição 'x' e 'y' e a imagem do botão)
-        rect_objeto = pygame.Rect(objeto["x"], objeto["y"], objeto["botao"].imagem.get_width(), objeto["botao"].imagem.get_height())
+        # Cria uma máscara para a área da praia
+        mask_area_praia = pygame.mask.from_surface(imagem_area_PRAIA)
         
-        # Verificar se o objeto está completamente dentro da área da praia
-        if rect_area_PRAIA.colliderect(rect_objeto):
+        # Cria uma máscara para o objeto
+        rect_objeto = pygame.Rect(objeto["x"], objeto["y"], objeto["botao"].imagem.get_width(), objeto["botao"].imagem.get_height())
+        mask_objeto = pygame.mask.from_surface(objeto["botao"].imagem)
+        
+        # Obter o deslocamento entre o objeto e a área da praia
+        deslocamento = (rect_objeto.x - posicao_area_PRAIA[0], rect_objeto.y - posicao_area_PRAIA[1])
+        
+        # Verifica se as máscaras se sobrepõem
+        if mask_area_praia.overlap(mask_objeto, deslocamento):
             return True
         return False
 
-    # Função para verificar se o objeto está dentro da área do lixo
+
     def colisao_com_area_LIXO(objeto):
-        # Criar o retângulo do objeto (assumindo que o objeto tem a posição 'x' e 'y' e a imagem do botão)
-        rect_objeto = pygame.Rect(objeto["x"], objeto["y"], objeto["botao"].imagem.get_width(), objeto["botao"].imagem.get_height())
+        # Cria uma máscara para a área do lixo
+        mask_area_lixo = pygame.mask.from_surface(imagem_area_LIXO)
         
-        # Verificar se o objeto está completamente dentro da área do lixo
-        if rect_area_LIXO.colliderect(rect_objeto):
+        # Cria uma máscara para o objeto
+        rect_objeto = pygame.Rect(objeto["x"], objeto["y"], objeto["botao"].imagem.get_width(), objeto["botao"].imagem.get_height())
+        mask_objeto = pygame.mask.from_surface(objeto["botao"].imagem)
+        
+        # Obter o deslocamento entre o objeto e a área do lixo
+        deslocamento = (rect_objeto.x - posicao_area_LIXO[0], rect_objeto.y - posicao_area_LIXO[1])
+        
+        # Verifica se as máscaras se sobrepõem
+        if mask_area_lixo.overlap(mask_objeto, deslocamento):
             return True
         return False
 
-
+ 
     def posicionar_objetos(lista_imagens, tipo="correto"):
         imagens_selecionadas = lista_imagens  # Lista de imagens a posicionar
 
@@ -2104,7 +2114,7 @@ def fase3():
 
             texto_contorno_tempo = fonte.render(texto_tempo, True, (0, 0, 0))  # Contorno preto
             texto_preenchimento_tempo = fonte.render(texto_tempo, True, cor_texto)  # Texto branco
-            posicao_tempo = (780, 130)  # Posição abaixo do contador de objetos
+            posicao_tempo = (710, 20)  # Posição abaixo do contador de objetos
 
             # Desenhar o texto com contorno
             tela.blit(texto_contorno_tempo, (posicao_tempo[0] - 1, posicao_tempo[1]))
@@ -2119,7 +2129,7 @@ def fase3():
             texto_contorno = fonte.render(f"TOTAL DE OBJETOS: {imagensCorretasClicadas}/10", True, (0, 0, 0))  # Preto para o contorno
             texto_preenchimento = fonte.render(f"TOTAL DE OBJETOS: {imagensCorretasClicadas}/10", True, cor_texto)  # Cor original
 
-            posicao_texto = (120, 130)  # Posição no canto superior esquerdo
+            posicao_texto = (180, 20)  
 
             # Desenhar o texto com deslocamento para criar o contorno
             tela.blit(texto_contorno, (posicao_texto[0] - 1, posicao_texto[1]))  # Esquerda
