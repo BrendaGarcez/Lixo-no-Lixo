@@ -1003,8 +1003,8 @@ def relatorio(nome_jogador):
     jogadores = dados.get("jogadores", [])
 
     # Posições horizontais para os nomes
-    posicao_x_nome = largura_tela // 2
-    altura_fase = 120  # Altura inicial para exibir o texto dos jogadores
+    posicao_x_nome = 500
+    altura_fase = 150  # Altura inicial para exibir o texto dos jogadores
     altura_pontuacao = altura_fase + 40  # Altura para exibir as pontuações
 
     # Variáveis para rolagem
@@ -1013,9 +1013,9 @@ def relatorio(nome_jogador):
     scroll_bar_height = 50  # Altura da barra de rolagem
     scroll_ratio = max_scroll / scroll_bar_height  # Proporção entre o conteúdo e a altura da barra
 
-    def desenhar_texto_com_contorno(texto, x, y):
+    def desenhar_texto_com_contorno(texto, x, y, cor_nome=cor_texto):
         texto_contorno = fonte.render(texto, True, cor_contorno)
-        texto_principal = fonte.render(texto, True, cor_texto)
+        texto_principal = fonte.render(texto, True, cor_nome)
         
         # Desenhar o contorno
         tela.blit(texto_contorno, (x - 1, y - 1))
@@ -1025,6 +1025,7 @@ def relatorio(nome_jogador):
 
         # Desenhar o texto principal
         tela.blit(texto_principal, (x, y))
+
 
     run = True
     while run:
@@ -1038,6 +1039,7 @@ def relatorio(nome_jogador):
         voltarBotao.desenharBotao(tela)
         configuracoesBotao.desenharBotao(tela)
 
+        # Exibir os jogadores e suas pontuações
         # Exibir os jogadores e suas pontuações
         if jogadores:  # Se houver jogadores
             for i, jogador in enumerate(jogadores):
@@ -1059,8 +1061,8 @@ def relatorio(nome_jogador):
                     y_nome = altura_fase + i * 120 + y_offset
                     y_pontuacao = y_nome + 40 + (j * 40)
 
-                    # Desenhar o nome e a pontuação
-                    desenhar_texto_com_contorno(nome_jogador1, posicao_x_nome - fonte.size(nome_jogador)[0] // 2, y_nome)
+                    # Desenhar o nome com a cor personalizada e as pontuações
+                    desenhar_texto_com_contorno(nome_jogador1, posicao_x_nome - fonte.size(nome_jogador)[0] // 2, y_nome, cor_nome)
                     desenhar_texto_com_contorno(fase_str, posicao_x_nome - fonte.size(fase_str)[0] // 2, y_pontuacao)
         else:  # Caso não haja jogadores
             mensagem = "Nenhum jogador registrado ainda."
@@ -1106,8 +1108,6 @@ def relatorio(nome_jogador):
 
         pygame.display.update()
         clock.tick(60)
-
-
 
     
 # Função para as fases

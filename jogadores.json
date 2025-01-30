@@ -46,7 +46,23 @@
         },
         {
             "nome": "brenda",
-            "fases": []
+            "fases": [
+                {
+                    "fase": 1,
+                    "pontuacao": 10,
+                    "tempo": 8
+                },
+                {
+                    "fase": 2,
+                    "pontuacao": 10,
+                    "tempo": 9
+                },
+                {
+                    "fase": 3,
+                    "pontuacao": 10,
+                    "tempo": 7
+                }
+            ]
         },
         {
             "nome": "Sem registro",
