@@ -1,109 +1,15 @@
 {
     "jogadores": [
         {
-            "nome": "amanda alana anda",
-            "fases": [
-                {
-                    "fase": 1,
-                    "pontuacao": 8,
-                    "tempo": 8
-                },
-                {
-                    "fase": 2,
-                    "pontuacao": 9,
-                    "tempo": 8
-                },
-                {
-                    "fase": 3,
-                    "pontuacao": 8,
-                    "tempo": 15
-                }
-            ]
-        },
-        {
-            "nome": "ola",
+            "nome": "teste",
             "fases": []
         },
         {
-            "nome": "mando",
-            "fases": [
-                {
-                    "fase": 1,
-                    "pontuacao": 10,
-                    "tempo": 8
-                },
-                {
-                    "fase": 2,
-                    "pontuacao": 10,
-                    "tempo": 6
-                },
-                {
-                    "fase": 3,
-                    "pontuacao": 9,
-                    "tempo": 8
-                }
-            ]
-        },
-        {
-            "nome": "brenda",
-            "fases": [
-                {
-                    "fase": 1,
-                    "pontuacao": 10,
-                    "tempo": 8
-                },
-                {
-                    "fase": 2,
-                    "pontuacao": 10,
-                    "tempo": 9
-                },
-                {
-                    "fase": 3,
-                    "pontuacao": 10,
-                    "tempo": 7
-                }
-            ]
-        },
-        {
-            "nome": "Sem registro",
+            "nome": "anadasdadas",
             "fases": []
-        },
-        {
-            "nome": "matheus",
-            "fases": [
-                {
-                    "fase": 1,
-                    "pontuacao": 10,
-                    "tempo": 18
-                }
-            ]
         },
         {
             "nome": "aa",
-            "fases": [
-                {
-                    "fase": 2,
-                    "pontuacao": 10,
-                    "tempo": 17
-                }
-            ]
-        },
-        {
-            "nome": "aaa",
-            "fases": [
-                {
-                    "fase": 2,
-                    "pontuacao": 10,
-                    "tempo": 18
-                }
-            ]
-        },
-        {
-            "nome": "a",
-            "fases": []
-        },
-        {
-            "nome": "am",
             "fases": []
         }
     ]
