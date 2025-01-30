@@ -34,6 +34,7 @@ jogoConcluido = False
 pontuacao_fase1 = 0
 pontuacao_fase2 = 0
 pontuacao_fase3 = 0
+nome_jogador = "Sem registro"
 
 # Função para criar botões
 def criarBotao(x, y, imagem, imagemAlterada):
@@ -180,25 +181,48 @@ def atualizar_pontuacao_fase(nome, fase, pontuacao, tempo):
     salvar_dados_jogadores(dados)
     print(f"Pontuação e tempo da fase {fase} atualizados para {nome}.")
 
+
+def verificar_clique_botao(x, y, largura, altura):
+    """Verifica se houve clique dentro de um botão, dado sua posição e tamanho."""
+    mouse_pos = pygame.mouse.get_pos()
+    mouse_pressed = pygame.mouse.get_pressed()
+    if x <= mouse_pos[0] <= x + largura and y <= mouse_pos[1] <= y + altura:
+        if mouse_pressed[0]:  # Se o botão esquerdo do mouse foi pressionado
+            return True
+    return False
+
 def pedir_nome():
     """Solicita o nome do jogador via input no Pygame."""
-    global nome_jogador
+    global nome_jogador, estadoJogo, somAtivo
     pygame.init()
     fonte = pygame.font.Font("tipografia/LuckiestGuy-Regular.ttf", 30)
     texto = ""
     input_ativo = True
 
+    voltarBotao = criarBotao(30, 660, "imagens/GUI/botaoVoltar/voltar0.png", "imagens/GUI/botaoVoltar/voltar1.png")
+    configuracoesBotao = criarBotao(900, 660, "imagens/GUI/botaoConfiguracoes/configuracoes0.png", "imagens/GUI/botaoConfiguracoes/configuracoes1.png")
+
+    # Definir as posições e tamanhos dos botões
+    voltar_x, voltar_y = 30, 660
+    configuracoes_x, configuracoes_y = 900, 660
+    largura_botao, altura_botao = 200, 50  # Suponha que o tamanho dos botões seja 200x50
+
     while input_ativo:
         nome_background = pygame.image.load("imagens/GUI/Backgrounds/nomeBackground.png")
         tela.blit(nome_background, (0, 0))
 
-        # Exibe mensagem
-        #mensagem = fonte.render("Digite seu nome:", True, (255, 255, 255))
-        #tela.blit(mensagem, (400, 250))
-
         # Exibe o nome digitado
         texto_render = fonte.render(texto, True, (255, 255, 255))
         tela.blit(texto_render, (400, 300))
+
+        # Atualizar os botões
+        posicaoMouse = pygame.mouse.get_pos()
+        
+        # Desenhar os botões (Aqui você ainda pode usar o seu código de desenhar imagem de botão)
+        voltarBotao.atualizarImagem(posicaoMouse)
+        configuracoesBotao.atualizarImagem(posicaoMouse)
+        voltarBotao.desenharBotao(tela)
+        configuracoesBotao.desenharBotao(tela)
 
         pygame.display.update()
 
@@ -206,6 +230,7 @@ def pedir_nome():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 exit()
+
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_RETURN and texto.strip():
                     nome_jogador = texto.strip()
@@ -214,6 +239,20 @@ def pedir_nome():
                     texto = texto[:-1]
                 else:
                     texto += event.unicode
+
+            # Usar a função verificar_clique_botao para verificar o clique nos botões
+            if verificar_clique_botao(voltar_x, voltar_y, largura_botao, altura_botao):
+                som_click.play()  # Som de clique
+                print("Voltar clicado")
+                estadoJogo = "menuPrincipal"
+                input_ativo = False
+                return menuPrincipal()
+
+            if verificar_clique_botao(configuracoes_x, configuracoes_y, largura_botao, altura_botao):
+                som_click.play()  # Som de clique
+                print("Configurações clicado")
+                abrirConfiguracoes()
+
 
 def salvar_pontuacao(nome_jogador, fase, pontuacao, tempo):
     """Salva a pontuação de uma fase de um jogador."""
@@ -472,7 +511,7 @@ def abrirConfiguracoes():
 
         if voltarBotao.clicarBotao(tela):
             som_click.play()  # Som de clique
-            run = False  
+            run = False  # Sai do loop para voltar para a tela anterior
         
         if sairBotao.clicarBotao(tela):
             som_click.play()  # Som de clique
@@ -954,7 +993,7 @@ def relatorio(nome_jogador):
     configuracoesBotao = criarBotao(940, 660, "imagens/GUI/botaoConfiguracoes/configuracoes0.png", "imagens/GUI/botaoConfiguracoes/configuracoes1.png")
 
     # Fonte para exibir o texto
-    fonte = pygame.font.Font("tipografia/LuckiestGuy-Regular.ttf", 36)
+    fonte = pygame.font.Font("tipografia/LuckiestGuy-Regular.ttf", 30)
     cor_texto = (255, 255, 255)  # Cor branca
     cor_contorno = (0, 0, 0)  # Cor preta para o contorno
     largura_tela = tela.get_width()  # Largura da tela
@@ -975,7 +1014,6 @@ def relatorio(nome_jogador):
     scroll_ratio = max_scroll / scroll_bar_height  # Proporção entre o conteúdo e a altura da barra
 
     def desenhar_texto_com_contorno(texto, x, y):
-        """Função para desenhar texto com contorno"""
         texto_contorno = fonte.render(texto, True, cor_contorno)
         texto_principal = fonte.render(texto, True, cor_texto)
         
@@ -1001,23 +1039,36 @@ def relatorio(nome_jogador):
         configuracoesBotao.desenharBotao(tela)
 
         # Exibir os jogadores e suas pontuações
-        for i, jogador in enumerate(jogadores):
-            nome_jogador1 = jogador["nome"]
-            fases = jogador.get("fases", [])
+        if jogadores:  # Se houver jogadores
+            for i, jogador in enumerate(jogadores):
+                nome_jogador1 = jogador["nome"]
+                fases = jogador.get("fases", [])
 
-            # Inicializa as pontuações da fase
-            for j, fase in enumerate(fases):
-                pontuacao = fase["pontuacao"]
-                tempo = fase.get("tempo", "N/A")  # Caso o tempo não exista, vai exibir "N/A"
-                fase_str = f"Fase {fase['fase']}: {pontuacao} pontos, Tempo: {tempo}s"
+                # Destacar o último jogador
+                cor_nome = cor_texto
+                if i == len(jogadores) - 1:  # Se for o último jogador
+                    cor_nome = (255, 215, 0)  # Destaque em dourado
 
-                # Calcular posição para o nome e pontuação
-                y_nome = altura_fase + i * 120 + y_offset
-                y_pontuacao = y_nome + 40 + (j * 40)
+                # Inicializa as pontuações da fase
+                for j, fase in enumerate(fases):
+                    pontuacao = fase["pontuacao"]
+                    tempo = fase.get("tempo", "N/A")  # Caso o tempo não exista, vai exibir "N/A"
+                    fase_str = f"Fase {fase['fase']}: {pontuacao} pontos, Tempo: {tempo}s"
 
-                # Desenhar o nome e a pontuação
-                desenhar_texto_com_contorno(nome_jogador1, posicao_x_nome - fonte.size(nome_jogador)[0] // 2, y_nome)
-                desenhar_texto_com_contorno(fase_str, posicao_x_nome - fonte.size(fase_str)[0] // 2, y_pontuacao)
+                    # Calcular posição para o nome e pontuação
+                    y_nome = altura_fase + i * 120 + y_offset
+                    y_pontuacao = y_nome + 40 + (j * 40)
+
+                    # Desenhar o nome e a pontuação
+                    desenhar_texto_com_contorno(nome_jogador1, posicao_x_nome - fonte.size(nome_jogador)[0] // 2, y_nome)
+                    desenhar_texto_com_contorno(fase_str, posicao_x_nome - fonte.size(fase_str)[0] // 2, y_pontuacao)
+        else:  # Caso não haja jogadores
+            mensagem = "Nenhum jogador registrado ainda."
+            desenhar_texto_com_contorno(mensagem, largura_tela // 2 - fonte.size(mensagem)[0] // 2, altura_fase + y_offset)
+
+            # Exibir um campo vazio para a lista de jogadores
+            nome_jogador1 = "Nenhum jogador"
+            desenhar_texto_com_contorno(nome_jogador1, posicao_x_nome - fonte.size(nome_jogador1)[0] // 2, altura_fase + 120 + y_offset)
 
         # Barra de rolagem (se o conteúdo for maior que a tela)
         if max_scroll > tela.get_height():
@@ -1028,7 +1079,7 @@ def relatorio(nome_jogador):
         if voltarBotao.clicarBotao(tela):
             som_click.play()  # Som de clique
             print("Voltar clicado")
-            estadoJogo = "menu"
+            estadoJogo = "menu"  # Voltar para o menu
             run = False
 
         if configuracoesBotao.clicarBotao(tela):
@@ -1055,6 +1106,7 @@ def relatorio(nome_jogador):
 
         pygame.display.update()
         clock.tick(60)
+
 
 
     
@@ -1357,7 +1409,7 @@ def fase1(nome_jogador):
                     estadoJogo = "menu"  # Voltar para o menu
                     fase_ativa = False  # Sai do loop atual
                     menuPrincipal()  # Chama a função do menu principa
-            salvar_pontuacao(nome_jogador, 1, pontuacao_fase1, tempo_decorrido) 
+                salvar_pontuacao(nome_jogador, 1, pontuacao_fase1, tempo_decorrido) 
             if jogoPerdeu:
                 pontuacao_fase1 = 0
                 # Desenhar o botão "Voltar ao Menu"
@@ -1378,7 +1430,7 @@ def fase1(nome_jogador):
                 print("Botão 'Próxima Fase' clicado.")
                 estadoJogo = "fase2"  # Mudar o estado do jogo para a fase 2
                 fase_ativa = False  # Sai do loop atual
-                fase2()  # Chama a função para a próxima fase (fase2)
+                fase2(nome_jogador)  # Chama a função para a próxima fase (fase2)
                 
             # Desenhar o botão "Tentar Novamente"
             botaoTentarNovamente.atualizarImagem(posicaoMouse)
@@ -1389,7 +1441,7 @@ def fase1(nome_jogador):
                 som_click.play()  # Tocar o som de clique
                 print("Botão 'Tentar Novamente' clicado.")
                 fase_ativa = False  # Sai do loop atual
-                fase1()  # Reinicia a fase
+                fase1(nome_jogador)  # Reinicia a fase
 
             tempo_total = tempo_inicial - tempo_restante  # Tempo total que o jogador levou
             erros = imagensIncorretasClicadas  # Número de objetos errados que o jogador clicou
@@ -1523,7 +1575,7 @@ def fase1(nome_jogador):
         pygame.display.update()
         clock.tick(60)
 
-def fase2():
+def fase2(nome_jogador):
     global estadoJogo, jogoConcluido, pontuacao_fase2, fase_ativa
     pontuacao_fase2 = 0
     jogoConcluido = False
@@ -1751,7 +1803,7 @@ def fase2():
                     estadoJogo = "menu"  # Voltar para o menu
                     fase_ativa = False  # Sai do loop atual
                     menuPrincipal()  # Chama a função do menu principa
-
+                salvar_pontuacao(nome_jogador, 2, pontuacao_fase2, tempo_decorrido) 
             if jogoPerdeu:
                 pontuacao_fase2 = 0
                 # Desenhar o botão "Voltar ao Menu"
@@ -1772,7 +1824,7 @@ def fase2():
                 print("Botão 'Próxima Fase' clicado.")
                 estadoJogo = "fase2"  # Mudar o estado do jogo para a fase 2
                 fase_ativa = False  # Sai do loop atual
-                fase3()  # Chama a função para a próxima fase (fase2)
+                fase3(nome_jogador)  # Chama a função para a próxima fase (fase2)
                 
             # Desenhar o botão "Tentar Novamente"
             botaoTentarNovamente.atualizarImagem(posicaoMouse)
@@ -1918,7 +1970,7 @@ def fase2():
         pygame.display.update()
         clock.tick(60)
 
-def fase3():
+def fase3(nome_jogador):
     global estadoJogo, jogoConcluido, pontuacao_fase3, fase_ativa
     pontuacao_fase3 = 0
     jogoConcluido = False
@@ -2115,6 +2167,7 @@ def fase3():
             tela.blit(pygame.image.load("imagens/fase3/perdeuPraia.jpg"), (0, 0))
             objetos.clear()  # Limpa todos os objetos
         elif jogoGanhou:
+            salvar_pontuacao(nome_jogador, 3, pontuacao_fase3, tempo_decorrido) 
             tela.blit(pygame.image.load("imagens/fase3/ganhouPraia.jpg"), (0, 0))
             objetos.clear()  # Limpa todos os objetos
         else:
@@ -2451,9 +2504,9 @@ while rodando:
     elif estadoJogo == "fase1":
         fase1(nome_jogador)
     elif estadoJogo == "fase2":
-        fase2()
+        fase2(nome_jogador)
     elif estadoJogo == "fase3":
-        fase3()
+        fase3(nome_jogador)
     
 
 # Finaliza o pygame

@@ -1,49 +1,55 @@
 {
     "jogadores": [
         {
-            "nome": "Brenda",
+            "nome": "amanda alana anda",
             "fases": [
                 {
                     "fase": 1,
-                    "pontuacao": 10,
-                    "tempo": 11
+                    "pontuacao": 8,
+                    "tempo": 8
+                },
+                {
+                    "fase": 2,
+                    "pontuacao": 9,
+                    "tempo": 8
+                },
+                {
+                    "fase": 3,
+                    "pontuacao": 8,
+                    "tempo": 15
                 }
             ]
         },
         {
-            "nome": "Brenda Garcez",
+            "nome": "ola",
+            "fases": []
+        },
+        {
+            "nome": "mando",
             "fases": [
                 {
                     "fase": 1,
+                    "pontuacao": 10,
+                    "tempo": 8
+                },
+                {
+                    "fase": 2,
                     "pontuacao": 10,
                     "tempo": 6
-                }
-            ]
-        },
-        {
-            "nome": "Markos",
-            "fases": [
+                },
                 {
-                    "fase": 1,
-                    "pontuacao": 10,
-                    "tempo": 9
+                    "fase": 3,
+                    "pontuacao": 9,
+                    "tempo": 8
                 }
             ]
-        },
-        {
-            "nome": "Menu",
-            "fases": []
         },
         {
             "nome": "brenda",
             "fases": []
         },
         {
-            "nome": "Brenda amanda",
-            "fases": []
-        },
-        {
-            "nome": "brneda",
+            "nome": "Sem registro",
             "fases": []
         }
     ]
