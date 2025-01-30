@@ -96,9 +96,23 @@ def verificar_clique_botao(x, y, largura, altura):
     return False
 
 """Dados para relatório"""
+def carregar_dados_jogadores():
+    try:
+        with open("jogadores.json", "r", encoding="utf-8") as arquivo:
+            dados = json.load(arquivo)  # Carregar os dados do JSON
+
+            if not isinstance(dados, dict) or "jogadores" not in dados:
+                return {"jogadores": []}  # Se os dados não tiverem o formato correto, retorna uma lista vazia
+
+            return dados  # Retorna os dados carregados
+
+    except (FileNotFoundError, json.JSONDecodeError) as e:
+        print(f"Erro ao carregar os dados do arquivo JSON: {e}")
+        return {"jogadores": []}  # Retorna uma lista vazia em caso de erro
+
 def adicionar_jogador(nome):
-    jogadores = carregar_dados_jogadores()
- 
+    jogadores = carregar_dados_jogadores()  # Carrega os dados corretamente
+
     # Verifica se o jogador já existe
     if buscar_jogador(nome):
         print(f"O jogador {nome} já está registrado.")
@@ -108,74 +122,94 @@ def adicionar_jogador(nome):
             "nome": nome,
             "pontuacoes": [{"fase": 1, "pontuacao": 0}, {"fase": 2, "pontuacao": 0}, {"fase": 3, "pontuacao": 0}]
         }
-        jogadores.append(novo_jogador)
-     
+        jogadores["jogadores"].append(novo_jogador)  # Adiciona o novo jogador à lista de jogadores
+
         # Salva a lista de jogadores de volta no arquivo JSON
-        with open('jogadores.json', 'w') as arquivo:
-            json.dump({"jogadores": jogadores}, arquivo, indent=4)
-     
+        with open("jogadores.json", "w", encoding="utf-8") as arquivo:
+            json.dump(jogadores, arquivo, indent=4)
+
         print(f"O jogador {nome} foi adicionado com sucesso!")
 
 
 
-def carregar_dados_jogadores():
-    try:
-        with open('jogadores.json', 'r') as arquivo:
-            dados = json.load(arquivo)
-        return dados.get("jogadores", [])  # Acessa a chave "jogadores" no JSON
-    except (json.JSONDecodeError, FileNotFoundError) as e:
-        print(f"Erro ao carregar o arquivo JSON: {e}")
-        return []  # Retorna uma lista vazia ou algum valor padrão
-
-    
 def buscar_jogador(nome):
-    jogadores = carregar_dados_jogadores()  # Carrega os jogadores
+    dados = carregar_dados_jogadores()  # Carrega os dados corretamente
+    jogadores = dados.get("jogadores", [])  # Obtém a lista de jogadores
+
     for jogador in jogadores:
-        if jogador['nome'].lower() == nome.lower():  # Compara o nome ignorando maiúsculas/minúsculas
-            return jogador  # Retorna o jogador encontrado
-    return None  # Retorna None caso o jogador não seja encontrado
+        if isinstance(jogador, dict) and "nome" in jogador:
+            if jogador["nome"].lower() == nome.lower():  # Compara o nome ignorando maiúsculas/minúsculas
+                return jogador  # Retorna o jogador encontrado
+
+    return None  # Retorna None se não encontrar o jogador
+
 
 
 def pedir_nome():
-    font = pygame.font.SysFont('Arial', 30)
-    input_box = pygame.Rect(100, 100, 400, 40)
-    color_inactive = pygame.Color('lightskyblue3')
-    color_active = pygame.Color('dodgerblue2')
-    color = color_inactive
-    active = False
-    text = ''
-    clock = pygame.time.Clock()
- 
-    while True:
-        tela.fill((30, 30, 30))
-     
+    global nome_jogador
+    fonte = pygame.font.Font("tipografia/LuckiestGuy-Regular.ttf", 36)
+    texto = ""
+    input_ativo = True
+
+    while input_ativo:
+        # Redesenha o menu para manter o fundo e os botões
+        tela.blit(menuBackground, (0, 0))
+
+        # Exibe mensagem
+        mensagem = fonte.render("Digite seu nome:", True, (255, 255, 255))
+        tela.blit(mensagem, (400, 250))
+
+        # Exibe o nome digitado
+        texto_render = fonte.render(texto, True, (255, 255, 255))
+        tela.blit(texto_render, (400, 300))
+
+        pygame.display.update()
+
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
-                return None
-            if event.type == pygame.MOUSEBUTTONDOWN:
-                if input_box.collidepoint(event.pos):
-                    active = not active
-                else:
-                    active = False
-                color = color_active if active else color_inactive
+                exit()
             if event.type == pygame.KEYDOWN:
-                if active:
-                    if event.key == pygame.K_RETURN:
-                        return text  # Retorna o texto quando "Enter" for pressionado
-                    elif event.key == pygame.K_BACKSPACE:
-                        text = text[:-1]
-                    else:
-                        text += event.unicode
-     
-        txt_surface = font.render(text, True, color)
-        width = max(400, txt_surface.get_width()+10)
-        input_box.w = width
-        tela.blit(txt_surface, (input_box.x+5, input_box.y+5))
-        pygame.draw.rect(tela, color, input_box, 2)
-     
-        pygame.display.flip()
-        clock.tick(30)
+                if event.key == pygame.K_RETURN and texto.strip():
+                    nome_jogador = texto.strip()
+                    input_ativo = False  # Sai do loop quando o jogador confirma
+                elif event.key == pygame.K_BACKSPACE:
+                    texto = texto[:-1]
+                else:
+                    texto += event.unicode
+
+
+def salvar_pontuacao(nome_jogador, fase, pontuacao, tempo):
+    jogadores = carregar_dados_jogadores()  # Carrega os jogadores
+
+    jogador = buscar_jogador(nome_jogador)  # Busca jogador específico
+
+    if jogador:
+        # Atualiza a pontuação da fase correspondente
+        for p in jogador["pontuacoes"]:
+            if p["fase"] == fase:
+                p["pontuacao"] = pontuacao
+                p["tempo"] = tempo
+                break
+    else:
+        # Se o jogador não existir, cria um novo
+        novo_jogador = {
+            "nome": nome_jogador,
+            "pontuacoes": [
+                {"fase": 1, "pontuacao": 0, "tempo": 0},
+                {"fase": 2, "pontuacao": 0, "tempo": 0},
+                {"fase": 3, "pontuacao": 0, "tempo": 0}
+            ]
+        }
+        novo_jogador["pontuacoes"][fase - 1]["pontuacao"] = pontuacao
+        novo_jogador["pontuacoes"][fase - 1]["tempo"] = tempo
+        jogadores.append(novo_jogador)
+
+    # Salva os dados no arquivo
+    with open('jogadores.json', 'w', encoding='utf-8') as arquivo:
+        json.dump({"jogadores": jogadores}, arquivo, indent=4, ensure_ascii=False)
+
+    print(f"Pontuação salva: {nome_jogador} - Fase {fase} - {pontuacao} pontos - {tempo:.2f} segundos")
 
 
 def mostrarVideo(video_path, video_width, video_height, imagem_fundo_path, audio_path):
@@ -574,7 +608,7 @@ def abrirInstrucoes():
         "",
         " Boa sorte!"
     ]
-
+    
     texto_atual = [
         "",
         "                           Bem-vindo ao Jogo!",
@@ -595,13 +629,20 @@ def abrirInstrucoes():
     altura_quadro = 480
     posicao_quadro = (330, 180)
 
-    altura_conteudo = len(texto_atual) * espacamento
+    # Cálculo do conteúdo e barra baseado no texto atual
+    def calcular_altura_barra(texto_atual):
+        altura_conteudo = len(texto_atual) * espacamento
+        barra_altura = max(30, (altura_quadro ** 2) / max(altura_conteudo, altura_quadro))
+        return altura_conteudo, barra_altura
+
+    altura_conteudo, barra_altura = calcular_altura_barra(texto_atual)
     deslocamento = 0  # Posição inicial
     clicando_na_barra = False
 
     barra_largura = 15
-    barra_altura = max(30, altura_quadro * (altura_quadro / max(altura_conteudo, altura_quadro)))
     barra_x = posicao_quadro[0] + largura_quadro - barra_largura - 5
+    trilho_x = barra_x
+    trilho_altura = altura_quadro
 
     run = True
     while run:
@@ -636,7 +677,7 @@ def abrirInstrucoes():
             superficie_instrucoes.blit(texto_contorno, (x, y + 1))
             superficie_instrucoes.blit(texto_preenchimento, (x, y))
 
-        deslocamento = max(0, min(deslocamento, len(texto_atual) * espacamento - altura_quadro))
+        deslocamento = max(0, min(deslocamento, altura_conteudo - altura_quadro))
         recorte = superficie_instrucoes.subsurface((0, deslocamento, largura_quadro, altura_quadro))
         tela.blit(recorte, posicao_quadro)
 
@@ -644,8 +685,8 @@ def abrirInstrucoes():
         trilho_x = barra_x
         trilho_altura = altura_quadro
         pygame.draw.rect(tela, (50, 50, 50), (trilho_x, posicao_quadro[1], barra_largura, trilho_altura))
-        barra_y = posicao_quadro[1] + (deslocamento / max(len(texto_atual) * espacamento, 1)) * altura_quadro
-        pygame.draw.rect(tela, (70, 130, 180), (barra_x, barra_y, barra_largura, barra_altura), border_radius=5)
+        barra_y = posicao_quadro[1] + (deslocamento / (altura_conteudo - altura_quadro)) * (altura_quadro - barra_altura)
+        pygame.draw.rect(tela, (236, 155, 94), (barra_x, barra_y, barra_largura, barra_altura), border_radius=5)
 
         # Verificar cliques nos botões
         if voltarBotao.clicarBotao(tela):
@@ -660,16 +701,19 @@ def abrirInstrucoes():
         if fase1Botao.clicarBotao(tela):
             som_click.play()
             texto_atual = texto_fase1  # Atualiza texto para Fase 1
+            altura_conteudo, barra_altura = calcular_altura_barra(texto_fase1)  # Atualiza altura da barra
             deslocamento = 0  # Reseta o deslocamento
 
         if fase2Botao.clicarBotao(tela):
             som_click.play()
             texto_atual = texto_fase2  # Atualiza texto para Fase 2
+            altura_conteudo, barra_altura = calcular_altura_barra(texto_fase2)  # Atualiza altura da barra
             deslocamento = 0
 
         if fase3Botao.clicarBotao(tela):
             som_click.play()
             texto_atual = texto_fase3  # Atualiza texto para Fase 3
+            altura_conteudo, barra_altura = calcular_altura_barra(texto_fase3)  # Atualiza altura da barra
             deslocamento = 0
 
         for event in pygame.event.get():
@@ -687,7 +731,7 @@ def abrirInstrucoes():
                 elif event.button == 4:
                     deslocamento = max(deslocamento - 20, 0)
                 elif event.button == 5:
-                    deslocamento = min(deslocamento + 20, len(texto_atual) * espacamento - altura_quadro)
+                    deslocamento = min(deslocamento + 20, altura_conteudo - altura_quadro)
 
             elif event.type == pygame.MOUSEBUTTONUP:
                 if event.button == 1:
@@ -695,11 +739,11 @@ def abrirInstrucoes():
 
             elif event.type == pygame.MOUSEMOTION:
                 if clicando_na_barra:
-                    deslocamento = max(0, min(len(texto_atual) * espacamento - altura_quadro,
-                                              (event.pos[1] - posicao_quadro[1]) * (len(texto_atual) * espacamento / altura_quadro)))
-             
+                    deslocamento = max(0, min(altura_conteudo - altura_quadro,
+                                              (event.pos[1] - posicao_quadro[1]) * (altura_conteudo / altura_quadro)))
 
         pygame.display.update()
+
 
 def abrirCreditos():
     global estadoJogo
@@ -883,12 +927,18 @@ def relatorio():
         largura_tela * 5 // 6  # Direita
     ]
 
+    # Variáveis para rolagem
+    y_offset = 0  # Deslocamento vertical inicial
+    max_scroll = max(len(fases) * 100, tela.get_height())  # Máxima altura do conteúdo
+    scroll_bar_height = 50  # Altura da barra de rolagem
+    scroll_ratio = max_scroll / scroll_bar_height  # Proporção entre o conteúdo e a altura da barra
+
     run = True
     while run:
         tela.blit(fasesBackground, (0, 0))
         posicaoMouse = pygame.mouse.get_pos()
 
-        # Desenhar os botões
+        # Atualizar os botões de navegação
         voltarBotao.atualizarImagem(posicaoMouse)
         configuracoesBotao.atualizarImagem(posicaoMouse)
 
@@ -903,11 +953,11 @@ def relatorio():
             texto_pontuacao = fonte.render(f"Pontuação: {pontuacoes[i]}", True, cor_texto)
             texto_pontuacao_contorno = fonte.render(f"Pontuação: {pontuacoes[i]}", True, cor_contorno)
 
-            # Posições calculadas
+            # Posições calculadas com base no deslocamento vertical
             x_fase = posicoes_x[i] - texto_fase.get_width() // 2
-            y_fase = altura_fase
+            y_fase = altura_fase + i * 100 + y_offset
             x_pontuacao = posicoes_x[i] - texto_pontuacao.get_width() // 2
-            y_pontuacao = altura_pontuacao
+            y_pontuacao = y_fase + 40
 
             # Desenhar contorno para o texto da fase
             tela.blit(texto_fase_contorno, (x_fase - 1, y_fase))
@@ -927,6 +977,11 @@ def relatorio():
             # Desenhar o texto preenchido da pontuação
             tela.blit(texto_pontuacao, (x_pontuacao, y_pontuacao))
 
+        # Barra de rolagem (se o conteúdo for maior que a tela)
+        if max_scroll > tela.get_height():
+            pygame.draw.rect(tela, (0, 0, 0), (tela.get_width() - 20, altura_fase, 20, scroll_bar_height))  # Barra de rolagem
+            pygame.draw.rect(tela, (255, 255, 255), (tela.get_width() - 20, altura_fase + int(y_offset / scroll_ratio), 20, scroll_bar_height))  # Posição da barra
+
         # Verificar cliques nos botões
         if voltarBotao.clicarBotao(tela):
             som_click.play()  # Som de clique
@@ -939,14 +994,25 @@ def relatorio():
             print("Configurações clicado")
             abrirConfiguracoes()
 
-        # Eventos
+        # Eventos de rolagem
         for event in pygame.event.get():
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if event.button == 4:  # Rolar para cima
+                    y_offset -= 20
+                elif event.button == 5:  # Rolar para baixo
+                    y_offset += 20
+
             if event.type == pygame.QUIT:
                 confirmar_saida(tela)
 
+        # Limitar o deslocamento da rolagem para não ultrapassar o conteúdo
+        if y_offset < 0:
+            y_offset = 0
+        if y_offset > max_scroll - tela.get_height():
+            y_offset = max_scroll - tela.get_height()
+
         pygame.display.update()
         clock.tick(60)
-
 
     
 # Função para as fases
@@ -2250,6 +2316,7 @@ def fase3():
 # Função para o menu principal
 def menuPrincipal():
     global estadoJogo
+    global menuBackground
     menuBackground = pygame.image.load("imagens/GUI/Backgrounds/menuBackground.jpg")
 
     if somAtivo:
@@ -2260,7 +2327,7 @@ def menuPrincipal():
     configuracoesBotao = criarBotao(900, 50, "imagens/GUI/botaoConfiguracoes/configuracoes0.png", "imagens/GUI/botaoConfiguracoes/configuracoes1.png")
     instrucoesBotao = criarBotao(410, 425, "imagens/GUI/botaoInicio/instrucoes1.png", "imagens/GUI/botaoInicio/instrucoes01.png")
     sairBotao = criarBotao(40, 50, "imagens/GUI/botaoSair/sair0.png", "imagens/GUI/botaoSair/sair1.png")
-    creditosBotao = criarBotao(1000, 640, "imagens/GUI/botaoConfiguracoes/info0.png", "imagens/GUI/botaoConfiguracoes/info1.png")  
+    creditosBotao = criarBotao(960, 620, "imagens/GUI/botaoConfiguracoes/info0.png", "imagens/GUI/botaoConfiguracoes/info1.png")  
     pontuacaoBotao = criarBotao(402, 550, "imagens/GUI/botaoPontuacao/pontuacao0.png", "imagens/GUI/botaoPontuacao/pontuacao1.png")
     run = True
     while run:
@@ -2286,9 +2353,9 @@ def menuPrincipal():
         if jogarBotao.clicarBotao(tela):
             som_click.play()  # Som de clique
             print("Jogar clicado")
+            """pedir_nome()  # Jogador digita o nome
+            adicionar_jogador(nome_jogador)"""  # Salva no JSON
             estadoJogo = "jogando"
-            """nome_jogador = pedir_nome()
-            adicionar_jogador(nome_jogador)"""
             run = False
             
         if configuracoesBotao.clicarBotao(tela):

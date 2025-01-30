@@ -1,11 +1,89 @@
-[
-    {
-      "nome": "Jogador1",
-      "pontuacao": 100
-    },
-    {
-      "nome": "Jogador2",
-      "pontuacao": 150
-    }
-  ]
-  
+{
+    "jogadores": [
+        {
+            "nome": "Jogador1",
+            "pontuacoes": [
+                {
+                    "fase": 1,
+                    "pontuacao": 0
+                },
+                {
+                    "fase": 2,
+                    "pontuacao": 0
+                },
+                {
+                    "fase": 3,
+                    "pontuacao": 0
+                }
+            ]
+        },
+        {
+            "nome": "Jogador2",
+            "pontuacoes": [
+                {
+                    "fase": 1,
+                    "pontuacao": 0
+                },
+                {
+                    "fase": 2,
+                    "pontuacao": 0
+                },
+                {
+                    "fase": 3,
+                    "pontuacao": 0
+                }
+            ]
+        },
+        {
+            "nome": "a",
+            "pontuacoes": [
+                {
+                    "fase": 1,
+                    "pontuacao": 0
+                },
+                {
+                    "fase": 2,
+                    "pontuacao": 0
+                },
+                {
+                    "fase": 3,
+                    "pontuacao": 0
+                }
+            ]
+        },
+        {
+            "nome": "Brenda",
+            "pontuacoes": [
+                {
+                    "fase": 1,
+                    "pontuacao": 0
+                },
+                {
+                    "fase": 2,
+                    "pontuacao": 0
+                },
+                {
+                    "fase": 3,
+                    "pontuacao": 0
+                }
+            ]
+        },
+        {
+            "nome": "fsdfs",
+            "pontuacoes": [
+                {
+                    "fase": 1,
+                    "pontuacao": 0
+                },
+                {
+                    "fase": 2,
+                    "pontuacao": 0
+                },
+                {
+                    "fase": 3,
+                    "pontuacao": 0
+                }
+            ]
+        }
+    ]
+}
