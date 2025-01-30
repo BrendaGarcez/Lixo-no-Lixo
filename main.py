@@ -1040,7 +1040,6 @@ def relatorio(nome_jogador):
         configuracoesBotao.desenharBotao(tela)
 
         # Exibir os jogadores e suas pontuações
-        # Exibir os jogadores e suas pontuações
         if jogadores:  # Se houver jogadores
             for i, jogador in enumerate(jogadores):
                 nome_jogador1 = jogador["nome"]

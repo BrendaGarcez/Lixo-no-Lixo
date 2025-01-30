@@ -67,6 +67,40 @@
         {
             "nome": "Sem registro",
             "fases": []
+        },
+        {
+            "nome": "breanaaça",
+            "fases": [
+                {
+                    "fase": 1,
+                    "pontuacao": 9,
+                    "tempo": 7
+                },
+                {
+                    "fase": 2,
+                    "pontuacao": 9,
+                    "tempo": 8
+                }
+            ]
+        },
+        {
+            "nome": "aaa",
+            "fases": []
+        },
+        {
+            "nome": "ana",
+            "fases": [
+                {
+                    "fase": 1,
+                    "pontuacao": 9,
+                    "tempo": 17
+                },
+                {
+                    "fase": 2,
+                    "pontuacao": 9,
+                    "tempo": 30
+                }
+            ]
         }
     ]
 }
