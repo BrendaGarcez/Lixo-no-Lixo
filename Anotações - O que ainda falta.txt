@@ -51,3 +51,98 @@ LÓGICA DAS PRÓXIMAS FASES SERÁ SEMELHANTE A 1, a 3 precisará mudar um pouco 
 -> Lógica do jogo(para relatório)
 -> áudio dos nomes
 
+
+
+def relatorio():
+    global estadoJogo, pontuacao_fase1, pontuacao_fase2, pontuacao_fase3
+
+    # Carregar o fundo
+    fasesBackground = pygame.image.load("imagens/GUI/Backgrounds/menuBackground.jpg")
+    tela.blit(fasesBackground, (0, 0))
+
+    # Botões
+    voltarBotao = criarBotao(20, 660, "imagens/GUI/botaoVoltar/voltar0.png", "imagens/GUI/botaoVoltar/voltar1.png")
+    configuracoesBotao = criarBotao(940, 660, "imagens/GUI/botaoConfiguracoes/configuracoes0.png", "imagens/GUI/botaoConfiguracoes/configuracoes1.png")
+
+    # Fonte para exibir o texto
+    fonte = pygame.font.Font("tipografia/LuckiestGuy-Regular.ttf", 36)
+    cor_texto = (255, 255, 255)  # Cor branca
+    cor_contorno = (0, 0, 0)  # Cor preta para o contorno
+    largura_tela = tela.get_width()  # Largura da tela
+    altura_fase = 320  # Altura para exibir o texto das fases
+    altura_pontuacao = altura_fase + 40  # Altura para exibir as pontuações
+
+    # Fases e pontuações
+    fases = ["FASE 1", "FASE 2", "FASE 3"]
+    pontuacoes = [pontuacao_fase1, pontuacao_fase2, pontuacao_fase3] 
+
+    # Posições horizontais
+    posicoes_x = [
+        largura_tela // 6,  # Esquerda
+        largura_tela // 2,  # Centro
+        largura_tela * 5 // 6  # Direita
+    ]
+
+    run = True
+    while run:
+        tela.blit(fasesBackground, (0, 0))
+        posicaoMouse = pygame.mouse.get_pos()
+
+        # Desenhar os botões
+        voltarBotao.atualizarImagem(posicaoMouse)
+        configuracoesBotao.atualizarImagem(posicaoMouse)
+
+        voltarBotao.desenharBotao(tela)
+        configuracoesBotao.desenharBotao(tela)
+
+        # Exibir as fases e pontuações com contorno
+        for i, fase in enumerate(fases):
+            # Renderizar textos
+            texto_fase = fonte.render(fase, True, cor_texto)
+            texto_fase_contorno = fonte.render(fase, True, cor_contorno)
+            texto_pontuacao = fonte.render(f"Pontuação: {pontuacoes[i]}", True, cor_texto)
+            texto_pontuacao_contorno = fonte.render(f"Pontuação: {pontuacoes[i]}", True, cor_contorno)
+
+            # Posições calculadas
+            x_fase = posicoes_x[i] - texto_fase.get_width() // 2
+            y_fase = altura_fase
+            x_pontuacao = posicoes_x[i] - texto_pontuacao.get_width() // 2
+            y_pontuacao = altura_pontuacao
+
+            # Desenhar contorno para o texto da fase
+            tela.blit(texto_fase_contorno, (x_fase - 1, y_fase))
+            tela.blit(texto_fase_contorno, (x_fase + 1, y_fase))
+            tela.blit(texto_fase_contorno, (x_fase, y_fase - 1))
+            tela.blit(texto_fase_contorno, (x_fase, y_fase + 1))
+
+            # Desenhar o texto preenchido da fase
+            tela.blit(texto_fase, (x_fase, y_fase))
+
+            # Desenhar contorno para o texto da pontuação
+            tela.blit(texto_pontuacao_contorno, (x_pontuacao - 1, y_pontuacao))
+            tela.blit(texto_pontuacao_contorno, (x_pontuacao + 1, y_pontuacao))
+            tela.blit(texto_pontuacao_contorno, (x_pontuacao, y_pontuacao - 1))
+            tela.blit(texto_pontuacao_contorno, (x_pontuacao, y_pontuacao + 1))
+
+            # Desenhar o texto preenchido da pontuação
+            tela.blit(texto_pontuacao, (x_pontuacao, y_pontuacao))
+
+        # Verificar cliques nos botões
+        if voltarBotao.clicarBotao(tela):
+            som_click.play()  # Som de clique
+            print("Voltar clicado")
+            estadoJogo = "menu"
+            run = False
+
+        if configuracoesBotao.clicarBotao(tela):
+            som_click.play()  # Som de clique
+            print("Configurações clicado")
+            abrirConfiguracoes()
+
+        # Eventos
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                confirmar_saida(tela)
+
+        pygame.display.update()
+        clock.tick(60)
