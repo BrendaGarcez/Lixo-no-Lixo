@@ -69,6 +69,7 @@
             "fases": []
         },
         {
+<<<<<<< HEAD
             "nome": "breanaaça",
             "fases": [
                 {
@@ -80,11 +81,30 @@
                     "fase": 2,
                     "pontuacao": 9,
                     "tempo": 8
+=======
+            "nome": "matheus",
+            "fases": [
+                {
+                    "fase": 1,
+                    "pontuacao": 10,
+                    "tempo": 18
+                }
+            ]
+        },
+        {
+            "nome": "aa",
+            "fases": [
+                {
+                    "fase": 2,
+                    "pontuacao": 10,
+                    "tempo": 17
+>>>>>>> 43af1ce84939f4c2d91c2cc41949170cb0ed86eb
                 }
             ]
         },
         {
             "nome": "aaa",
+<<<<<<< HEAD
             "fases": []
         },
         {
@@ -101,6 +121,23 @@
                     "tempo": 30
                 }
             ]
+=======
+            "fases": [
+                {
+                    "fase": 2,
+                    "pontuacao": 10,
+                    "tempo": 18
+                }
+            ]
+        },
+        {
+            "nome": "a",
+            "fases": []
+        },
+        {
+            "nome": "am",
+            "fases": []
+>>>>>>> 43af1ce84939f4c2d91c2cc41949170cb0ed86eb
         }
     ]
 }
