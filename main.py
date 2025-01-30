@@ -574,7 +574,7 @@ def abrirInstrucoes():
         "",
         " Boa sorte!"
     ]
-
+    
     texto_atual = [
         "",
         "                           Bem-vindo ao Jogo!",
@@ -595,13 +595,20 @@ def abrirInstrucoes():
     altura_quadro = 480
     posicao_quadro = (330, 180)
 
-    altura_conteudo = len(texto_atual) * espacamento
+    # Cálculo do conteúdo e barra baseado no texto atual
+    def calcular_altura_barra(texto_atual):
+        altura_conteudo = len(texto_atual) * espacamento
+        barra_altura = max(30, (altura_quadro ** 2) / max(altura_conteudo, altura_quadro))
+        return altura_conteudo, barra_altura
+
+    altura_conteudo, barra_altura = calcular_altura_barra(texto_atual)
     deslocamento = 0  # Posição inicial
     clicando_na_barra = False
 
     barra_largura = 15
-    barra_altura = max(30, altura_quadro * (altura_quadro / max(altura_conteudo, altura_quadro)))
     barra_x = posicao_quadro[0] + largura_quadro - barra_largura - 5
+    trilho_x = barra_x
+    trilho_altura = altura_quadro
 
     run = True
     while run:
@@ -636,7 +643,7 @@ def abrirInstrucoes():
             superficie_instrucoes.blit(texto_contorno, (x, y + 1))
             superficie_instrucoes.blit(texto_preenchimento, (x, y))
 
-        deslocamento = max(0, min(deslocamento, len(texto_atual) * espacamento - altura_quadro))
+        deslocamento = max(0, min(deslocamento, altura_conteudo - altura_quadro))
         recorte = superficie_instrucoes.subsurface((0, deslocamento, largura_quadro, altura_quadro))
         tela.blit(recorte, posicao_quadro)
 
@@ -644,8 +651,8 @@ def abrirInstrucoes():
         trilho_x = barra_x
         trilho_altura = altura_quadro
         pygame.draw.rect(tela, (50, 50, 50), (trilho_x, posicao_quadro[1], barra_largura, trilho_altura))
-        barra_y = posicao_quadro[1] + (deslocamento / max(len(texto_atual) * espacamento, 1)) * altura_quadro
-        pygame.draw.rect(tela, (70, 130, 180), (barra_x, barra_y, barra_largura, barra_altura), border_radius=5)
+        barra_y = posicao_quadro[1] + (deslocamento / (altura_conteudo - altura_quadro)) * (altura_quadro - barra_altura)
+        pygame.draw.rect(tela, (236, 155, 94), (barra_x, barra_y, barra_largura, barra_altura), border_radius=5)
 
         # Verificar cliques nos botões
         if voltarBotao.clicarBotao(tela):
@@ -660,16 +667,19 @@ def abrirInstrucoes():
         if fase1Botao.clicarBotao(tela):
             som_click.play()
             texto_atual = texto_fase1  # Atualiza texto para Fase 1
+            altura_conteudo, barra_altura = calcular_altura_barra(texto_fase1)  # Atualiza altura da barra
             deslocamento = 0  # Reseta o deslocamento
 
         if fase2Botao.clicarBotao(tela):
             som_click.play()
             texto_atual = texto_fase2  # Atualiza texto para Fase 2
+            altura_conteudo, barra_altura = calcular_altura_barra(texto_fase2)  # Atualiza altura da barra
             deslocamento = 0
 
         if fase3Botao.clicarBotao(tela):
             som_click.play()
             texto_atual = texto_fase3  # Atualiza texto para Fase 3
+            altura_conteudo, barra_altura = calcular_altura_barra(texto_fase3)  # Atualiza altura da barra
             deslocamento = 0
 
         for event in pygame.event.get():
@@ -687,7 +697,7 @@ def abrirInstrucoes():
                 elif event.button == 4:
                     deslocamento = max(deslocamento - 20, 0)
                 elif event.button == 5:
-                    deslocamento = min(deslocamento + 20, len(texto_atual) * espacamento - altura_quadro)
+                    deslocamento = min(deslocamento + 20, altura_conteudo - altura_quadro)
 
             elif event.type == pygame.MOUSEBUTTONUP:
                 if event.button == 1:
@@ -695,9 +705,8 @@ def abrirInstrucoes():
 
             elif event.type == pygame.MOUSEMOTION:
                 if clicando_na_barra:
-                    deslocamento = max(0, min(len(texto_atual) * espacamento - altura_quadro,
-                                              (event.pos[1] - posicao_quadro[1]) * (len(texto_atual) * espacamento / altura_quadro)))
-             
+                    deslocamento = max(0, min(altura_conteudo - altura_quadro,
+                                              (event.pos[1] - posicao_quadro[1]) * (altura_conteudo / altura_quadro)))
 
         pygame.display.update()
 
@@ -2250,7 +2259,7 @@ def menuPrincipal():
     configuracoesBotao = criarBotao(900, 50, "imagens/GUI/botaoConfiguracoes/configuracoes0.png", "imagens/GUI/botaoConfiguracoes/configuracoes1.png")
     instrucoesBotao = criarBotao(410, 425, "imagens/GUI/botaoInicio/instrucoes1.png", "imagens/GUI/botaoInicio/instrucoes01.png")
     sairBotao = criarBotao(40, 50, "imagens/GUI/botaoSair/sair0.png", "imagens/GUI/botaoSair/sair1.png")
-    creditosBotao = criarBotao(1000, 640, "imagens/GUI/botaoConfiguracoes/info0.png", "imagens/GUI/botaoConfiguracoes/info1.png")  
+    creditosBotao = criarBotao(960, 620, "imagens/GUI/botaoConfiguracoes/info0.png", "imagens/GUI/botaoConfiguracoes/info1.png")  
     pontuacaoBotao = criarBotao(402, 550, "imagens/GUI/botaoPontuacao/pontuacao0.png", "imagens/GUI/botaoPontuacao/pontuacao1.png")
     run = True
     while run:
