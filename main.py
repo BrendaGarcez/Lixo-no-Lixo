@@ -2051,7 +2051,7 @@ def fase3(nome_jogador):
     tamanho_area_LIXO = imagem_area_LIXO.get_rect().size
 
     # Fator de escala para diminuir o tamanho
-    fator_escala = 0.5
+    fator_escala = 0.4
 
     # Calcular o novo tamanho das imagens
     novo_tamanho_area_PRAIA = (int(tamanho_area_PRAIA[0] * fator_escala), int(tamanho_area_PRAIA[1] * fator_escala))
