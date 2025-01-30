@@ -97,9 +97,6 @@ def verificar_clique_botao(x, y, largura, altura):
     return False
 
 """Para relatório"""
-import json
-import pygame
-
 def carregar_dados_jogadores():
     """Carrega os dados do arquivo JSON e garante que seja um dicionário válido."""
     try:
