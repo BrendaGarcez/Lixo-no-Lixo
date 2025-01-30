@@ -95,69 +95,106 @@ def verificar_clique_botao(x, y, largura, altura):
             return True
     return False
 
-"""Dados para relatório"""
+"""Para relatório"""
+import json
+import pygame
+
 def carregar_dados_jogadores():
+    """Carrega os dados do arquivo JSON e garante que seja um dicionário válido."""
     try:
-        with open("jogadores.json", "r", encoding="utf-8") as arquivo:
-            dados = json.load(arquivo)  # Carregar os dados do JSON
+        with open("jogadores.json", "r", encoding="utf-8") as f:
+            dados = json.load(f)
+            if not isinstance(dados, dict):  # Garante que o arquivo tenha um dicionário
+                return {"jogadores": []}
+            return dados
+    except FileNotFoundError:
+        return {"jogadores": []}  # Retorna estrutura padrão se o arquivo não existir
+    except json.JSONDecodeError:
+        print("Erro ao carregar o JSON. O arquivo pode estar corrompido.")
+        return {"jogadores": []}
 
-            if not isinstance(dados, dict) or "jogadores" not in dados:
-                return {"jogadores": []}  # Se os dados não tiverem o formato correto, retorna uma lista vazia
-
-            return dados  # Retorna os dados carregados
-
-    except (FileNotFoundError, json.JSONDecodeError) as e:
-        print(f"Erro ao carregar os dados do arquivo JSON: {e}")
-        return {"jogadores": []}  # Retorna uma lista vazia em caso de erro
-
-def adicionar_jogador(nome):
-    jogadores = carregar_dados_jogadores()  # Carrega os dados corretamente
-
-    # Verifica se o jogador já existe
-    if buscar_jogador(nome):
-        print(f"O jogador {nome} já está registrado.")
-    else:
-        # Se não existir, cria um novo jogador com pontuação inicial
-        novo_jogador = {
-            "nome": nome,
-            "pontuacoes": [{"fase": 1, "pontuacao": 0}, {"fase": 2, "pontuacao": 0}, {"fase": 3, "pontuacao": 0}]
-        }
-        jogadores["jogadores"].append(novo_jogador)  # Adiciona o novo jogador à lista de jogadores
-
-        # Salva a lista de jogadores de volta no arquivo JSON
-        with open("jogadores.json", "w", encoding="utf-8") as arquivo:
-            json.dump(jogadores, arquivo, indent=4)
-
-        print(f"O jogador {nome} foi adicionado com sucesso!")
-
-
+def salvar_dados_jogadores(dados):
+    """Salva os dados no arquivo JSON."""
+    with open("jogadores.json", "w", encoding="utf-8") as arquivo:
+        json.dump(dados, arquivo, indent=4, ensure_ascii=False)
 
 def buscar_jogador(nome):
-    dados = carregar_dados_jogadores()  # Carrega os dados corretamente
-    jogadores = dados.get("jogadores", [])  # Obtém a lista de jogadores
+    """Busca um jogador pelo nome no JSON."""
+    dados = carregar_dados_jogadores()
+    jogadores = dados.get("jogadores", [])
 
     for jogador in jogadores:
-        if isinstance(jogador, dict) and "nome" in jogador:
-            if jogador["nome"].lower() == nome.lower():  # Compara o nome ignorando maiúsculas/minúsculas
-                return jogador  # Retorna o jogador encontrado
+        if jogador.get("nome") == nome:
+            return jogador
+    return None
 
-    return None  # Retorna None se não encontrar o jogador
+def adicionar_jogador(nome):
+    """Adiciona um novo jogador ao arquivo JSON."""
+    dados = carregar_dados_jogadores()
 
+    if buscar_jogador(nome):
+        print(f"O jogador {nome} já está registrado.")
+        return
 
+    novo_jogador = {
+        "nome": nome,
+        "fases": []  # Lista de fases jogadas
+    }
+    dados["jogadores"].append(novo_jogador)
+    salvar_dados_jogadores(dados)
+    print(f"O jogador {nome} foi adicionado com sucesso!")
+
+def atualizar_pontuacao_fase(nome, fase, pontuacao, tempo):
+    """Atualiza a pontuação e tempo de uma fase de um jogador."""
+    dados = carregar_dados_jogadores()
+    jogadores = dados.get("jogadores", [])
+
+    jogador = None
+    for j in jogadores:
+        if j["nome"] == nome:
+            jogador = j
+            break
+
+    if jogador is None:
+        print(f"Jogador {nome} não encontrado.")
+        return
+
+    # Verifica se a fase já existe
+    fase_existente = False
+    for f in jogador.get("fases", []):
+        if f["fase"] == fase:
+            f["pontuacao"] = pontuacao
+            f["tempo"] = tempo
+            fase_existente = True
+            break
+
+    # Se a fase não existe, adiciona uma nova entrada
+    if not fase_existente:
+        jogador.setdefault("fases", []).append({
+            "fase": fase,
+            "pontuacao": pontuacao,
+            "tempo": tempo
+        })
+
+    # Salva as alterações no arquivo
+    salvar_dados_jogadores(dados)
+    print(f"Pontuação e tempo da fase {fase} atualizados para {nome}.")
 
 def pedir_nome():
+    """Solicita o nome do jogador via input no Pygame."""
     global nome_jogador
-    fonte = pygame.font.Font("tipografia/LuckiestGuy-Regular.ttf", 36)
+    pygame.init()
+    fonte = pygame.font.Font("tipografia/LuckiestGuy-Regular.ttf", 30)
     texto = ""
     input_ativo = True
 
     while input_ativo:
-        # Redesenha o menu para manter o fundo e os botões
-        tela.blit(menuBackground, (0, 0))
+        nome_background = pygame.image.load("imagens/GUI/Backgrounds/nomeBackground.png")
+        tela.blit(nome_background, (0, 0))
 
         # Exibe mensagem
-        mensagem = fonte.render("Digite seu nome:", True, (255, 255, 255))
-        tela.blit(mensagem, (400, 250))
+        #mensagem = fonte.render("Digite seu nome:", True, (255, 255, 255))
+        #tela.blit(mensagem, (400, 250))
 
         # Exibe o nome digitado
         texto_render = fonte.render(texto, True, (255, 255, 255))
@@ -172,42 +209,50 @@ def pedir_nome():
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_RETURN and texto.strip():
                     nome_jogador = texto.strip()
-                    input_ativo = False  # Sai do loop quando o jogador confirma
+                    input_ativo = False
                 elif event.key == pygame.K_BACKSPACE:
                     texto = texto[:-1]
                 else:
                     texto += event.unicode
 
-
 def salvar_pontuacao(nome_jogador, fase, pontuacao, tempo):
-    jogadores = carregar_dados_jogadores()  # Carrega os jogadores
+    """Salva a pontuação de uma fase de um jogador."""
+    dados = carregar_dados_jogadores()
+    jogadores = dados.get("jogadores", [])
 
-    jogador = buscar_jogador(nome_jogador)  # Busca jogador específico
+    jogador = None
+    for j in jogadores:
+        if j["nome"] == nome_jogador:
+            jogador = j
+            break
 
     if jogador:
         # Atualiza a pontuação da fase correspondente
-        for p in jogador["pontuacoes"]:
+        fase_existente = False
+        for p in jogador["fases"]:
             if p["fase"] == fase:
                 p["pontuacao"] = pontuacao
                 p["tempo"] = tempo
+                fase_existente = True
                 break
+        
+        if not fase_existente:
+            jogador["fases"].append({
+                "fase": fase,
+                "pontuacao": pontuacao,
+                "tempo": tempo
+            })
     else:
         # Se o jogador não existir, cria um novo
         novo_jogador = {
             "nome": nome_jogador,
-            "pontuacoes": [
-                {"fase": 1, "pontuacao": 0, "tempo": 0},
-                {"fase": 2, "pontuacao": 0, "tempo": 0},
-                {"fase": 3, "pontuacao": 0, "tempo": 0}
+            "fases": [
+                {"fase": fase, "pontuacao": pontuacao, "tempo": tempo}
             ]
         }
-        novo_jogador["pontuacoes"][fase - 1]["pontuacao"] = pontuacao
-        novo_jogador["pontuacoes"][fase - 1]["tempo"] = tempo
-        jogadores.append(novo_jogador)
+        dados["jogadores"].append(novo_jogador)
 
-    # Salva os dados no arquivo
-    with open('jogadores.json', 'w', encoding='utf-8') as arquivo:
-        json.dump({"jogadores": jogadores}, arquivo, indent=4, ensure_ascii=False)
+    salvar_dados_jogadores(dados)
 
     print(f"Pontuação salva: {nome_jogador} - Fase {fase} - {pontuacao} pontos - {tempo:.2f} segundos")
 
@@ -897,11 +942,11 @@ def abrirCreditos():
 
         pygame.display.update()
 
-def relatorio():
-    global estadoJogo, pontuacao_fase1, pontuacao_fase2, pontuacao_fase3
+def relatorio(nome_jogador): 
+    global estadoJogo
 
     # Carregar o fundo
-    fasesBackground = pygame.image.load("imagens/GUI/Backgrounds/menuBackground.jpg")
+    fasesBackground = pygame.image.load("imagens/GUI/Backgrounds/relatorioBackground.png")
     tela.blit(fasesBackground, (0, 0))
 
     # Botões
@@ -913,25 +958,35 @@ def relatorio():
     cor_texto = (255, 255, 255)  # Cor branca
     cor_contorno = (0, 0, 0)  # Cor preta para o contorno
     largura_tela = tela.get_width()  # Largura da tela
-    altura_fase = 320  # Altura para exibir o texto das fases
+
+    # Carregar dados dos jogadores do JSON
+    dados = carregar_dados_jogadores()  # Carrega os dados de jogadores do JSON
+    jogadores = dados.get("jogadores", [])
+
+    # Posições horizontais para os nomes
+    posicao_x_nome = largura_tela // 2
+    altura_fase = 120  # Altura inicial para exibir o texto dos jogadores
     altura_pontuacao = altura_fase + 40  # Altura para exibir as pontuações
-
-    # Fases e pontuações
-    fases = ["FASE 1", "FASE 2", "FASE 3"]
-    pontuacoes = [pontuacao_fase1, pontuacao_fase2, pontuacao_fase3] 
-
-    # Posições horizontais
-    posicoes_x = [
-        largura_tela // 6,  # Esquerda
-        largura_tela // 2,  # Centro
-        largura_tela * 5 // 6  # Direita
-    ]
 
     # Variáveis para rolagem
     y_offset = 0  # Deslocamento vertical inicial
-    max_scroll = max(len(fases) * 100, tela.get_height())  # Máxima altura do conteúdo
+    max_scroll = max(len(jogadores) * 120, tela.get_height())  # Máxima altura do conteúdo (ajustado para cada jogador ter altura suficiente)
     scroll_bar_height = 50  # Altura da barra de rolagem
     scroll_ratio = max_scroll / scroll_bar_height  # Proporção entre o conteúdo e a altura da barra
+
+    def desenhar_texto_com_contorno(texto, x, y):
+        """Função para desenhar texto com contorno"""
+        texto_contorno = fonte.render(texto, True, cor_contorno)
+        texto_principal = fonte.render(texto, True, cor_texto)
+        
+        # Desenhar o contorno
+        tela.blit(texto_contorno, (x - 1, y - 1))
+        tela.blit(texto_contorno, (x + 1, y - 1))
+        tela.blit(texto_contorno, (x - 1, y + 1))
+        tela.blit(texto_contorno, (x + 1, y + 1))
+
+        # Desenhar o texto principal
+        tela.blit(texto_principal, (x, y))
 
     run = True
     while run:
@@ -945,37 +1000,24 @@ def relatorio():
         voltarBotao.desenharBotao(tela)
         configuracoesBotao.desenharBotao(tela)
 
-        # Exibir as fases e pontuações com contorno
-        for i, fase in enumerate(fases):
-            # Renderizar textos
-            texto_fase = fonte.render(fase, True, cor_texto)
-            texto_fase_contorno = fonte.render(fase, True, cor_contorno)
-            texto_pontuacao = fonte.render(f"Pontuação: {pontuacoes[i]}", True, cor_texto)
-            texto_pontuacao_contorno = fonte.render(f"Pontuação: {pontuacoes[i]}", True, cor_contorno)
+        # Exibir os jogadores e suas pontuações
+        for i, jogador in enumerate(jogadores):
+            nome_jogador1 = jogador["nome"]
+            fases = jogador.get("fases", [])
 
-            # Posições calculadas com base no deslocamento vertical
-            x_fase = posicoes_x[i] - texto_fase.get_width() // 2
-            y_fase = altura_fase + i * 100 + y_offset
-            x_pontuacao = posicoes_x[i] - texto_pontuacao.get_width() // 2
-            y_pontuacao = y_fase + 40
+            # Inicializa as pontuações da fase
+            for j, fase in enumerate(fases):
+                pontuacao = fase["pontuacao"]
+                tempo = fase.get("tempo", "N/A")  # Caso o tempo não exista, vai exibir "N/A"
+                fase_str = f"Fase {fase['fase']}: {pontuacao} pontos, Tempo: {tempo}s"
 
-            # Desenhar contorno para o texto da fase
-            tela.blit(texto_fase_contorno, (x_fase - 1, y_fase))
-            tela.blit(texto_fase_contorno, (x_fase + 1, y_fase))
-            tela.blit(texto_fase_contorno, (x_fase, y_fase - 1))
-            tela.blit(texto_fase_contorno, (x_fase, y_fase + 1))
+                # Calcular posição para o nome e pontuação
+                y_nome = altura_fase + i * 120 + y_offset
+                y_pontuacao = y_nome + 40 + (j * 40)
 
-            # Desenhar o texto preenchido da fase
-            tela.blit(texto_fase, (x_fase, y_fase))
-
-            # Desenhar contorno para o texto da pontuação
-            tela.blit(texto_pontuacao_contorno, (x_pontuacao - 1, y_pontuacao))
-            tela.blit(texto_pontuacao_contorno, (x_pontuacao + 1, y_pontuacao))
-            tela.blit(texto_pontuacao_contorno, (x_pontuacao, y_pontuacao - 1))
-            tela.blit(texto_pontuacao_contorno, (x_pontuacao, y_pontuacao + 1))
-
-            # Desenhar o texto preenchido da pontuação
-            tela.blit(texto_pontuacao, (x_pontuacao, y_pontuacao))
+                # Desenhar o nome e a pontuação
+                desenhar_texto_com_contorno(nome_jogador1, posicao_x_nome - fonte.size(nome_jogador)[0] // 2, y_nome)
+                desenhar_texto_com_contorno(fase_str, posicao_x_nome - fonte.size(fase_str)[0] // 2, y_pontuacao)
 
         # Barra de rolagem (se o conteúdo for maior que a tela)
         if max_scroll > tela.get_height():
@@ -1013,6 +1055,7 @@ def relatorio():
 
         pygame.display.update()
         clock.tick(60)
+
 
     
 # Função para as fases
@@ -1085,7 +1128,7 @@ def iniciarFases():
         pygame.display.update()
         clock.tick(60)
 
-def fase1():
+def fase1(nome_jogador):
     global estadoJogo, jogoConcluido, pontuacao_fase1, fase_ativa
     pontuacao_fase1 = 0
     jogoConcluido = False
@@ -1314,7 +1357,7 @@ def fase1():
                     estadoJogo = "menu"  # Voltar para o menu
                     fase_ativa = False  # Sai do loop atual
                     menuPrincipal()  # Chama a função do menu principa
-
+            salvar_pontuacao(nome_jogador, 1, pontuacao_fase1, tempo_decorrido) 
             if jogoPerdeu:
                 pontuacao_fase1 = 0
                 # Desenhar o botão "Voltar ao Menu"
@@ -2353,8 +2396,8 @@ def menuPrincipal():
         if jogarBotao.clicarBotao(tela):
             som_click.play()  # Som de clique
             print("Jogar clicado")
-            """pedir_nome()  # Jogador digita o nome
-            adicionar_jogador(nome_jogador)"""  # Salva no JSON
+            pedir_nome()  # Jogador digita o nome
+            adicionar_jogador(nome_jogador)  # Salva no JSON
             estadoJogo = "jogando"
             run = False
             
@@ -2387,7 +2430,7 @@ def menuPrincipal():
         if pontuacaoBotao.clicarBotao(tela):
             som_click.play()  # Som de clique
             print("relatório clicado")
-            relatorio()
+            relatorio(nome_jogador)
             run = False
 
         for event in pygame.event.get():
@@ -2406,7 +2449,7 @@ while rodando:
     elif estadoJogo == "jogando":
         iniciarFases()
     elif estadoJogo == "fase1":
-        fase1()
+        fase1(nome_jogador)
     elif estadoJogo == "fase2":
         fase2()
     elif estadoJogo == "fase3":

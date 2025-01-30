@@ -1,89 +1,50 @@
 {
     "jogadores": [
         {
-            "nome": "Jogador1",
-            "pontuacoes": [
-                {
-                    "fase": 1,
-                    "pontuacao": 0
-                },
-                {
-                    "fase": 2,
-                    "pontuacao": 0
-                },
-                {
-                    "fase": 3,
-                    "pontuacao": 0
-                }
-            ]
-        },
-        {
-            "nome": "Jogador2",
-            "pontuacoes": [
-                {
-                    "fase": 1,
-                    "pontuacao": 0
-                },
-                {
-                    "fase": 2,
-                    "pontuacao": 0
-                },
-                {
-                    "fase": 3,
-                    "pontuacao": 0
-                }
-            ]
-        },
-        {
-            "nome": "a",
-            "pontuacoes": [
-                {
-                    "fase": 1,
-                    "pontuacao": 0
-                },
-                {
-                    "fase": 2,
-                    "pontuacao": 0
-                },
-                {
-                    "fase": 3,
-                    "pontuacao": 0
-                }
-            ]
-        },
-        {
             "nome": "Brenda",
-            "pontuacoes": [
+            "fases": [
                 {
                     "fase": 1,
-                    "pontuacao": 0
-                },
-                {
-                    "fase": 2,
-                    "pontuacao": 0
-                },
-                {
-                    "fase": 3,
-                    "pontuacao": 0
+                    "pontuacao": 10,
+                    "tempo": 11
                 }
             ]
         },
         {
-            "nome": "fsdfs",
-            "pontuacoes": [
+            "nome": "Brenda Garcez",
+            "fases": [
                 {
                     "fase": 1,
-                    "pontuacao": 0
-                },
-                {
-                    "fase": 2,
-                    "pontuacao": 0
-                },
-                {
-                    "fase": 3,
-                    "pontuacao": 0
+                    "pontuacao": 10,
+                    "tempo": 6
                 }
             ]
+        },
+        {
+            "nome": "Markos",
+            "fases": [
+                {
+                    "fase": 1,
+                    "pontuacao": 10,
+                    "tempo": 9
+                }
+            ]
+        },
+        {
+            "nome": "Menu",
+            "fases": []
+        },
+        {
+            "nome": "brenda",
+            "fases": []
+        },
+        {
+            "nome": "Brenda amanda",
+            "fases": []
+        },
+        {
+            "nome": "brneda",
+            "fases": []
         }
     ]
 }
