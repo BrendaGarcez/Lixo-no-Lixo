@@ -296,15 +296,16 @@ def salvar_pontuacao(nome_jogador, fase, pontuacao, tempo):
 def mostrarVideo(video_path, video_width, video_height, imagem_fundo_path, audio_path):
     # Abrir o vídeo com OpenCV
     cap = cv2.VideoCapture(video_path)
+    cap.set(cv2.CAP_PROP_BUFFERSIZE, 1)
+    fps_video = cap.get(cv2.CAP_PROP_FPS) or 30
     
     # Inicializar o mixer do Pygame para áudio
     pygame.mixer.init()
-
     posicaoMouse = pygame.mouse.get_pos()
 
     # Criar o botão de voltar
-    voltarBotao = criarBotao(477.5 , 520,"imagens/GUI/imagensExtra/botaoPular0.png", "imagens/GUI/imagensExtra/botaoPular1.png")
-    avatarBotao = criarBotao(786, 485, "imagens/GUI/imagensExtra/avatar.png", "imagens/GUI/imagensExtra/avatar.png")
+    voltarBotao = criarBotao(477.5, 520, "imagens/GUI/imagensExtra/botaoPular0.png", "imagens/GUI/imagensExtra/botaoPular1.png")
+    avatarBotao = criarBotao(0, 420, "imagens/GUI/imagensExtra/assista-o-tutorial.png", "imagens/GUI/imagensExtra/assista-o-tutorial.png")
      
     if not cap.isOpened():
         print("Erro ao abrir o vídeo:", video_path)
@@ -315,7 +316,7 @@ def mostrarVideo(video_path, video_width, video_height, imagem_fundo_path, audio
 
     # Carregar e tocar o áudio
     pygame.mixer.music.load(audio_path)
-    pygame.mixer.music.play(-1, 0.0)  # Tocar o áudio de forma contínua (-1) desde o início (0.0)
+    pygame.mixer.music.play(-1, 0.0)
 
     # Calcular a posição central do vídeo na tela
     x_center = (telaLargura - video_width) // 2
@@ -324,20 +325,21 @@ def mostrarVideo(video_path, video_width, video_height, imagem_fundo_path, audio
     # Posição e tamanho do botão de "Voltar"
     botao_largura, botao_altura = 145, 47
 
-    # Loop principal do vídeo
+    clock = pygame.time.Clock()
     run = True
     while run:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 run = False
+                confirmar_saida(tela)
                 pygame.quit()
                 sys.exit()
 
         # Verificar se o botão foi clicado
-        if verificar_clique_botao(477.5 , 520, botao_largura, botao_altura):
+        if verificar_clique_botao(477.5, 520, botao_largura, botao_altura):
             print("Botão de voltar clicado!")
             run = False
-            cap.set(cv2.CAP_PROP_POS_FRAMES, 0)  # Voltar ao início do vídeo
+            cap.set(cv2.CAP_PROP_POS_FRAMES, 0)
 
         # Ler o próximo frame do vídeo
         ret, frame = cap.read()
@@ -345,34 +347,21 @@ def mostrarVideo(video_path, video_width, video_height, imagem_fundo_path, audio
             print("Fim do vídeo ou erro ao ler frame!")
             break
 
-        # Redimensionar o frame para o tamanho definido (video_width x video_height)
         frame = cv2.resize(frame, (video_width, video_height))
         frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
         frame_surface = pygame.surfarray.make_surface(frame.swapaxes(0, 1))
 
-        # Renderizar o fundo da fase (imagem de fundo)
-        tela.blit(fundo_imagem, (0, 0))  # Colocar a imagem de fundo
-
-        # Renderizar o vídeo no centro da tela
+        tela.blit(fundo_imagem, (0, 0))
         tela.blit(frame_surface, (x_center, y_center))
 
-        # Atualizar a posição do mouse
         posicaoMouse = pygame.mouse.get_pos()
-        
         avatarBotao.desenharBotao(tela)
-        # Verificar se o mouse está sobre o botão e alterar a imagem para o hover
-        if 200 <= posicaoMouse[0] <= 200 + botao_largura and 660 <= posicaoMouse[1] <= 660 + botao_altura:
-            voltarBotao.desenharBotao(tela)  # Desenhar o botão hover
-        else:
-            voltarBotao.desenharBotao(tela)
+        voltarBotao.desenharBotao(tela)
         
         pygame.display.update()
-        pygame.time.Clock().tick(30)
+        clock.tick(fps_video)
 
-    # Parar o áudio quando o vídeo terminar
     pygame.mixer.music.stop()
-
-    # Liberar os recursos do vídeo
     cap.release()
 
 
