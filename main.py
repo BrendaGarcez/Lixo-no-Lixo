@@ -256,7 +256,6 @@ def pedir_nome():
                 som_click.play()
                 print("Nome confirmado!")
                 input_ativo = False  # Sai do loop de input
-                return
 
     # Após sair do loop, o nome do jogador foi registrado
     print(f"Nome do jogador: {nome_jogador}")
