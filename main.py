@@ -967,132 +967,106 @@ def abrirCreditos():
 
         pygame.display.update()
 
-def relatorio(nome_jogador): 
+def abrirRelatorio(ultimo_jogador=None):
     global estadoJogo
-
-    # Carregar o fundo
-    fasesBackground = pygame.image.load("imagens/GUI/Backgrounds/relatorioBackground.png")
-    tela.blit(fasesBackground, (0, 0))
-
-    # Botões
+    pygame.init()
+    tela = pygame.display.set_mode((1100, 720))  # Ajustando para o tamanho correto da tela
+    relatorioBackground = pygame.image.load("imagens/GUI/Backgrounds/relatorioBackground.png")
     voltarBotao = criarBotao(20, 660, "imagens/GUI/botaoVoltar/voltar0.png", "imagens/GUI/botaoVoltar/voltar1.png")
-    configuracoesBotao = criarBotao(940, 660, "imagens/GUI/botaoConfiguracoes/configuracoes0.png", "imagens/GUI/botaoConfiguracoes/configuracoes1.png")
-
-    # Fonte para exibir o texto
-    fonte = pygame.font.Font("tipografia/LuckiestGuy-Regular.ttf", 30)
-    cor_texto = (255, 255, 255)  # Cor branca
-    cor_contorno = (0, 0, 0)  # Cor preta para o contorno
-    largura_tela = tela.get_width()  # Largura da tela
-
-    # Carregar dados dos jogadores do JSON
-    dados = carregar_dados_jogadores()  # Carrega os dados de jogadores do JSON
+    configuracoesBotao = criarBotao(930, 50, "imagens/GUI/botaoConfiguracoes/configuracoes0.png", "imagens/GUI/botaoConfiguracoes/configuracoes1.png")
+    
+    dados = carregar_dados_jogadores()
     jogadores = dados.get("jogadores", [])
-
-    # Posições horizontais para os nomes
-    posicao_x_nome = 500
-    altura_fase = 150  # Altura inicial para exibir o texto dos jogadores
-    altura_pontuacao = altura_fase + 40  # Altura para exibir as pontuações
-
-    # Variáveis para rolagem
-    y_offset = 0  # Deslocamento vertical inicial
-    max_scroll = max(len(jogadores) * 120, tela.get_height())  # Máxima altura do conteúdo (ajustado para cada jogador ter altura suficiente)
-    scroll_bar_height = 50  # Altura da barra de rolagem
-    scroll_ratio = max_scroll / scroll_bar_height  # Proporção entre o conteúdo e a altura da barra
-
-    def desenhar_texto_com_contorno(texto, x, y, cor_nome=cor_texto):
-        texto_contorno = fonte.render(texto, True, cor_contorno)
-        texto_principal = fonte.render(texto, True, cor_nome)
-        
-        # Desenhar o contorno
-        tela.blit(texto_contorno, (x - 1, y - 1))
-        tela.blit(texto_contorno, (x + 1, y - 1))
-        tela.blit(texto_contorno, (x - 1, y + 1))
-        tela.blit(texto_contorno, (x + 1, y + 1))
-
-        # Desenhar o texto principal
-        tela.blit(texto_principal, (x, y))
-
-
+    if jogadores:
+        jogadores.insert(0, jogadores.pop())
+    
+    fonte = pygame.font.Font("tipografia/LuckiestGuy-Regular.ttf", 26)
+    cor_texto = (255, 255, 255)
+    cor_destacada = (255, 215, 0)
+    cor_ultimo = (0, 255, 0)  # Cor diferente para o último inserido
+    espacamento = 50
+    
+    largura_quadro = 700
+    altura_quadro = 350
+    posicao_quadro = ((1100 - largura_quadro) // 2, (720 - altura_quadro) // 2)  # Centralizando o quadro
+    
+    altura_conteudo = sum((1 + len(jogador.get("fases", []))) * espacamento for jogador in jogadores)
+    deslocamento = 0
+    
+    barra_largura = 15
+    barra_altura = max(30, altura_quadro * (altura_quadro / max(altura_conteudo, altura_quadro)))
+    barra_x = posicao_quadro[0] + largura_quadro - barra_largura - 5
+    trilho_x = barra_x
+    trilho_altura = altura_quadro
+    
+    clicando_na_barra = False
+    deslocamento_inicial = 0
+    mouse_inicial = 0
+    
     run = True
     while run:
-        tela.blit(fasesBackground, (0, 0))
+        tela.blit(relatorioBackground, (0, 0))
         posicaoMouse = pygame.mouse.get_pos()
-
-        # Atualizar os botões de navegação
-        voltarBotao.atualizarImagem(posicaoMouse)
+        
         configuracoesBotao.atualizarImagem(posicaoMouse)
-
-        voltarBotao.desenharBotao(tela)
         configuracoesBotao.desenharBotao(tela)
-
-        # Exibir os jogadores e suas pontuações
-        if jogadores:  # Se houver jogadores
-            for i, jogador in enumerate(jogadores):
-                nome_jogador1 = jogador["nome"]
-                fases = jogador.get("fases", [])
-
-                # Destacar o último jogador
-                cor_nome = cor_texto
-                if i == len(jogadores) - 1:  # Se for o último jogador
-                    cor_nome = (255, 215, 0)  # Destaque em dourado
-
-                # Inicializa as pontuações da fase
-                for j, fase in enumerate(fases):
-                    pontuacao = fase["pontuacao"]
-                    tempo = fase.get("tempo", "N/A")  # Caso o tempo não exista, vai exibir "N/A"
-                    fase_str = f"Fase {fase['fase']}: {pontuacao} pontos, Tempo: {tempo}s"
-
-                    # Calcular posição para o nome e pontuação
-                    y_nome = altura_fase + i * 120 + y_offset
-                    y_pontuacao = y_nome + 40 + (j * 40)
-
-                    # Desenhar o nome com a cor personalizada e as pontuações
-                    desenhar_texto_com_contorno(nome_jogador1, posicao_x_nome - fonte.size(nome_jogador)[0] // 2, y_nome, cor_nome)
-                    desenhar_texto_com_contorno(fase_str, posicao_x_nome - fonte.size(fase_str)[0] // 2, y_pontuacao)
-        else:  # Caso não haja jogadores
-            mensagem = "Nenhum jogador registrado ainda."
-            desenhar_texto_com_contorno(mensagem, largura_tela // 2 - fonte.size(mensagem)[0] // 2, altura_fase + y_offset)
-
-            # Exibir um campo vazio para a lista de jogadores
-            nome_jogador1 = "Nenhum jogador"
-            desenhar_texto_com_contorno(nome_jogador1, posicao_x_nome - fonte.size(nome_jogador1)[0] // 2, altura_fase + 120 + y_offset)
-
-        # Barra de rolagem (se o conteúdo for maior que a tela)
-        if max_scroll > tela.get_height():
-            pygame.draw.rect(tela, (0, 0, 0), (tela.get_width() - 20, altura_fase, 20, scroll_bar_height))  # Barra de rolagem
-            pygame.draw.rect(tela, (255, 255, 255), (tela.get_width() - 20, altura_fase + int(y_offset / scroll_ratio), 20, scroll_bar_height))  # Posição da barra
-
-        # Verificar cliques nos botões
+        voltarBotao.atualizarImagem(posicaoMouse)
+        voltarBotao.desenharBotao(tela)
+        
+        superficie_relatorio = pygame.Surface((largura_quadro, altura_conteudo), pygame.SRCALPHA)
+        superficie_relatorio.fill((255, 189, 140))
+        
+        y_atual = 20
+        for jogador in jogadores:
+            nome = jogador["nome"]
+            fases = jogador.get("fases", [])
+            
+            cor_atual = cor_ultimo if nome == ultimo_jogador else cor_texto
+            texto_nome = fonte.render(f"Jogador: {nome}", True, cor_atual)
+            superficie_relatorio.blit(texto_nome, (20, y_atual))
+            y_atual += espacamento
+            
+            for fase in fases:
+                fase_str = f"Fase {fase['fase']}: {fase['pontuacao']} pontos, Tempo: {fase.get('tempo', 'N/A')}s"
+                texto_fase = fonte.render(fase_str, True, cor_texto)
+                superficie_relatorio.blit(texto_fase, (40, y_atual))
+                y_atual += espacamento
+        
+        deslocamento = max(0, min(deslocamento, max(0, altura_conteudo - altura_quadro)))
+        recorte = superficie_relatorio.subsurface((0, deslocamento, largura_quadro, min(altura_quadro, altura_conteudo)))
+        tela.blit(recorte, posicao_quadro)
+        
+        pygame.draw.rect(tela, (100, 100, 100), (trilho_x, posicao_quadro[1], barra_largura, trilho_altura))
+        barra_y = posicao_quadro[1] + (deslocamento / max(1, altura_conteudo - altura_quadro)) * (altura_quadro - barra_altura)
+        pygame.draw.rect(tela, (200, 200, 200), (barra_x, barra_y, barra_largura, barra_altura), border_radius=5)
+        
         if voltarBotao.clicarBotao(tela):
-            som_click.play()  # Som de clique
-            print("Voltar clicado")
-            estadoJogo = "menu"  # Voltar para o menu
+            som_click.play()
+            estadoJogo = "menu"
             run = False
-
         if configuracoesBotao.clicarBotao(tela):
-            som_click.play()  # Som de clique
-            print("Configurações clicado")
+            som_click.play()
             abrirConfiguracoes()
-
-        # Eventos de rolagem
+        
         for event in pygame.event.get():
-            if event.type == pygame.MOUSEBUTTONDOWN:
-                if event.button == 4:  # Rolar para cima
-                    y_offset -= 20
-                elif event.button == 5:  # Rolar para baixo
-                    y_offset += 20
-
             if event.type == pygame.QUIT:
                 confirmar_saida(tela)
-
-        # Limitar o deslocamento da rolagem para não ultrapassar o conteúdo
-        if y_offset < 0:
-            y_offset = 0
-        if y_offset > max_scroll - tela.get_height():
-            y_offset = max_scroll - tela.get_height()
-
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                if event.button == 1 and trilho_x <= posicaoMouse[0] <= trilho_x + barra_largura and barra_y <= posicaoMouse[1] <= barra_y + barra_altura:
+                    clicando_na_barra = True
+                    deslocamento_inicial = deslocamento
+                    mouse_inicial = event.pos[1]
+                elif event.button == 4:
+                    deslocamento = max(deslocamento - 20, 0)
+                elif event.button == 5:
+                    deslocamento = min(deslocamento + 20, max(0, altura_conteudo - altura_quadro))
+            elif event.type == pygame.MOUSEBUTTONUP and event.button == 1:
+                clicando_na_barra = False
+            elif event.type == pygame.MOUSEMOTION and clicando_na_barra:
+                diferenca = event.pos[1] - mouse_inicial
+                deslocamento = max(0, min(altura_conteudo - altura_quadro, deslocamento_inicial + diferenca * (altura_conteudo / altura_quadro)))
+        
         pygame.display.update()
-        clock.tick(60)
 
     
 # Função para as fases
@@ -2468,7 +2442,7 @@ def menuPrincipal():
         if pontuacaoBotao.clicarBotao(tela):
             som_click.play()  # Som de clique
             print("relatório clicado")
-            relatorio(nome_jogador)
+            abrirRelatorio(nome_jogador)
             run = False
 
         for event in pygame.event.get():
