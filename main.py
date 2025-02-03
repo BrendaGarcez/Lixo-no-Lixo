@@ -10,6 +10,7 @@ import cv2
 from PIL import Image, ImageTk
 import json
 import os
+import time
 
 pygame.init()  # Inicializa os módulos do pygame
 pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_HAND)  # Muda o cursor para a mão
@@ -64,26 +65,28 @@ def criarBotaoImagensFASE3(x, y, imagem, imagemAlterada):
     
     return botaoObjetos.BotaoObjetos(x, y, imagem, imagemAlterada)
 
-import pygame
+ultimo_som_tocado = 0  # Tempo do último som tocado
+cooldown_som = 0.8  # Cooldown de segundos entre sons
 
-def exibir_nome_objeto(obj):
-    # Definir a fonte para o nome do objeto
-    fonte_nome = pygame.font.Font("tipografia/LuckiestGuy-Regular.ttf", 24)
-    nome_objeto = obj["nome"]  # Usa o nome extraído da imagem
-    cor_texto = (255, 255, 255)  # Cor do texto (branco)
+def falar_nome_objeto(obj):
+    """Toca o som do nome do objeto, respeitando o cooldown."""
+    global ultimo_som_tocado
 
-    # Caminho do som baseado no nome do objeto
-    caminho_som = f"sons/audioNomeObjetos/{nome_objeto}.mp3"
+    caminho_som = f"sons/audioNomeObjetos/{obj['nome']}.mp3"
+    tempo_atual = time.time()
 
-    # Verificar se o áudio foi tocado, evitar múltiplos toques
-    if obj.get("selecionado", False) and not obj.get("som_tocado", False):
-        # Verificar se o arquivo de áudio existe antes de tentar carregar
+    if not obj.get("som_tocado", False) and (tempo_atual - ultimo_som_tocado > cooldown_som):
         if os.path.exists(caminho_som):
             som_nome = pygame.mixer.Sound(caminho_som)  # Carregar o som
             som_nome.play()  # Tocar o som do nome do objeto
-            obj["som_tocado"] = True  # Marcar que o som foi tocado para evitar múltiplos toques
-        else:
-            obj["som_tocado"] = True  # Se não existir som, marca como tocado para evitar tentar novamente
+            ultimo_som_tocado = tempo_atual  # Atualiza o tempo do último som tocado
+            obj["som_tocado"] = True  # Marca que o som foi tocado
+
+def exibir_nome_objeto(obj):
+    """Exibe o nome do objeto acima dele e chama a função para falar o nome."""
+    fonte_nome = pygame.font.Font("tipografia/LuckiestGuy-Regular.ttf", 24)
+    nome_objeto = obj["nome"]  # Nome do objeto
+    cor_texto = (255, 255, 255)  # Cor do texto (branco)
 
     # Renderizar o nome com contorno e preenchimento
     texto_nome_contorno = fonte_nome.render(nome_objeto, True, (0, 0, 0))  # Contorno preto
@@ -101,7 +104,11 @@ def exibir_nome_objeto(obj):
     # Desenhar o texto preenchido
     tela.blit(texto_nome_preenchimento, posicao_nome)
 
+    # Toca o som do nome do objeto se necessário
+    falar_nome_objeto(obj)
 
+    # Toca o som do nome do objeto se necessário
+    falar_nome_objeto(obj)
 
 # Função para verificar se o botão foi clicado
 def verificar_clique_botao(x, y, largura, altura):
@@ -1199,29 +1206,27 @@ def fase1(nome_jogador):
         "imagens/fase1/corretas/Tamanduá.png",
         "imagens/fase1/corretas/Capivara.png",
         "imagens/fase1/corretas/Preguiça.png",
-        "imagens/fase1/corretas/elefante.png",
-        "imagens/fase1/corretas/esquilo.png",
+        "imagens/fase1/corretas/Elefante.png",
+        "imagens/fase1/corretas/Esquilo.png",
         "imagens/fase1/corretas/Gambá.png",
         "imagens/fase1/corretas/Panda.png",
-        "imagens/fase1/corretas/Panda .png",
         "imagens/fase1/corretas/Pássaro.png",
         "imagens/fase1/corretas/Girafa.png",
-        "imagens/fase1/corretas/raposa.png",
+        "imagens/fase1/corretas/Raposa.png",
         "imagens/fase1/corretas/Cervo.png",
     ]
 
     imagensIncorretas = [
-        "imagens/fase1/incorretas/caixa de papelao.png",
-        "imagens/fase1/incorretas/Copo Amassado.png",
-        "imagens/fase1/incorretas/fralda descartavel.png",
-        "imagens/fase1/incorretas/garrafa de vidro.png",
+        "imagens/fase1/incorretas/Caixa de Papelão.png",
+        "imagens/fase1/incorretas/Copo Descartável.png",
+        "imagens/fase1/incorretas/Fralda Descartável.png",
+        "imagens/fase1/incorretas/Garrafa de Vidro.png",
         "imagens/fase1/incorretas/Garrafa Pet.png",
-        "imagens/fase1/incorretas/Garrafa Pet .png",
-        "imagens/fase1/incorretas/lata amassada.png",
-        "imagens/fase1/incorretas/lata.png",
-        "imagens/fase1/incorretas/saco de lixo.png",
-        "imagens/fase1/incorretas/papel amassado.png",
-        "imagens/fase1/incorretas/saco de papel.png",
+        "imagens/fase1/incorretas/Lata Amassada.png",
+        "imagens/fase1/incorretas/Lata.png",
+        "imagens/fase1/incorretas/Saco de Lixo.png",
+        "imagens/fase1/incorretas/Papel Amassado.png",
+        "imagens/fase1/incorretas/Saco de Papel.png",
     ]
 
     # Selecionando aleatoriamente 6 imagens corretas e 4 incorretas
@@ -1306,7 +1311,7 @@ def fase1(nome_jogador):
         tela.blit(fase1Background, (0, 0))
         
         if jogoPerdeu:
-            tela.blit(pygame.image.load("imagens/fase1/perdeuZoologico.jpg"), (0, 0))
+            tela.blit(pygame.image.load("imagens/fase1/perdeuZoologico.png"), (0, 0))
             objetos.clear()  # Limpa todos os objetos
         elif jogoGanhou:
             tela.blit(pygame.image.load("imagens/fase1/ganhouZoologico.jpg"), (0, 0))
@@ -1501,13 +1506,11 @@ def fase1(nome_jogador):
             botao = obj["botao"]
             botao.atualizarImagem(posicaoMouse)
             botao.desenharBotao(tela)
-
-            # Verifica se o mouse está sobre o objeto (hover)
             if botao.rect.collidepoint(posicaoMouse):  # Verifica se o mouse está sobre o botão
-                exibir_nome_objeto(obj)
-                  # Exibe o nome do objeto acima dele
-            
-
+                 exibir_nome_objeto(obj)
+            else:
+                obj["som_tocado"] = False  # Reseta para permitir que o som toque novamente
+        
         # Verificar clique nos objetos
         for obj in objetos:
             if obj["botao"].clicarBotao(tela):
@@ -1567,7 +1570,7 @@ def fase2(nome_jogador):
     global estadoJogo, jogoConcluido, pontuacao_fase2, fase_ativa
     pontuacao_fase2 = 0
     jogoConcluido = False
-    fase1Background = pygame.image.load("imagens/fase2/imagemSaladeAula.png")
+    fase2Background = pygame.image.load("imagens/fase2/imagemSaladeAula.png")
 
     mostrarVideo("video/fase2.mp4", 600, 300, "imagens/fase2/imagemTutorialSala.png", "sons/tutorial/fase2.wav")
 
@@ -1596,21 +1599,21 @@ def fase2(nome_jogador):
 
     # Lista de imagens
     imagensCorretas = [
-        "imagens/fase2/corretas/casca de banana.png",
-        "imagens/fase2/corretas/copo descartavel.png",
-        "imagens/fase2/corretas/fralda descartavel.png",
-        "imagens/fase2/corretas/Garrafa de Vidro Vazia.png",
-        "imagens/fase2/corretas/lata amassada.png",
-        "imagens/fase2/corretas/lata.png",
-        "imagens/fase2/corretas/saco de lixo.png",
-        "imagens/fase2/corretas/restos de maça.png",
-        "imagens/fase2/corretas/saco de papel.png",
+        "imagens/fase2/corretas/Casca de Banana.png",
+        "imagens/fase2/corretas/Copo Descartável.png",
+        "imagens/fase2/corretas/Fralda Descartável.png",
+        "imagens/fase2/corretas/Garrafa de Vidro.png",
+        "imagens/fase2/corretas/Lata Amassada.png",
+        "imagens/fase2/corretas/Lata.png",
+        "imagens/fase2/corretas/Saco de Lixo.png",
+        "imagens/fase2/corretas/Restos de Maçã.png",
+        "imagens/fase2/corretas/Saco de Papel.png",
     ]
 
     imagensIncorretas = [
         "imagens/fase2/incorretas/Borracha.png",
-        "imagens/fase2/incorretas/estojo.png",
-        "imagens/fase2/incorretas/livro.png",
+        "imagens/fase2/incorretas/Estojo.png",
+        "imagens/fase2/incorretas/Livro.png",
         "imagens/fase2/incorretas/Mochila.png",
         "imagens/fase2/incorretas/Caneta.png",
         "imagens/fase2/incorretas/Apontador.png",
@@ -1700,9 +1703,9 @@ def fase2(nome_jogador):
     mostrar_informacoes = True
 
     while fase_ativa:
-        tela.blit(fase1Background, (0, 0))
+        tela.blit(fase2Background, (0, 0))
         if jogoPerdeu:
-            tela.blit(pygame.image.load("imagens/fase2/perdeuSaladeAula.jpg"), (0, 0))
+            tela.blit(pygame.image.load("imagens/fase2/perdeuSaladeAula.png"), (0, 0))
             objetos.clear()  # Limpa todos os objetos
         elif jogoGanhou:
             tela.blit(pygame.image.load("imagens/fase2/ganhouSaladeAula.jpg"), (0, 0))
@@ -1900,9 +1903,11 @@ def fase2(nome_jogador):
 
             # Verifica se o mouse está sobre o objeto (hover)
             if botao.rect.collidepoint(posicaoMouse):  # Verifica se o mouse está sobre o botão
-                exibir_nome_objeto(obj)  # Exibe o nome do objeto acima dele
-
+                exibir_nome_objeto(obj)
+            else:
+                obj["som_tocado"] = False  # Reseta para permitir que o som toque novamente
         # Verificar clique nos objetos
+
         for obj in objetos:
             if obj["botao"].clicarBotao(tela):
                 som_click.play()  # Som de clique
@@ -1962,7 +1967,7 @@ def fase3(nome_jogador):
     global estadoJogo, jogoConcluido, pontuacao_fase3, fase_ativa
     pontuacao_fase3 = 0
     jogoConcluido = False
-    fase1Background = pygame.image.load("imagens/fase3/imagemPraia.jpg")
+    fase3Background = pygame.image.load("imagens/fase3/imagemPraia.jpg")
 
     mostrarVideo("video/fase3.mp4", 600, 300, "imagens/fase3/imagemTutorialPraia.png", "sons/tutorial/fase3.wav")
 
@@ -1988,28 +1993,27 @@ def fase3(nome_jogador):
     # Lista de imagens
     imagensCorretas = [
         "imagens/fase3/corretas/Balde de Areia.png",
-        "imagens/fase3/corretas/cadeira e guarda sol de praia.png",
-        "imagens/fase3/corretas/coco.png",
-        "imagens/fase3/corretas/coqueiro.png",
+        "imagens/fase3/corretas/Cadeira de Praia.png",
+        "imagens/fase3/corretas/Coco.png",
+        "imagens/fase3/corretas/Coqueiro.png",
         "imagens/fase3/corretas/Guarda Sol.png",
-        "imagens/fase3/corretas/bolsa de praia.png",
-        "imagens/fase3/corretas/oculos de sol.png",
-        "imagens/fase3/corretas/toalha.png",
+        "imagens/fase3/corretas/Bolsa de Praia.png",
+        "imagens/fase3/corretas/Óculos de Sol.png",
+        "imagens/fase3/corretas/Toalha.png",
     ]
 
     imagensIncorretas = [
-        "imagens/fase3/incorretas/banana.png",
-        "imagens/fase3/incorretas/caixa de papelao.png",
-        "imagens/fase3/incorretas/copo descartavel.png",
-        "imagens/fase3/incorretas/fralda descartavel.png",
-        "imagens/fase3/incorretas/garrafa de vidro.png",
+        "imagens/fase3/incorretas/Casca de Banana.png",
+        "imagens/fase3/incorretas/Copo Descartável.png",
+        "imagens/fase3/incorretas/Fralda Descartável.png",
+        "imagens/fase3/incorretas/Garrafa de Vidro.png",
         "imagens/fase3/incorretas/Garrafa Pet.png",
-        "imagens/fase3/incorretas/lata amassada.png",
-        "imagens/fase3/incorretas/lata.png",
-        "imagens/fase3/incorretas/saco de lixo.png",
-        "imagens/fase3/incorretas/papel amassado.png",
-        "imagens/fase3/incorretas/restos de maça.png",
-        "imagens/fase3/incorretas/saco de papel.png",
+        "imagens/fase3/incorretas/Lata Amassada.png",
+        "imagens/fase3/incorretas/Lata.png",
+        "imagens/fase3/incorretas/Saco de Lixo.png",
+        "imagens/fase3/incorretas/Papel Amassado.png",
+        "imagens/fase3/incorretas/Restos de Maçã.png",
+        "imagens/fase3/incorretas/Saco de Papel.png",
     ]
 
     # Selecionando aleatoriamente 6 imagens corretas e 4 incorretas
@@ -2149,9 +2153,9 @@ def fase3(nome_jogador):
     mostrar_informacoes = True
     fase_ativa = True
     while fase_ativa:
-        tela.blit(fase1Background, (0, 0))
+        tela.blit(fase3Background, (0, 0))
         if jogoPerdeu:
-            tela.blit(pygame.image.load("imagens/fase3/perdeuPraia.jpg"), (0, 0))
+            tela.blit(pygame.image.load("imagens/fase3/perdeuPraia.png"), (0, 0))
             objetos.clear()  # Limpa todos os objetos
         elif jogoGanhou:
             salvar_pontuacao(nome_jogador, 3, pontuacao_fase3, tempo_decorrido) 
@@ -2389,8 +2393,10 @@ def fase3(nome_jogador):
             botao.desenharBotao(tela)  # Desenha o objeto na nova posição
 
             # Verifica se o mouse está sobre o objeto (hover)
-            if botao.rect.collidepoint(posicaoMouse):
-                exibir_nome_objeto(obj)  # Exibe o nome do objeto acima dele
+            if botao.rect.collidepoint(posicaoMouse):  # Verifica se o mouse está sobre o botão
+                 exibir_nome_objeto(obj)
+            else:
+                obj["som_tocado"] = False  # Reseta para permitir que o som toque novamente
             
             # Atualiza a tela
         pygame.display.update() 
