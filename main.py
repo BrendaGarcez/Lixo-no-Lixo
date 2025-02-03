@@ -64,11 +64,26 @@ def criarBotaoImagensFASE3(x, y, imagem, imagemAlterada):
     
     return botaoObjetos.BotaoObjetos(x, y, imagem, imagemAlterada)
 
+import pygame
+
 def exibir_nome_objeto(obj):
     # Definir a fonte para o nome do objeto
     fonte_nome = pygame.font.Font("tipografia/LuckiestGuy-Regular.ttf", 24)
     nome_objeto = obj["nome"]  # Usa o nome extraído da imagem
     cor_texto = (255, 255, 255)  # Cor do texto (branco)
+
+    # Caminho do som baseado no nome do objeto
+    caminho_som = f"sons/audioNomeObjetos/{nome_objeto}.mp3"
+
+    # Verificar se o áudio foi tocado, evitar múltiplos toques
+    if obj.get("selecionado", False) and not obj.get("som_tocado", False):
+        # Verificar se o arquivo de áudio existe antes de tentar carregar
+        if os.path.exists(caminho_som):
+            som_nome = pygame.mixer.Sound(caminho_som)  # Carregar o som
+            som_nome.play()  # Tocar o som do nome do objeto
+            obj["som_tocado"] = True  # Marcar que o som foi tocado para evitar múltiplos toques
+        else:
+            obj["som_tocado"] = True  # Se não existir som, marca como tocado para evitar tentar novamente
 
     # Renderizar o nome com contorno e preenchimento
     texto_nome_contorno = fonte_nome.render(nome_objeto, True, (0, 0, 0))  # Contorno preto
@@ -85,6 +100,7 @@ def exibir_nome_objeto(obj):
 
     # Desenhar o texto preenchido
     tela.blit(texto_nome_preenchimento, posicao_nome)
+
 
 
 # Função para verificar se o botão foi clicado
@@ -1183,29 +1199,29 @@ def fase1(nome_jogador):
         "imagens/fase1/corretas/Tamanduá.png",
         "imagens/fase1/corretas/Capivara.png",
         "imagens/fase1/corretas/Preguiça.png",
-        "imagens/fase1/corretas/Elefante.png",
-        "imagens/fase1/corretas/Esquilo.png",
+        "imagens/fase1/corretas/elefante.png",
+        "imagens/fase1/corretas/esquilo.png",
         "imagens/fase1/corretas/Gambá.png",
         "imagens/fase1/corretas/Panda.png",
         "imagens/fase1/corretas/Panda .png",
         "imagens/fase1/corretas/Pássaro.png",
         "imagens/fase1/corretas/Girafa.png",
-        "imagens/fase1/corretas/Raposa.png",
+        "imagens/fase1/corretas/raposa.png",
         "imagens/fase1/corretas/Cervo.png",
     ]
 
     imagensIncorretas = [
-        "imagens/fase1/incorretas/Caixa.png",
+        "imagens/fase1/incorretas/caixa de papelao.png",
         "imagens/fase1/incorretas/Copo Amassado.png",
-        "imagens/fase1/incorretas/Fralda.png",
-        "imagens/fase1/incorretas/Garrafa de Vidro.png",
+        "imagens/fase1/incorretas/fralda descartavel.png",
+        "imagens/fase1/incorretas/garrafa de vidro.png",
         "imagens/fase1/incorretas/Garrafa Pet.png",
         "imagens/fase1/incorretas/Garrafa Pet .png",
-        "imagens/fase1/incorretas/Latinha.png",
-        "imagens/fase1/incorretas/Latinha .png",
-        "imagens/fase1/incorretas/Lixo.png",
-        "imagens/fase1/incorretas/Papel.png",
-        "imagens/fase1/incorretas/Saco de Papel.png",
+        "imagens/fase1/incorretas/lata amassada.png",
+        "imagens/fase1/incorretas/lata.png",
+        "imagens/fase1/incorretas/saco de lixo.png",
+        "imagens/fase1/incorretas/papel amassado.png",
+        "imagens/fase1/incorretas/saco de papel.png",
     ]
 
     # Selecionando aleatoriamente 6 imagens corretas e 4 incorretas
@@ -1488,7 +1504,9 @@ def fase1(nome_jogador):
 
             # Verifica se o mouse está sobre o objeto (hover)
             if botao.rect.collidepoint(posicaoMouse):  # Verifica se o mouse está sobre o botão
-                exibir_nome_objeto(obj)  # Exibe o nome do objeto acima dele
+                exibir_nome_objeto(obj)
+                  # Exibe o nome do objeto acima dele
+            
 
         # Verificar clique nos objetos
         for obj in objetos:
@@ -1578,27 +1596,27 @@ def fase2(nome_jogador):
 
     # Lista de imagens
     imagensCorretas = [
-        "imagens/fase2/corretas/Banana.png",
-        "imagens/fase2/corretas/Copo Amassado.png",
-        "imagens/fase2/corretas/Fralda.png",
-        "imagens/fase2/corretas/Garrafa de Vidro.png",
-        "imagens/fase2/corretas/Latinha.png",
-        "imagens/fase2/corretas/Latinha .png",
-        "imagens/fase2/corretas/Lixo.png",
-        "imagens/fase2/corretas/Maçã Comida.png",
-        "imagens/fase2/corretas/Saco de Papel.png",
+        "imagens/fase2/corretas/casca de banana.png",
+        "imagens/fase2/corretas/copo descartavel.png",
+        "imagens/fase2/corretas/fralda descartavel.png",
+        "imagens/fase2/corretas/Garrafa de Vidro Vazia.png",
+        "imagens/fase2/corretas/lata amassada.png",
+        "imagens/fase2/corretas/lata.png",
+        "imagens/fase2/corretas/saco de lixo.png",
+        "imagens/fase2/corretas/restos de maça.png",
+        "imagens/fase2/corretas/saco de papel.png",
     ]
 
     imagensIncorretas = [
         "imagens/fase2/incorretas/Borracha.png",
-        "imagens/fase2/incorretas/Estojo.png",
-        "imagens/fase2/incorretas/Caderno.png",
+        "imagens/fase2/incorretas/estojo.png",
+        "imagens/fase2/incorretas/livro.png",
         "imagens/fase2/incorretas/Mochila.png",
         "imagens/fase2/incorretas/Caneta.png",
         "imagens/fase2/incorretas/Apontador.png",
         "imagens/fase2/incorretas/Lápis.png",
         "imagens/fase2/incorretas/Tesoura.png",
-
+        "imagens/fase2/incorretas/Régua.png",
     ]
 
     # Selecionando aleatoriamente 6 imagens corretas e 4 incorretas
@@ -1970,29 +1988,28 @@ def fase3(nome_jogador):
     # Lista de imagens
     imagensCorretas = [
         "imagens/fase3/corretas/Balde de Areia.png",
-        "imagens/fase3/corretas/Cadeira de Praia.png",
-        "imagens/fase3/corretas/Coco.png",
-        "imagens/fase3/corretas/Coqueiro.png",
+        "imagens/fase3/corretas/cadeira e guarda sol de praia.png",
+        "imagens/fase3/corretas/coco.png",
+        "imagens/fase3/corretas/coqueiro.png",
         "imagens/fase3/corretas/Guarda Sol.png",
-        "imagens/fase3/corretas/Objetos de Praia.png",
-        "imagens/fase3/corretas/Óculos de Praia.png",
-        "imagens/fase3/corretas/Toalha de Praia.png",
+        "imagens/fase3/corretas/bolsa de praia.png",
+        "imagens/fase3/corretas/oculos de sol.png",
+        "imagens/fase3/corretas/toalha.png",
     ]
 
     imagensIncorretas = [
-        "imagens/fase3/incorretas/Banana.png",
-        "imagens/fase3/incorretas/Caixa.png",
-        "imagens/fase3/incorretas/Copo Amassado.png",
-        "imagens/fase3/incorretas/Fralda.png",
-        "imagens/fase3/incorretas/Garrafa de Vidro.png",
+        "imagens/fase3/incorretas/banana.png",
+        "imagens/fase3/incorretas/caixa de papelao.png",
+        "imagens/fase3/incorretas/copo descartavel.png",
+        "imagens/fase3/incorretas/fralda descartavel.png",
+        "imagens/fase3/incorretas/garrafa de vidro.png",
         "imagens/fase3/incorretas/Garrafa Pet.png",
-        "imagens/fase3/incorretas/Latinha.png",
-        "imagens/fase3/incorretas/Latinha .png",
-        "imagens/fase3/incorretas/Lixo.png",
-        "imagens/fase3/incorretas/Papel.png",
-        "imagens/fase3/incorretas/Maçã Comida.png",
-        "imagens/fase3/incorretas/Papel.png",
-        "imagens/fase3/incorretas/Saco de Papel.png",
+        "imagens/fase3/incorretas/lata amassada.png",
+        "imagens/fase3/incorretas/lata.png",
+        "imagens/fase3/incorretas/saco de lixo.png",
+        "imagens/fase3/incorretas/papel amassado.png",
+        "imagens/fase3/incorretas/restos de maça.png",
+        "imagens/fase3/incorretas/saco de papel.png",
     ]
 
     # Selecionando aleatoriamente 6 imagens corretas e 4 incorretas
