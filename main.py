@@ -198,11 +198,7 @@ def pedir_nome():
 
     voltarBotao = criarBotao(30, 660, "imagens/GUI/botaoVoltar/voltar0.png", "imagens/GUI/botaoVoltar/voltar1.png")
     configuracoesBotao = criarBotao(900, 660, "imagens/GUI/botaoConfiguracoes/configuracoes0.png", "imagens/GUI/botaoConfiguracoes/configuracoes1.png")
-
-    # Definir as posições e tamanhos dos botões
-    voltar_x, voltar_y = 30, 660
-    configuracoes_x, configuracoes_y = 900, 660
-    largura_botao, altura_botao = 200, 50  # Suponha que o tamanho dos botões seja 200x50
+    confirmarBotao = criarBotao(450, 500, "imagens/GUI/botaoConfirmar/confirmar1.png", "imagens/GUI/botaoConfirmar/confirmar2.png")  
 
     while input_ativo:
         nome_background = pygame.image.load("imagens/GUI/Backgrounds/nomeBackground.png")
@@ -215,40 +211,58 @@ def pedir_nome():
         # Atualizar os botões
         posicaoMouse = pygame.mouse.get_pos()
         
-        # Desenhar os botões (Aqui você ainda pode usar o seu código de desenhar imagem de botão)
         voltarBotao.atualizarImagem(posicaoMouse)
         configuracoesBotao.atualizarImagem(posicaoMouse)
+        confirmarBotao.atualizarImagem(posicaoMouse)
+
         voltarBotao.desenharBotao(tela)
         configuracoesBotao.desenharBotao(tela)
+        confirmarBotao.desenharBotao(tela)
 
         pygame.display.update()
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
+                confirmar_saida(tela)
                 pygame.quit()
                 exit()
 
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_RETURN and texto.strip():
                     nome_jogador = texto.strip()
-                    input_ativo = False
+                    som_click.play()
+                    input_ativo = False  # Nome confirmado
                 elif event.key == pygame.K_BACKSPACE:
                     texto = texto[:-1]
                 else:
                     texto += event.unicode
 
-            # Usar a função verificar_clique_botao para verificar o clique nos botões
-            if verificar_clique_botao(voltar_x, voltar_y, largura_botao, altura_botao):
-                som_click.play()  # Som de clique
+            # Verifica clique nos botões
+            if voltarBotao.clicarBotao(tela):
+                som_click.play()
                 print("Voltar clicado")
                 estadoJogo = "menuPrincipal"
                 input_ativo = False
                 return menuPrincipal()
 
-            if verificar_clique_botao(configuracoes_x, configuracoes_y, largura_botao, altura_botao):
-                som_click.play()  # Som de clique
+            if configuracoesBotao.clicarBotao(tela):
+                som_click.play()
                 print("Configurações clicado")
                 abrirConfiguracoes()
+
+            # Verifica clique no botão de confirmar
+            if confirmarBotao.clicarBotao(tela) and texto.strip():
+                nome_jogador = texto.strip()
+                som_click.play()
+                print("Nome confirmado!")
+                input_ativo = False  # Sai do loop de input
+                return
+
+    # Após sair do loop, o nome do jogador foi registrado
+    print(f"Nome do jogador: {nome_jogador}")
+
+
+
 
 
 def salvar_pontuacao(nome_jogador, fase, pontuacao, tempo):
