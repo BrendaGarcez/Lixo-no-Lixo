@@ -408,11 +408,12 @@ def tocar_musica(nova_musica): # FUNÇÃO DA MÚSICA DE FUNDO
         pygame.mixer.music.play(-1)  # Toca em loop
         musica_atual = nova_musica  # Atualiza a música atual
         
-def tocar_efeito_sonoro(efeito):
+
+def tocar_efeito_sonoro(efeito, volume=0.5):
     efeito_sonoro = pygame.mixer.Sound(efeito)
+    efeito_sonoro.set_volume(volume)  # Define o volume do efeito (0.0 a 1.0)
     efeito_sonoro.play()  # Toca o efeito sonoro sem parar a música de fundo
-
-
+    
 def confirmar_saida(tela):
     # Dimensões da janela de confirmação
     largura = 400
@@ -1533,7 +1534,7 @@ def fase1(nome_jogador):
                     if imagensCorretasClicadas == 6:  # Clicou em todas as imagens corretas
                         jogoGanhou = True
                     # Tocar som de resposta certa
-                    tocar_efeito_sonoro("sons/somObjetoCorreto/respostaCerta.mp3")
+                    tocar_efeito_sonoro("sons/somObjetoCorreto/respostaCerta.mp3", volume=0.3)
                 elif obj["tipo"] == "incorreto":
                     imagensIncorretasClicadas += 1
                     pontuacao_fase1 -= 1
@@ -1541,7 +1542,7 @@ def fase1(nome_jogador):
                     if vidas == 0:
                         jogoPerdeu = True
                     # Tocar som de resposta errada
-                    tocar_efeito_sonoro("sons/somObjetoIncorreto/respostaErrada.mp3")
+                    tocar_efeito_sonoro("sons/somObjetoIncorreto/respostaErrada.mp3", volume=0.4)
                 objetos.remove(obj)  # Remove o objeto selecionado
             objetosSelecionados.clear()  # Limpa a lista de objetos selecionados
             print("Seleção confirmada. Você pode selecionar outro objeto.")
@@ -1929,7 +1930,7 @@ def fase2(nome_jogador):
                     if imagensCorretasClicadas == 6:  # Clicou em todas as imagens corretas
                         jogoGanhou = True
                     # Tocar som de resposta certa
-                    tocar_efeito_sonoro("sons/somObjetoCorreto/respostaCerta.mp3")
+                    tocar_efeito_sonoro("sons/somObjetoCorreto/respostaCerta.mp3", volume=0.3)
                 elif obj["tipo"] == "incorreto":
                     imagensIncorretasClicadas += 1
                     pontuacao_fase2 -= 1
@@ -1937,7 +1938,7 @@ def fase2(nome_jogador):
                     if vidas == 0:
                         jogoPerdeu = True
                     # Tocar som de resposta errada
-                    tocar_efeito_sonoro("sons/somObjetoIncorreto/respostaErrada.mp3")
+                    tocar_efeito_sonoro("sons/somObjetoIncorreto/respostaErrada.mp3", volume=0.4)
                 objetos.remove(obj)  # Remove o objeto selecionado
             objetosSelecionados.clear()  # Limpa a lista de objetos selecionados
             print("Seleção confirmada. Você pode selecionar outro objeto.")
@@ -2350,7 +2351,7 @@ def fase3(nome_jogador):
                                 imagensCorretasClicadas += 1  # Incrementa a pontuação de objetos corretos
                                 pontuacao_fase3 += 1
                                 todasImagens += 1
-                                tocar_efeito_sonoro("sons/somObjetoCorreto/respostaCerta.mp3")
+                                tocar_efeito_sonoro("sons/somObjetoCorreto/respostaCerta.mp3", volume=0.3)
                             elif arrastando_objeto["tipo"] == "incorreto":
                                 objetos.remove(arrastando_objeto)  # Remove o objeto da lista
                                 imagensIncorretasClicadas += 1  # Incrementa a pontuação de objetos incorretos
@@ -2358,7 +2359,7 @@ def fase3(nome_jogador):
                                 vidas -= 1
                                 if vidas == 0:
                                     jogoPerdeu = True
-                                tocar_efeito_sonoro("sons/somObjetoIncorreto/respostaErrada.mp3")
+                                tocar_efeito_sonoro("sons/somObjetoIncorreto/respostaErrada.mp3", volume=0.4)
                         elif colisao_com_area_LIXO(arrastando_objeto):
                             if arrastando_objeto["tipo"] == "correto":
                                 objetos.remove(arrastando_objeto)  # Remove o objeto da lista
@@ -2367,13 +2368,13 @@ def fase3(nome_jogador):
                                 vidas -= 1
                                 if vidas == 0:
                                     jogoPerdeu = True
-                                tocar_efeito_sonoro("sons/somObjetoIncorreto/respostaErrada.mp3")
+                                tocar_efeito_sonoro("sons/somObjetoIncorreto/respostaErrada.mp3", volume=0.4)
                             elif arrastando_objeto["tipo"] == "incorreto":
                                 objetos.remove(arrastando_objeto)  # Remove o objeto da lista
                                 imagensCorretasClicadas += 1  # Incrementa a pontuação de objetos corretos
                                 pontuacao_fase3 += 1
                                 todasImagens += 1
-                                tocar_efeito_sonoro("sons/somObjetoCorreto/respostaCerta.mp3")
+                                tocar_efeito_sonoro("sons/somObjetoCorreto/respostaCerta.mp3", volume=0.3)
 
                         if imagensCorretasClicadas == 10:
                             jogoGanhou = True
