@@ -362,6 +362,7 @@ def mostrarVideo(video_path, video_width, video_height, imagem_fundo_path, audio
     clock = pygame.time.Clock()
     run = True
     while run:
+        voltarBotao.atualizarImagem(posicaoMouse)
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 run = False
