@@ -367,8 +367,6 @@ def mostrarVideo(video_path, video_width, video_height, imagem_fundo_path, audio
             if event.type == pygame.QUIT:
                 run = False
                 confirmar_saida(tela)
-                pygame.quit()
-                sys.exit()
 
         # Verificar se o botão foi clicado
         if verificar_clique_botao(477.5, 520, botao_largura, botao_altura):
@@ -1018,7 +1016,6 @@ def abrirRelatorio(ultimo_jogador=None):
     
     fonte = pygame.font.Font("tipografia/LuckiestGuy-Regular.ttf", 26)
     cor_texto = (255, 255, 255)
-    cor_destacada = (255, 215, 0)
     cor_ultimo = (0, 255, 0)  # Cor diferente para o último inserido
     espacamento = 50
     
