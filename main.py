@@ -203,6 +203,7 @@ def pedir_nome():
     while input_ativo:
         nome_background = pygame.image.load("imagens/GUI/Backgrounds/nomeBackground.png")
         tela.blit(nome_background, (0, 0))
+        botao_largura, botao_altura = 145, 47
 
         # Exibe o nome digitado
         texto_render = fonte.render(texto, True, (255, 255, 255))
@@ -219,7 +220,6 @@ def pedir_nome():
         configuracoesBotao.desenharBotao(tela)
         confirmarBotao.desenharBotao(tela)
 
-        pygame.display.update()
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -238,30 +238,28 @@ def pedir_nome():
                     texto += event.unicode
 
             # Verifica clique nos botões
-            if voltarBotao.clicarBotao(tela):
+            if verificar_clique_botao(30, 660, botao_largura, botao_altura):
                 som_click.play()
                 print("Voltar clicado")
                 estadoJogo = "menuPrincipal"
                 input_ativo = False
                 return menuPrincipal()
 
-            if configuracoesBotao.clicarBotao(tela):
+            if verificar_clique_botao(900, 660, botao_largura, botao_altura):
                 som_click.play()
                 print("Configurações clicado")
                 abrirConfiguracoes()
 
             # Verifica clique no botão de confirmar
-            if confirmarBotao.clicarBotao(tela) and texto.strip():
+            if verificar_clique_botao(450, 500, botao_largura, botao_altura) and texto.strip():
                 nome_jogador = texto.strip()
                 som_click.play()
                 print("Nome confirmado!")
                 input_ativo = False  # Sai do loop de input
+        pygame.display.update()
 
     # Após sair do loop, o nome do jogador foi registrado
     print(f"Nome do jogador: {nome_jogador}")
-
-
-
 
 
 def salvar_pontuacao(nome_jogador, fase, pontuacao, tempo):
