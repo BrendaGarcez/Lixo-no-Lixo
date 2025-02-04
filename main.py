@@ -321,15 +321,18 @@ def mostrarVideo(video_path, video_width, video_height, imagem_fundo_path, audio
     cap = cv2.VideoCapture(video_path)
     cap.set(cv2.CAP_PROP_BUFFERSIZE, 1)
     fps_video = cap.get(cv2.CAP_PROP_FPS) or 30
-    
+
     # Inicializar o mixer do Pygame para áudio
     pygame.mixer.init()
     posicaoMouse = pygame.mouse.get_pos()
 
     # Criar o botão de voltar
     voltarBotao = criarBotao(477.5, 520, "imagens/GUI/imagensExtra/botaoPular0.png", "imagens/GUI/imagensExtra/botaoPular1.png")
-    avatarBotao = criarBotao(0, 420, "imagens/GUI/imagensExtra/assista-o-tutorial.png", "imagens/GUI/imagensExtra/assista-o-tutorial.png")
-     
+
+    # Carregar a imagem do avatar (substitui o botão)
+    avatarImagem = pygame.image.load("imagens/GUI/imagensExtra/assista-o-tutorial.png")
+    avatarImagem = pygame.transform.scale(avatarImagem, (294, 498))  # Ajuste o tamanho conforme necessário
+
     if not cap.isOpened():
         print("Erro ao abrir o vídeo:", video_path)
         return
@@ -361,7 +364,6 @@ def mostrarVideo(video_path, video_width, video_height, imagem_fundo_path, audio
         if verificar_clique_botao(477.5, 520, botao_largura, botao_altura):
             print("Botão de voltar clicado!")
             run = False
-            cap.set(cv2.CAP_PROP_POS_FRAMES, 0)
 
         # Ler o próximo frame do vídeo
         ret, frame = cap.read()
@@ -376,8 +378,10 @@ def mostrarVideo(video_path, video_width, video_height, imagem_fundo_path, audio
         tela.blit(fundo_imagem, (0, 0))
         tela.blit(frame_surface, (x_center, y_center))
 
+        # Desenhar a imagem do avatar na tela (posição x=0, y=420)
+        tela.blit(avatarImagem, (0, 260))
+
         posicaoMouse = pygame.mouse.get_pos()
-        avatarBotao.desenharBotao(tela)
         voltarBotao.desenharBotao(tela)
         
         pygame.display.update()
@@ -385,7 +389,7 @@ def mostrarVideo(video_path, video_width, video_height, imagem_fundo_path, audio
 
     pygame.mixer.music.stop()
     cap.release()
-
+    
 def tocar_musica(nova_musica): # FUNÇÃO DA MÚSICA DE FUNDO
     global musica_atual
     if musica_atual != nova_musica:  # Só troca se a música for diferente
@@ -2075,7 +2079,7 @@ def fase3(nome_jogador):
 
     # Posicionar as áreas na tela
     posicao_area_PRAIA = (largura_tela - novo_tamanho_area_PRAIA[0] - 40, altura_tela - novo_tamanho_area_PRAIA[1] - 20)
-    posicao_area_LIXO = (40, altura_tela - novo_tamanho_area_LIXO[1] - 20)
+    posicao_area_LIXO = (30, altura_tela - novo_tamanho_area_LIXO[1] - 20)
 
     # Função para verificar se o objeto está dentro da área da praia
     def colisao_com_area_PRAIA(objeto):
