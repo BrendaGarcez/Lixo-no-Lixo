@@ -8,18 +8,13 @@ Geral de Trabalho
 
 ---- Mudanças professora ----
 -Layout detalhes p/professor       
--Mudar o você perdeu (pedir imagem novas)
--Visibilidade dos itens melhor (feito?)
 
 Geral de aplicativo
--->>> Design de Lixos, Botões e Tutoriais
-->>> Tamanho de botões
-->>>  O VOLUME NÃO TÁ FICANDO FIXO AO AUMENTAR OU DIMINUIR, SE CLICAR NAS CONFIG VOLTA A SER 50%
+-->>> Tutoriais
+
 
 Telas:
 -----Tela Inicial-----
-- Organização dos Botões
-- Tela de Pontuação (Ainda verificar como fara a área do avaliador)
 
 -----Instruções----- 
 - Pronto
