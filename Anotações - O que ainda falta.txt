@@ -35,15 +35,11 @@ Telas:
 
 -----Fase 1-----
 -> mensagens de apoio caso erro e de incentivo caso acerto (a pensar)
--> Lógica do jogo(pontuação, quantidade de itens, tempo) (falta lógica do relatário)
--> áudio dos nomes (a pensar)
 
 LÓGICA DAS PRÓXIMAS FASES SERÁ SEMELHANTE A 1, a 3 precisará mudar um pouco mais
 
 -----Fase 2-----
 -> mensagens de apoio caso erro e de incentivo caso acerto
--> Lógica do jogo(para relatório)
--> áudio dos nomes
 
 -----Fase 3-----
 -> mensagens de apoio caso erro e de incentivo caso acerto

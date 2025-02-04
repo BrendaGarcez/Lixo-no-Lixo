@@ -65,8 +65,8 @@ def criarBotaoImagensFASE3(x, y, imagem, imagemAlterada):
     
     return botaoObjetos.BotaoObjetos(x, y, imagem, imagemAlterada)
 
-ultimo_som_tocado = 0  # Tempo do último som tocado
-cooldown_som = 0.8  # Cooldown de segundos entre sons
+cooldown_som = 1  # Cooldown de 0.8 segundos
+ultimo_som_tocado = 0  # Inicializa o tempo do último som
 
 def falar_nome_objeto(obj):
     """Toca o som do nome do objeto, respeitando o cooldown."""
@@ -75,12 +75,12 @@ def falar_nome_objeto(obj):
     caminho_som = f"sons/audioNomeObjetos/{obj['nome']}.mp3"
     tempo_atual = time.time()
 
-    if not obj.get("som_tocado", False) and (tempo_atual - ultimo_som_tocado > cooldown_som):
+    if (tempo_atual - ultimo_som_tocado > cooldown_som):  # Verifica cooldown
         if os.path.exists(caminho_som):
             som_nome = pygame.mixer.Sound(caminho_som)  # Carregar o som
+            som_nome.set_volume(0.5)  # Define o volume para 50%
             som_nome.play()  # Tocar o som do nome do objeto
             ultimo_som_tocado = tempo_atual  # Atualiza o tempo do último som tocado
-            obj["som_tocado"] = True  # Marca que o som foi tocado
 
 def exibir_nome_objeto(obj):
     """Exibe o nome do objeto acima dele e chama a função para falar o nome."""
@@ -103,12 +103,6 @@ def exibir_nome_objeto(obj):
 
     # Desenhar o texto preenchido
     tela.blit(texto_nome_preenchimento, posicao_nome)
-
-    # Toca o som do nome do objeto se necessário
-    falar_nome_objeto(obj)
-
-    # Toca o som do nome do objeto se necessário
-    falar_nome_objeto(obj)
 
 # Função para verificar se o botão foi clicado
 def verificar_clique_botao(x, y, largura, altura):
@@ -1177,7 +1171,6 @@ def fase1(nome_jogador):
     pontuacao_fase1 = 0
     jogoConcluido = False
     fase1Background = pygame.image.load("imagens/fase1/imagemZoologico.png")
-     
 
     mostrarVideo("video/fase1.mp4", 600, 300, "imagens/fase1/imagemTutorialZoo.png", "sons/tutorial/fase1.wav")
 
@@ -1345,15 +1338,22 @@ def fase1(nome_jogador):
         # Adicionar o botão "Tentar Novamente" para as telas de vitória e derrota
         botaoTentarNovamente = criarBotao(
             402,  # Centraliza horizontalmente
-            350,  # Posiciona um pouco abaixo do texto
+            300,  # Posiciona um pouco abaixo do texto
             "imagens/GUI/botaoTentarnovamente/tentarnovamente.png",
             "imagens/GUI/botaoTentarnovamente/tentarnovamente1.png"
+        )
+
+        fasesBotao = criarBotao(
+            410,  # Centraliza horizontalmente
+            410,  # Posiciona um pouco abaixo do botão "Tentar Novamente"
+            "imagens/GUI/botaoFases/botaoFases.png", 
+            "imagens/GUI/botaoFases/botaoFases.png"
         )
 
         # Criar o botão de "Próxima Fase"
         proximaFaseBotao = criarBotao(
             410,  # Centraliza horizontalmente
-            460,  # Posiciona um pouco abaixo do botão "Tentar Novamente"
+            410,  # Posiciona um pouco abaixo do botão "Tentar Novamente"
             "imagens/GUI/botaoProximaFase/proximafase0.png",  # Imagem do botão
             "imagens/GUI/botaoProximaFase/proximafase1.png"  # Imagem do botão (hover)
         )
@@ -1361,20 +1361,16 @@ def fase1(nome_jogador):
         # Criar o botão de "Voltar ao Menu"
         voltarMenuBotao = criarBotao(
             405,  # Centraliza horizontalmente
-            550,  # Posiciona um pouco abaixo do botão "Próxima Fase"
-            "imagens/GUI/botaoVoltarMenu/voltaraomenu.png",  # Imagem do botão
-            "imagens/GUI/botaoVoltarMenu/voltaraomenu1.png"  # Imagem do botão (hover)
-        )
-
-        voltarMenuBotao2 = criarBotao(
-            405,  # Centraliza horizontalmente
-            460,  # Posiciona um pouco abaixo do botão "Próxima Fase"
+            480,  # Posiciona um pouco abaixo do botão "Próxima Fase"
             "imagens/GUI/botaoVoltarMenu/voltaraomenu.png",  # Imagem do botão
             "imagens/GUI/botaoVoltarMenu/voltaraomenu1.png"  # Imagem do botão (hover)
         )
 
         # Se o jogo foi ganho ou perdido, exibe o tempo total e o número de objetos errados
         if jogoGanhou or jogoPerdeu:
+            # Desenhar o botão "Tentar Novamente"
+            botaoTentarNovamente.atualizarImagem(posicaoMouse)
+            botaoTentarNovamente.desenharBotao(tela)
             jogoConcluido = True
             mostrar_informacoes = False
             if jogoGanhou:
@@ -1384,6 +1380,7 @@ def fase1(nome_jogador):
                     pontuacao_fase1 = 9
                 elif pontuacao_fase1 == 4:
                     pontuacao_fase1 = 8
+               
                 # Exibir o botão de "Próxima Fase" na tela de vitória
                 proximaFaseBotao.atualizarImagem(posicaoMouse)
                 proximaFaseBotao.desenharBotao(tela)
@@ -1403,16 +1400,27 @@ def fase1(nome_jogador):
             if jogoPerdeu:
                 pontuacao_fase1 = 0
                 # Desenhar o botão "Voltar ao Menu"
-                voltarMenuBotao2.atualizarImagem(posicaoMouse)
-                voltarMenuBotao2.desenharBotao(tela)
+
+                fasesBotao.atualizarImagem(posicaoMouse)
+                fasesBotao.desenharBotao(tela)
+
+                voltarMenuBotao.atualizarImagem(posicaoMouse)
+                voltarMenuBotao.desenharBotao(tela)
 
                 # Verificar clique no botão "Voltar ao Menu"
-                if voltarMenuBotao2.clicarBotao(tela):
+                if voltarMenuBotao.clicarBotao(tela):
                     som_click.play()  # Tocar som de clique
                     print("Botão 'Voltar ao Menu' clicado.")
                     estadoJogo = "menu"  # Voltar para o menu
                     fase_ativa = False  # Sai do loop atual
                     menuPrincipal()  # Chama a função do menu principa
+
+                if fasesBotao.clicarBotao(tela):
+                    som_click.play()
+                    print("botao fases clicado")
+                    estadoJogo = "jogando"
+                    fase_ativa = False
+                    iniciarFases()
 
             # Verificar clique no botão "Próxima Fase"
             if proximaFaseBotao.clicarBotao(tela):
@@ -1422,10 +1430,6 @@ def fase1(nome_jogador):
                 fase_ativa = False  # Sai do loop atual
                 fase2(nome_jogador)  # Chama a função para a próxima fase (fase2)
                 
-            # Desenhar o botão "Tentar Novamente"
-            botaoTentarNovamente.atualizarImagem(posicaoMouse)
-            botaoTentarNovamente.desenharBotao(tela)
-
             # Verificar clique no botão "Tentar Novamente"
             if botaoTentarNovamente.clicarBotao(tela):
                 som_click.play()  # Tocar o som de clique
@@ -1442,7 +1446,7 @@ def fase1(nome_jogador):
             # Renderizando o texto para mostrar no centro da tela
             texto_contorno_conclusao = fonte.render(texto_conclusao, True, (0, 0, 0))  # Contorno preto
             texto_preenchimento_conclusao = fonte.render(texto_conclusao, True, cor_texto)  # Texto branco
-            posicao_conclusao = (largura_tela // 2 - texto_contorno_conclusao.get_width() // 2, altura_tela // 2 - 50)  # Centraliza o texto
+            posicao_conclusao = (largura_tela // 2 - texto_contorno_conclusao.get_width() // 2, altura_tela // 2 - 120)  # Centraliza o texto
 
             # Desenhar o texto com contorno
             tela.blit(texto_contorno_conclusao, (posicao_conclusao[0] - 1, posicao_conclusao[1]))
@@ -1514,6 +1518,9 @@ def fase1(nome_jogador):
         for obj in objetos:
             if obj["botao"].clicarBotao(tela):
                 som_click.play()  # Som de clique
+                # Fala o som do nome do objeto
+                falar_nome_objeto(obj)
+                
                 # Substituir o objeto selecionado
                 if objetosSelecionados:
                     print(f"Objeto {objetosSelecionados[0]['tipo']} desmarcado.")
@@ -1739,15 +1746,22 @@ def fase2(nome_jogador):
          # Adicionar o botão "Tentar Novamente" para as telas de vitória e derrota
         botaoTentarNovamente = criarBotao(
             402,  # Centraliza horizontalmente
-            350,  # Posiciona um pouco abaixo do texto
+            300,  # Posiciona um pouco abaixo do texto
             "imagens/GUI/botaoTentarnovamente/tentarnovamente.png",
             "imagens/GUI/botaoTentarnovamente/tentarnovamente1.png"
+        )
+
+        fasesBotao = criarBotao(
+            410,  # Centraliza horizontalmente
+            410,  # Posiciona um pouco abaixo do botão "Tentar Novamente"
+            "imagens/GUI/botaoFases/botaoFases.png", 
+            "imagens/GUI/botaoFases/botaoFases.png"
         )
 
         # Criar o botão de "Próxima Fase"
         proximaFaseBotao = criarBotao(
             410,  # Centraliza horizontalmente
-            460,  # Posiciona um pouco abaixo do botão "Tentar Novamente"
+            410,  # Posiciona um pouco abaixo do botão "Tentar Novamente"
             "imagens/GUI/botaoProximaFase/proximafase0.png",  # Imagem do botão
             "imagens/GUI/botaoProximaFase/proximafase1.png"  # Imagem do botão (hover)
         )
@@ -1755,20 +1769,16 @@ def fase2(nome_jogador):
         # Criar o botão de "Voltar ao Menu"
         voltarMenuBotao = criarBotao(
             405,  # Centraliza horizontalmente
-            550,  # Posiciona um pouco abaixo do botão "Próxima Fase"
-            "imagens/GUI/botaoVoltarMenu/voltaraomenu.png",  # Imagem do botão
-            "imagens/GUI/botaoVoltarMenu/voltaraomenu1.png"  # Imagem do botão (hover)
-        )
-
-        voltarMenuBotao2 = criarBotao(
-            405,  # Centraliza horizontalmente
-            460,  # Posiciona um pouco abaixo do botão "Próxima Fase"
+            480,  # Posiciona um pouco abaixo do botão "Próxima Fase"
             "imagens/GUI/botaoVoltarMenu/voltaraomenu.png",  # Imagem do botão
             "imagens/GUI/botaoVoltarMenu/voltaraomenu1.png"  # Imagem do botão (hover)
         )
 
         # Se o jogo foi ganho ou perdido, exibe o tempo total e o número de objetos errados
         if jogoGanhou or jogoPerdeu:
+            # Desenhar o botão "Tentar Novamente"
+            botaoTentarNovamente.atualizarImagem(posicaoMouse)
+            botaoTentarNovamente.desenharBotao(tela)
             jogoConcluido = True
             mostrar_informacoes = False
             if jogoGanhou:
@@ -1796,17 +1806,28 @@ def fase2(nome_jogador):
                 salvar_pontuacao(nome_jogador, 2, pontuacao_fase2, tempo_decorrido) 
             if jogoPerdeu:
                 pontuacao_fase2 = 0
+
+                fasesBotao.atualizarImagem(posicaoMouse)
+                fasesBotao.desenharBotao(tela)
+
                 # Desenhar o botão "Voltar ao Menu"
-                voltarMenuBotao2.atualizarImagem(posicaoMouse)
-                voltarMenuBotao2.desenharBotao(tela)
+                voltarMenuBotao.atualizarImagem(posicaoMouse)
+                voltarMenuBotao.desenharBotao(tela)
 
                 # Verificar clique no botão "Voltar ao Menu"
-                if voltarMenuBotao2.clicarBotao(tela):
+                if voltarMenuBotao.clicarBotao(tela):
                     som_click.play()  # Tocar som de clique
                     print("Botão 'Voltar ao Menu' clicado.")
                     estadoJogo = "menu"  # Voltar para o menu
                     fase_ativa = False  # Sai do loop atual
                     menuPrincipal()  # Chama a função do menu principa
+
+                if fasesBotao.clicarBotao(tela):
+                    som_click.play()
+                    print("botao fases clicado")
+                    estadoJogo = "jogando"
+                    fase_ativa = False
+                    iniciarFases()
 
             # Verificar clique no botão "Próxima Fase"
             if proximaFaseBotao.clicarBotao(tela):
@@ -1815,17 +1836,13 @@ def fase2(nome_jogador):
                 estadoJogo = "fase2"  # Mudar o estado do jogo para a fase 2
                 fase_ativa = False  # Sai do loop atual
                 fase3(nome_jogador)  # Chama a função para a próxima fase (fase2)
-                
-            # Desenhar o botão "Tentar Novamente"
-            botaoTentarNovamente.atualizarImagem(posicaoMouse)
-            botaoTentarNovamente.desenharBotao(tela)
 
             # Verificar clique no botão "Tentar Novamente"
             if botaoTentarNovamente.clicarBotao(tela):
                 som_click.play()  # Tocar o som de clique
                 print("Botão 'Tentar Novamente' clicado.")
                 fase_ativa = False  # Sai do loop atual
-                fase2()  # Reinicia a fase
+                fase2(nome_jogador)  # Reinicia a fase
 
             tempo_total = tempo_inicial - tempo_restante  # Tempo total que o jogador levou
             erros = imagensIncorretasClicadas  # Número de objetos errados que o jogador clicou
@@ -1836,7 +1853,7 @@ def fase2(nome_jogador):
             # Renderizando o texto para mostrar no centro da tela
             texto_contorno_conclusao = fonte.render(texto_conclusao, True, (0, 0, 0))  # Contorno preto
             texto_preenchimento_conclusao = fonte.render(texto_conclusao, True, cor_texto)  # Texto branco
-            posicao_conclusao = (largura_tela // 2 - texto_contorno_conclusao.get_width() // 2, altura_tela // 2 - 50)  # Centraliza o texto
+            posicao_conclusao = (largura_tela // 2 - texto_contorno_conclusao.get_width() // 2, altura_tela // 2 - 120)  # Centraliza o texto
 
             # Desenhar o texto com contorno
             tela.blit(texto_contorno_conclusao, (posicao_conclusao[0] - 1, posicao_conclusao[1]))
@@ -1910,6 +1927,9 @@ def fase2(nome_jogador):
         for obj in objetos:
             if obj["botao"].clicarBotao(tela):
                 som_click.play()  # Som de clique
+                # Fala o som do nome do objeto
+                falar_nome_objeto(obj)
+                
                 # Substituir o objeto selecionado
                 if objetosSelecionados:
                     print(f"Objeto {objetosSelecionados[0]['tipo']} desmarcado.")
@@ -2076,7 +2096,6 @@ def fase3(nome_jogador):
             return True
         return False
 
-
     def colisao_com_area_LIXO(objeto):
         # Cria uma máscara para a área do lixo
         mask_area_lixo = pygame.mask.from_surface(imagem_area_LIXO)
@@ -2093,7 +2112,6 @@ def fase3(nome_jogador):
             return True
         return False
 
- 
     def posicionar_objetos(lista_imagens, tipo="correto"):
         imagens_selecionadas = lista_imagens  # Lista de imagens a posicionar
 
@@ -2196,15 +2214,22 @@ def fase3(nome_jogador):
         # Adicionar o botão "Tentar Novamente" para as telas de vitória e derrota
         botaoTentarNovamente = criarBotao(
             402,  # Centraliza horizontalmente
-            350,  # Posiciona um pouco abaixo do texto
+            300,  # Posiciona um pouco abaixo do texto
             "imagens/GUI/botaoTentarnovamente/tentarnovamente.png",
             "imagens/GUI/botaoTentarnovamente/tentarnovamente1.png"
+        )
+
+        fasesBotao = criarBotao(
+            410,  # Centraliza horizontalmente
+            410,  # Posiciona um pouco abaixo do botão "Tentar Novamente"
+            "imagens/GUI/botaoFases/botaoFases.png", 
+            "imagens/GUI/botaoFases/botaoFases.png"
         )
 
         # Criar o botão de "Voltar ao Menu"
         voltarMenuBotao = criarBotao(
             405,  # Centraliza horizontalmente
-            469,  # Posiciona um pouco abaixo do botão "Próxima Fase"
+            480,  # Posiciona um pouco abaixo do botão "Próxima Fase"
             "imagens/GUI/botaoVoltarMenu/voltaraomenu.png",  # Imagem do botão
             "imagens/GUI/botaoVoltarMenu/voltaraomenu1.png"  # Imagem do botão (hover)
         )
@@ -2216,16 +2241,24 @@ def fase3(nome_jogador):
             
             if jogoPerdeu:
                 pontuacao_fase3 = 0    
+                fasesBotao.atualizarImagem(posicaoMouse)
+                fasesBotao.desenharBotao(tela)
+                if fasesBotao.clicarBotao(tela):
+                    som_click.play()
+                    print("botao fases clicado")
+                    estadoJogo = "jogando"
+                    fase_ativa = False
+                    iniciarFases()
+
             voltarMenuBotao.atualizarImagem(posicaoMouse)
             voltarMenuBotao.desenharBotao(tela)
-
             # Verificar clique no botão "Voltar ao Menu"
             if voltarMenuBotao.clicarBotao(tela):
                 som_click.play()  # Tocar som de clique
                 print("Botão 'Voltar ao Menu' clicado.")
                 estadoJogo = "menu"  # Voltar para o menu
                 fase_ativa = False  # Sai do loop atual
-                menuPrincipal()  # Chama a função do menu principa
+                menuPrincipal()  # Chama a função do menu principal
 
             # Desenhar o botão "Tentar Novamente"
             botaoTentarNovamente.atualizarImagem(posicaoMouse)
@@ -2236,7 +2269,7 @@ def fase3(nome_jogador):
                 som_click.play()  # Tocar o som de clique
                 print("Botão 'Tentar Novamente' clicado.")
                 fase_ativa = False  # Sai do loop atual
-                fase3()  # Reinicia a fase
+                fase3(nome_jogador)  # Reinicia a fase
 
             tempo_total = tempo_inicial - tempo_restante  # Tempo total que o jogador levou
             erros = imagensIncorretasClicadas  # Número de objetos errados que o jogador clicou
@@ -2247,7 +2280,7 @@ def fase3(nome_jogador):
             # Renderizando o texto para mostrar no centro da tela
             texto_contorno_conclusao = fonte.render(texto_conclusao, True, (0, 0, 0))  # Contorno preto
             texto_preenchimento_conclusao = fonte.render(texto_conclusao, True, cor_texto)  # Texto branco
-            posicao_conclusao = (largura_tela // 2 - texto_contorno_conclusao.get_width() // 2, altura_tela // 2 - 50)  # Centraliza o texto
+            posicao_conclusao = (largura_tela // 2 - texto_contorno_conclusao.get_width() // 2, altura_tela // 2 - 120)  # Centraliza o texto
 
             # Desenhar o texto com contorno
             tela.blit(texto_contorno_conclusao, (posicao_conclusao[0] - 1, posicao_conclusao[1]))
@@ -2326,6 +2359,8 @@ def fase3(nome_jogador):
 
                     for obj in objetos:
                         if obj["botao"].rect.collidepoint(posicaoMouse):  # Verifica se o mouse clicou no objeto
+                            # Fala o som do nome do objeto
+                            falar_nome_objeto(obj)
                             arrastando_objeto = obj  # Inicia o arraste do objeto
                             deslocamento_x = posicaoMouse[0] - obj["x"]  # Calcula o deslocamento
                             deslocamento_y = posicaoMouse[1] - obj["y"]
