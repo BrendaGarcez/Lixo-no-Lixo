@@ -13,6 +13,9 @@ Geral de aplicativo
 -->>> Tutoriais
 
 
+-> pyinstaller com -w para não abrir terminal
+-> adicionar imagem clara para o botão de fases 
+-> apagar o .venv (talvez)
 Telas:
 -----Tela Inicial-----
 
@@ -30,7 +33,4 @@ Telas:
 
 -----Fase 1, 2 ,3-----
 -> mensagens de apoio caso erro e de incentivo caso acerto (a pensar)
-
-
--> adicionar imagem clara para o botão de fases 
 
