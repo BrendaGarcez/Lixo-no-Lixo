@@ -213,7 +213,7 @@ def pedir_nome():
 
     voltarBotao = criarBotao(30, 660, "imagens/GUI/botaoVoltar/voltar0.png", "imagens/GUI/botaoVoltar/voltar1.png")
     configuracoesBotao = criarBotao(900, 660, "imagens/GUI/botaoConfiguracoes/configuracoes0.png", "imagens/GUI/botaoConfiguracoes/configuracoes1.png")
-    confirmarBotao = criarBotao(450, 500, "imagens/GUI/botaoConfirmar/confirmar1.png", "imagens/GUI/botaoConfirmar/confirmar2.png")  
+    confirmarBotao = criarBotao(450, 340, "imagens/GUI/botaoConfirmar/confirmar1.png", "imagens/GUI/botaoConfirmar/confirmar2.png")  
 
     while input_ativo:
         nome_background = pygame.image.load("imagens/GUI/Backgrounds/nomeBackground.png")

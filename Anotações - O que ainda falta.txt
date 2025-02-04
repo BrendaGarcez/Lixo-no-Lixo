@@ -16,6 +16,8 @@ Geral de aplicativo
 -> pyinstaller com -w para não abrir terminal
 -> adicionar imagem clara para o botão de fases 
 -> apagar o .venv (talvez)
+-> problema de áudio, está abaixando para 19
+
 Telas:
 -----Tela Inicial-----
 
