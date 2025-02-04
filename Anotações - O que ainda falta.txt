@@ -28,15 +28,9 @@ Telas:
 -----Sons-----
 - Nome dos objetos falados 
 
------Fase 1-----
+-----Fase 1, 2 ,3-----
 -> mensagens de apoio caso erro e de incentivo caso acerto (a pensar)
 
-LÓGICA DAS PRÓXIMAS FASES SERÁ SEMELHANTE A 1, a 3 precisará mudar um pouco mais
 
------Fase 2-----
--> mensagens de apoio caso erro e de incentivo caso acerto
-
------Fase 3-----
--> mensagens de apoio caso erro e de incentivo caso acerto
-
+-> adicionar imagem clara para o botão de fases 
 

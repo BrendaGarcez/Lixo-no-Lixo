@@ -237,7 +237,6 @@ def pedir_nome():
         configuracoesBotao.desenharBotao(tela)
         confirmarBotao.desenharBotao(tela)
 
-
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 confirmar_saida(tela)
@@ -277,7 +276,6 @@ def pedir_nome():
 
     # Após sair do loop, o nome do jogador foi registrado
     print(f"Nome do jogador: {nome_jogador}")
-
 
 def salvar_pontuacao(nome_jogador, fase, pontuacao, tempo):
     """Salva a pontuação de uma fase de um jogador."""
@@ -319,7 +317,6 @@ def salvar_pontuacao(nome_jogador, fase, pontuacao, tempo):
     salvar_dados_jogadores(dados)
 
     print(f"Pontuação salva: {nome_jogador} - Fase {fase} - {pontuacao} pontos - {tempo:.2f} segundos")
-
 
 def mostrarVideo(video_path, video_width, video_height, imagem_fundo_path, audio_path):
     # Abrir o vídeo com OpenCV
@@ -391,7 +388,6 @@ def mostrarVideo(video_path, video_width, video_height, imagem_fundo_path, audio
     pygame.mixer.music.stop()
     cap.release()
 
-
 def tocar_musica(nova_musica): # FUNÇÃO DA MÚSICA DE FUNDO
     global musica_atual
     if musica_atual != nova_musica:  # Só troca se a música for diferente
@@ -401,7 +397,6 @@ def tocar_musica(nova_musica): # FUNÇÃO DA MÚSICA DE FUNDO
         pygame.mixer.music.play(-1)  # Toca em loop
         musica_atual = nova_musica  # Atualiza a música atual
         
-
 def tocar_efeito_sonoro(efeito, volume=0.5):
     efeito_sonoro = pygame.mixer.Sound(efeito)
     efeito_sonoro.set_volume(volume)  # Define o volume do efeito (0.0 a 1.0)
@@ -567,9 +562,15 @@ def abrirConfiguracoesFases():
         tela.blit(configuracoesBackground, (0, 0))
         posicaoMouse = pygame.mouse.get_pos()
         cliqueMouse = pygame.mouse.get_pressed()
-
         # Atualizar e desenhar botões
         if somAtivo:
+            if estadoJogo == "fase1":
+                tocar_musica("sons/musicaZoo/fundoZoo.mp3")  # Toca a primeira música
+            elif estadoJogo == "fase2":
+                tocar_musica("sons/musicaSala/fundoSala.mp3")  # Toca a primeira música
+            elif estadoJogo == "fase3":
+                tocar_musica("sons/musicaPraia/fundoPraia.mp3")  # Toca a primeira música
+
             somLigadoBotao.atualizarImagem(posicaoMouse)
             somLigadoBotao.desenharBotao(tela)
         else:
@@ -1346,8 +1347,8 @@ def fase1(nome_jogador):
         fasesBotao = criarBotao(
             410,  # Centraliza horizontalmente
             410,  # Posiciona um pouco abaixo do botão "Tentar Novamente"
-            "imagens/GUI/botaoFases/botaoFases.png", 
-            "imagens/GUI/botaoFases/botaoFases.png"
+            "imagens/GUI/botaoFases/fasesBotao.png", 
+            "imagens/GUI/botaoFases/fasesBotao.png" # adicionar imagem nova com cor
         )
 
         # Criar o botão de "Próxima Fase"
@@ -1361,7 +1362,7 @@ def fase1(nome_jogador):
         # Criar o botão de "Voltar ao Menu"
         voltarMenuBotao = criarBotao(
             405,  # Centraliza horizontalmente
-            480,  # Posiciona um pouco abaixo do botão "Próxima Fase"
+            510,  # Posiciona um pouco abaixo do botão "Próxima Fase"
             "imagens/GUI/botaoVoltarMenu/voltaraomenu.png",  # Imagem do botão
             "imagens/GUI/botaoVoltarMenu/voltaraomenu1.png"  # Imagem do botão (hover)
         )
@@ -1754,8 +1755,8 @@ def fase2(nome_jogador):
         fasesBotao = criarBotao(
             410,  # Centraliza horizontalmente
             410,  # Posiciona um pouco abaixo do botão "Tentar Novamente"
-            "imagens/GUI/botaoFases/botaoFases.png", 
-            "imagens/GUI/botaoFases/botaoFases.png"
+            "imagens/GUI/botaoFases/fasesBotao.png", 
+            "imagens/GUI/botaoFases/fasesBotao.png"
         )
 
         # Criar o botão de "Próxima Fase"
@@ -1769,7 +1770,7 @@ def fase2(nome_jogador):
         # Criar o botão de "Voltar ao Menu"
         voltarMenuBotao = criarBotao(
             405,  # Centraliza horizontalmente
-            480,  # Posiciona um pouco abaixo do botão "Próxima Fase"
+            510,  # Posiciona um pouco abaixo do botão "Próxima Fase"
             "imagens/GUI/botaoVoltarMenu/voltaraomenu.png",  # Imagem do botão
             "imagens/GUI/botaoVoltarMenu/voltaraomenu1.png"  # Imagem do botão (hover)
         )
@@ -1986,7 +1987,7 @@ def fase3(nome_jogador):
     global estadoJogo, jogoConcluido, pontuacao_fase3, fase_ativa
     pontuacao_fase3 = 0
     jogoConcluido = False
-    fase3Background = pygame.image.load("imagens/fase3/imagemPraia.jpg")
+    fase3Background = pygame.image.load("imagens/fase3/imagemPraia.png")
 
     mostrarVideo("video/fase3.mp4", 600, 300, "imagens/fase3/imagemTutorialPraia.png", "sons/tutorial/fase3.wav")
 
@@ -2222,17 +2223,26 @@ def fase3(nome_jogador):
         fasesBotao = criarBotao(
             410,  # Centraliza horizontalmente
             410,  # Posiciona um pouco abaixo do botão "Tentar Novamente"
-            "imagens/GUI/botaoFases/botaoFases.png", 
-            "imagens/GUI/botaoFases/botaoFases.png"
+            "imagens/GUI/botaoFases/fasesBotao.png", 
+            "imagens/GUI/botaoFases/fasesBotao.png" 
         )
 
         # Criar o botão de "Voltar ao Menu"
         voltarMenuBotao = criarBotao(
             405,  # Centraliza horizontalmente
+            510,  # Posiciona um pouco abaixo do botão "Próxima Fase"
+            "imagens/GUI/botaoVoltarMenu/voltaraomenu.png",  # Imagem do botão
+            "imagens/GUI/botaoVoltarMenu/voltaraomenu1.png"  # Imagem do botão (hover)
+        )
+
+        # Criar o botão de "Voltar ao Menu"
+        voltarMenuBotao2 = criarBotao(
+            405,  # Centraliza horizontalmente
             400,  # Posiciona um pouco abaixo do botão "Próxima Fase"
             "imagens/GUI/botaoVoltarMenu/voltaraomenu.png",  # Imagem do botão
             "imagens/GUI/botaoVoltarMenu/voltaraomenu1.png"  # Imagem do botão (hover)
         )
+
 
         # Se o jogo foi ganho ou perdido, exibe o tempo total e o número de objetos errados
         if jogoGanhou or jogoPerdeu:
@@ -2251,15 +2261,26 @@ def fase3(nome_jogador):
                     fase_ativa = False
                     iniciarFases()
 
-            voltarMenuBotao.atualizarImagem(posicaoMouse)
-            voltarMenuBotao.desenharBotao(tela)
-            # Verificar clique no botão "Voltar ao Menu"
-            if voltarMenuBotao.clicarBotao(tela):
-                som_click.play()  # Tocar som de clique
-                print("Botão 'Voltar ao Menu' clicado.")
-                estadoJogo = "menu"  # Voltar para o menu
-                fase_ativa = False  # Sai do loop atual
-                menuPrincipal()  # Chama a função do menu principal
+                voltarMenuBotao.atualizarImagem(posicaoMouse)
+                voltarMenuBotao.desenharBotao(tela)
+                # Verificar clique no botão "Voltar ao Menu"
+                if voltarMenuBotao.clicarBotao(tela):
+                    som_click.play()  # Tocar som de clique
+                    print("Botão 'Voltar ao Menu' clicado.")
+                    estadoJogo = "menu"  # Voltar para o menu
+                    fase_ativa = False  # Sai do loop atual
+                    menuPrincipal()  # Chama a função do menu principal
+
+            if jogoGanhou:
+                voltarMenuBotao2.atualizarImagem(posicaoMouse)
+                voltarMenuBotao2.desenharBotao(tela)
+                # Verificar clique no botão "Voltar ao Menu"
+                if voltarMenuBotao2.clicarBotao(tela):
+                    som_click.play()  # Tocar som de clique
+                    print("Botão 'Voltar ao Menu' clicado.")
+                    estadoJogo = "menu"  # Voltar para o menu
+                    fase_ativa = False  # Sai do loop atual
+                    menuPrincipal()  # Chama a função do menu principal
 
             # Desenhar o botão "Tentar Novamente"
             botaoTentarNovamente.atualizarImagem(posicaoMouse)
@@ -2439,6 +2460,7 @@ def fase3(nome_jogador):
         
 # Função para o menu principal
 def menuPrincipal():
+    global somAtivo
     global estadoJogo
     global menuBackground
     menuBackground = pygame.image.load("imagens/GUI/Backgrounds/menuBackground.jpg")
