@@ -2229,7 +2229,7 @@ def fase3(nome_jogador):
         # Criar o botão de "Voltar ao Menu"
         voltarMenuBotao = criarBotao(
             405,  # Centraliza horizontalmente
-            480,  # Posiciona um pouco abaixo do botão "Próxima Fase"
+            400,  # Posiciona um pouco abaixo do botão "Próxima Fase"
             "imagens/GUI/botaoVoltarMenu/voltaraomenu.png",  # Imagem do botão
             "imagens/GUI/botaoVoltarMenu/voltaraomenu1.png"  # Imagem do botão (hover)
         )
@@ -2243,6 +2243,7 @@ def fase3(nome_jogador):
                 pontuacao_fase3 = 0    
                 fasesBotao.atualizarImagem(posicaoMouse)
                 fasesBotao.desenharBotao(tela)
+
                 if fasesBotao.clicarBotao(tela):
                     som_click.play()
                     print("botao fases clicado")
