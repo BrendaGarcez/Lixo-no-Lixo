@@ -5,9 +5,7 @@ import botaoObjetos
 import sys
 import random
 import math
-import tkinter as tk
 import cv2
-from PIL import Image, ImageTk
 import json
 import os
 import time
@@ -644,7 +642,6 @@ def abrirConfiguracoesFases():
 
         pygame.display.update()
         clock.tick(60)
-
 
 def abrirInstrucoes():
     global estadoJogo
