@@ -8,18 +8,13 @@ Geral de Trabalho
 
 ---- Mudanças professora ----
 -Layout detalhes p/professor       
--Mudar o você perdeu (pedir imagem novas)
--Visibilidade dos itens melhor (feito?)
 
 Geral de aplicativo
--->>> Design de Lixos, Botões e Tutoriais
-->>> Tamanho de botões
-->>>  O VOLUME NÃO TÁ FICANDO FIXO AO AUMENTAR OU DIMINUIR, SE CLICAR NAS CONFIG VOLTA A SER 50%
+-->>> Tutoriais
+
 
 Telas:
 -----Tela Inicial-----
-- Organização dos Botões
-- Tela de Pontuação (Ainda verificar como fara a área do avaliador)
 
 -----Instruções----- 
 - Pronto
@@ -35,15 +30,11 @@ Telas:
 
 -----Fase 1-----
 -> mensagens de apoio caso erro e de incentivo caso acerto (a pensar)
--> Lógica do jogo(pontuação, quantidade de itens, tempo) (falta lógica do relatário)
--> áudio dos nomes (a pensar)
 
 LÓGICA DAS PRÓXIMAS FASES SERÁ SEMELHANTE A 1, a 3 precisará mudar um pouco mais
 
 -----Fase 2-----
 -> mensagens de apoio caso erro e de incentivo caso acerto
--> Lógica do jogo(para relatório)
--> áudio dos nomes
 
 -----Fase 3-----
 -> mensagens de apoio caso erro e de incentivo caso acerto
