@@ -9,7 +9,7 @@ Este jogo foi desenvolvido como parte da disciplina de **Engenharia de Software 
 
 ## Equipe de Desenvolvimento  
 - **Pedro Victor** – Documentação  
-- **Brenda Garcez e Matheus** – Desenvolvedores   
+- **Brenda Garcez e Matheus Vinícius** – Desenvolvedores   
 - **João Rafael e Nicole Jamuchewski** – Design e Video
 
 ## Tecnologias Utilizadas  
