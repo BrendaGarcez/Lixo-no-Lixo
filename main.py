@@ -1326,9 +1326,21 @@ def fase1(nome_jogador):
         "imagens/fase1/incorretas/Saco de Papel.png",
     ]
 
-    # Selecionando aleatoriamente 6 imagens corretas e 4 incorretas
-    imagensCorretasSelecionadas = random.sample(imagensCorretas, 6)  # Seleciona 6 imagens corretas aleatórias
-    imagensIncorretasSelecionadas = random.sample(imagensIncorretas, 4)  # Seleciona 4 imagens incorretas aleatórias
+    # Sorteia um número e imprime
+    senhor_passaro = random.randint(1, 1000)
+    #print(f"Número sorteado: {senhor_passaro}")
+
+    if senhor_passaro == 666:
+        # Seleciona 5 imagens corretas e adiciona o "Pássaro raro"
+        imagensCorretasSelecionadas = random.sample(imagensCorretas, 5)
+        imagensCorretasSelecionadas.append("imagens/fase1/corretas/Pássaro .png")
+    else:
+        # Seleciona 6 imagens corretas normalmente
+        imagensCorretasSelecionadas = random.sample(imagensCorretas, 6)
+
+    # Seleciona 4 imagens incorretas
+    imagensIncorretasSelecionadas = random.sample(imagensIncorretas, 4)
+
 
     imagensCorretasClicadas = 0  # Contador de imagens corretas clicadas
     imagensIncorretasClicadas = 0  # Contador de imagens incorretas clicadas
