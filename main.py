@@ -1326,12 +1326,12 @@ def fase1(nome_jogador):
         "imagens/fase1/incorretas/Saco de Papel.png",
     ]
 
-    # Sorteia um número e imprime
+    # Sorteio pro senhor pássaro
     senhor_passaro = random.randint(1, 1000)
-    #print(f"Número sorteado: {senhor_passaro}")
+    #print(f"número sorteado: {senhor_passaro}")
 
-    if senhor_passaro == 666:
-        # Seleciona 5 imagens corretas e adiciona o "Pássaro raro"
+    if senhor_passaro == 47:
+        # Seleciona 5 imagens corretas e adiciona o "senhor pássaro"
         imagensCorretasSelecionadas = random.sample(imagensCorretas, 5)
         imagensCorretasSelecionadas.append("imagens/fase1/corretas/Pássaro .png")
     else:
