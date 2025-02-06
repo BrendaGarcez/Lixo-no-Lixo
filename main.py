@@ -11,6 +11,8 @@ import os
 import time
 
 pygame.init()  # Inicializa os módulos do pygame
+pygame.mixer.init()
+
 pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_HAND)  # Muda o cursor para a mão
 # Resolução da tela
 telaLargura = 1100
@@ -23,7 +25,6 @@ som_click.set_volume(0.2)
 clock = pygame.time.Clock()
 somAtivo = True  # Estado inicial do som
 musica_atual = None
-pygame.mixer.init()
 
 estadoJogo = "menu"  # situação atual do jogo, para rastrear as telas
 rodando = True  # Controla se o programa deve continuar rodando
@@ -207,26 +208,59 @@ def pedir_nome():
     """Solicita o nome do jogador via input no Pygame."""
     global nome_jogador, estadoJogo, somAtivo
     pygame.init()
-    fonte = pygame.font.Font("tipografia/LuckiestGuy-Regular.ttf", 30)
+
+    fonte_titulo = pygame.font.Font("tipografia/LuckiestGuy-Regular.ttf", 50)  # Fonte do título
+    fonte_nome = pygame.font.Font("tipografia/LuckiestGuy-Regular.ttf", 30)  # Fonte menor para o nome
+
     texto = ""
     input_ativo = True
 
-    voltarBotao = criarBotao(30, 660, "imagens/GUI/botaoVoltar/voltar0.png", "imagens/GUI/botaoVoltar/voltar1.png")
-    configuracoesBotao = criarBotao(900, 660, "imagens/GUI/botaoConfiguracoes/configuracoes0.png", "imagens/GUI/botaoConfiguracoes/configuracoes1.png")
-    confirmarBotao = criarBotao(450, 340, "imagens/GUI/botaoConfirmar/confirmar1.png", "imagens/GUI/botaoConfirmar/confirmar2.png")  
+    voltarBotao = criarBotao(20, 660, "imagens/GUI/botaoVoltar/voltar0.png", "imagens/GUI/botaoVoltar/voltar1.png")
+    configuracoesBotao = criarBotao(940, 660, "imagens/GUI/botaoConfiguracoes/configuracoes0.png", "imagens/GUI/botaoConfiguracoes/configuracoes1.png")
+    confirmarBotao = criarBotao(470, 345, "imagens/GUI/botaoConfirmar/confirmar1.png", "imagens/GUI/botaoConfirmar/confirmar2.png")
+
+    # Variáveis para controle de repetição de teclas
+    key_repeat_delay = 0.5  # Tempo de espera antes de começar a repetir
+    key_repeat_interval = 0.05  # Intervalo de repetição
+    last_key_time = 0
+    key_repeating = None
 
     while input_ativo:
-        nome_background = pygame.image.load("imagens/GUI/Backgrounds/nomeBackground.png")
-        tela.blit(nome_background, (0, 0))
-        botao_largura, botao_altura = 145, 47
+        # Define o novo background
+        menu_background = pygame.image.load("imagens/GUI/Backgrounds/nomeBackground.png")
+        tela.blit(menu_background, (0, 0))
 
-        # Exibe o nome digitado
-        texto_render = fonte.render(texto, True, (255, 255, 255))
-        tela.blit(texto_render, (400, 300))
+        botao_largura, botao_altura = 147, 48
+
+        # Exibe o título "Informe seu nome"
+        texto_titulo = "Informe seu nome"
+        texto_contorno = fonte_titulo.render(texto_titulo, True, (0, 0, 0))  # Contorno preto
+        texto_preenchido = fonte_titulo.render(texto_titulo, True, (255, 255, 255))  # Texto branco
+        posicao_titulo = (323, 200)
+
+        tela.blit(texto_contorno, (posicao_titulo[0] - 1, posicao_titulo[1]))
+        tela.blit(texto_contorno, (posicao_titulo[0] + 1, posicao_titulo[1]))
+        tela.blit(texto_contorno, (posicao_titulo[0], posicao_titulo[1] - 1))
+        tela.blit(texto_contorno, (posicao_titulo[0], posicao_titulo[1] + 1))
+        tela.blit(texto_preenchido, posicao_titulo)
+
+        # Calcular a largura do texto para centralizar
+        largura_nome = fonte_nome.size(texto)[0]
+        posicao_nome_x = (tela.get_width() - largura_nome) // 2
+        posicao_nome_y = 300
+
+        # Exibe o nome digitado com contorno
+        texto_contorno = fonte_nome.render(texto, True, (0, 0, 0))  # Contorno preto
+        texto_preenchido = fonte_nome.render(texto, True, (255, 255, 255))  # Texto branco
+
+        tela.blit(texto_contorno, (posicao_nome_x - 1, posicao_nome_y))  # Esquerda
+        tela.blit(texto_contorno, (posicao_nome_x + 1, posicao_nome_y))  # Direita
+        tela.blit(texto_contorno, (posicao_nome_x, posicao_nome_y - 1))  # Cima
+        tela.blit(texto_contorno, (posicao_nome_x, posicao_nome_y + 1))  # Baixo
+        tela.blit(texto_preenchido, (posicao_nome_x, posicao_nome_y))  # Texto final branco
 
         # Atualizar os botões
         posicaoMouse = pygame.mouse.get_pos()
-        
         voltarBotao.atualizarImagem(posicaoMouse)
         configuracoesBotao.atualizarImagem(posicaoMouse)
         confirmarBotao.atualizarImagem(posicaoMouse)
@@ -245,34 +279,50 @@ def pedir_nome():
                 if event.key == pygame.K_RETURN and texto.strip():
                     nome_jogador = texto.strip()
                     som_click.play()
-                    input_ativo = False  # Nome confirmado
+                    input_ativo = False
                 elif event.key == pygame.K_BACKSPACE:
-                    texto = texto[:-1]
-                else:
-                    texto += event.unicode
+                    texto = texto[:-1]  # Remove a última letra
+                    key_repeating = pygame.K_BACKSPACE
+                    last_key_time = time.time()
+                elif len(texto) < 22:
+                    texto += event.unicode  # Adiciona o caractere digitado
+                    key_repeating = event.key
+                    last_key_time = time.time()
+
+            if event.type == pygame.KEYUP:
+                if event.key == key_repeating:
+                    key_repeating = None
 
             # Verifica clique nos botões
-            if verificar_clique_botao(30, 660, botao_largura, botao_altura):
+            if verificar_clique_botao(20, 660, botao_largura, botao_altura):
                 som_click.play()
                 print("Voltar clicado")
-                estadoJogo = "menuPrincipal"
+                print(estadoJogo)
+                estadoJogo = "menu"
                 input_ativo = False
                 return menuPrincipal()
 
-            if verificar_clique_botao(900, 660, botao_largura, botao_altura):
+            if verificar_clique_botao(940, 660, botao_largura, botao_altura):
                 som_click.play()
                 print("Configurações clicado")
                 abrirConfiguracoes()
 
-            # Verifica clique no botão de confirmar
-            if verificar_clique_botao(450, 500, botao_largura, botao_altura) and texto.strip():
+            if verificar_clique_botao(470, 345, botao_largura, botao_altura) and texto.strip():
                 nome_jogador = texto.strip()
                 som_click.play()
                 print("Nome confirmado!")
-                input_ativo = False  # Sai do loop de input
+                input_ativo = False
+
+        # Lógica para repetição de teclas
+        if key_repeating is not None and time.time() - last_key_time > key_repeat_delay:
+            if key_repeating == pygame.K_BACKSPACE:
+                texto = texto[:-1]  # Remove a última letra
+            elif len(texto) < 22:
+                texto += pygame.key.name(key_repeating)  # Adiciona o caractere digitado
+            last_key_time = time.time() - (key_repeat_delay - key_repeat_interval)
+
         pygame.display.update()
 
-    # Após sair do loop, o nome do jogador foi registrado
     print(f"Nome do jogador: {nome_jogador}")
 
 def salvar_pontuacao(nome_jogador, fase, pontuacao, tempo):
@@ -316,21 +366,21 @@ def salvar_pontuacao(nome_jogador, fase, pontuacao, tempo):
 
     print(f"Pontuação salva: {nome_jogador} - Fase {fase} - {pontuacao} pontos - {tempo:.2f} segundos")
 
-def mostrarVideo(video_path, video_width, video_height, imagem_fundo_path, audio_path):
+def mostrarVideo(video_path, video_width, video_height, imagem_fundo_path, audio_path, audio_normal_jogo):
+    global somAtivo
     # Abrir o vídeo com OpenCV
     cap = cv2.VideoCapture(video_path)
     cap.set(cv2.CAP_PROP_BUFFERSIZE, 1)
     fps_video = cap.get(cv2.CAP_PROP_FPS) or 30
 
     # Inicializar o mixer do Pygame para áudio
-    pygame.mixer.init()
     posicaoMouse = pygame.mouse.get_pos()
 
-    # Criar o botão de voltar
-    voltarBotao = criarBotao(477.5, 520, "imagens/GUI/imagensExtra/botaoPular0.png", "imagens/GUI/imagensExtra/botaoPular1.png")
+    # Criar o botão de pular
+    pularBotao = criarBotao(477.5, 520, "imagens/GUI/botaoPularTutorial/botaoPular0.png", "imagens/GUI/botaoPularTutorial/botaoPular1.png")
 
     # Carregar a imagem do avatar (substitui o botão)
-    avatarImagem = pygame.image.load("imagens/GUI/imagensExtra/assista-o-tutorial.png")
+    avatarImagem = pygame.image.load("imagens/GUI/imagensExtra/avatarTeste.png")
     avatarImagem = pygame.transform.scale(avatarImagem, (294, 498))  # Ajuste o tamanho conforme necessário
 
     if not cap.isOpened():
@@ -340,7 +390,7 @@ def mostrarVideo(video_path, video_width, video_height, imagem_fundo_path, audio
     # Carregar a imagem de fundo
     fundo_imagem = pygame.image.load(imagem_fundo_path)
 
-    # Carregar e tocar o áudio
+    # Carregar e tocar o áudio do tutorial
     pygame.mixer.music.load(audio_path)
     pygame.mixer.music.play(-1, 0.0)
 
@@ -348,13 +398,21 @@ def mostrarVideo(video_path, video_width, video_height, imagem_fundo_path, audio
     x_center = (telaLargura - video_width) // 2
     y_center = (telaAltura - video_height) // 2
 
-    # Posição e tamanho do botão de "Voltar"
+    # Posição e tamanho do botão de "Pular"
     botao_largura, botao_altura = 145, 47
+
+    # Definir a fonte para o texto
+    fonte = pygame.font.Font("tipografia/LuckiestGuy-Regular.ttf", 40)
+    texto_1 = "Assista o"
+    texto_2 = "tutorial"
+    cor_texto = (255, 255, 255)  # Cor do texto (branco)
+    cor_contorno = (0, 0, 0)  # Cor do contorno (preto)
 
     clock = pygame.time.Clock()
     run = True
     while run:
-        voltarBotao.atualizarImagem(posicaoMouse)
+        posicaoMouse = pygame.mouse.get_pos()
+        pularBotao.atualizarImagem(posicaoMouse)
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 run = False
@@ -362,7 +420,12 @@ def mostrarVideo(video_path, video_width, video_height, imagem_fundo_path, audio
 
         # Verificar se o botão foi clicado
         if verificar_clique_botao(477.5, 520, botao_largura, botao_altura):
-            print("Botão de voltar clicado!")
+            som_click.play()  # Som de clique
+            print("Botão de pular clicado!")
+            pygame.mixer.music.stop()  # Parar a música do tutorial
+            if somAtivo:
+                pygame.mixer.music.load(audio_normal_jogo)  # Carregar o áudio normal do jogo
+                pygame.mixer.music.play(-1, 0.0)  # Reproduzir o áudio normal do jogo
             run = False
 
         # Ler o próximo frame do vídeo
@@ -381,15 +444,36 @@ def mostrarVideo(video_path, video_width, video_height, imagem_fundo_path, audio
         # Desenhar a imagem do avatar na tela (posição x=0, y=420)
         tela.blit(avatarImagem, (0, 260))
 
-        posicaoMouse = pygame.mouse.get_pos()
-        voltarBotao.desenharBotao(tela)
-        
+        # Desenhar o texto com contorno
+        # Desenhar o contorno para o texto superior (Assista o)
+        for dx in [-2, 0, 2]:
+            for dy in [-2, 0, 2]:
+                if dx != 0 or dy != 0:
+                    contorno_1 = fonte.render(texto_1, True, cor_contorno)
+                    tela.blit(contorno_1, (76 + dx, 300 + dy))  # Ajuste a posição conforme necessário
+
+        # Desenhar o texto superior
+        texto_surf_1 = fonte.render(texto_1, True, cor_texto)
+        tela.blit(texto_surf_1, (76, 300))  # Ajuste a posição conforme necessário
+
+        # Desenhar o contorno para o texto inferior (tutorial)
+        for dx in [-2, 0, 2]:
+            for dy in [-2, 0, 2]:
+                if dx != 0 or dy != 0:
+                    contorno_2 = fonte.render(texto_2, True, cor_contorno)
+                    tela.blit(contorno_2, (76 + dx, 350 + dy))  # Ajuste a posição conforme necessário
+
+        # Desenhar o texto inferior
+        texto_surf_2 = fonte.render(texto_2, True, cor_texto)
+        tela.blit(texto_surf_2, (76, 350))  # Ajuste a posição conforme necessário
+
+        pularBotao.desenharBotao(tela)
+
         pygame.display.update()
         clock.tick(fps_video)
 
-    pygame.mixer.music.stop()
     cap.release()
-    
+
 def tocar_musica(nova_musica): # FUNÇÃO DA MÚSICA DE FUNDO
     global musica_atual
     if musica_atual != nova_musica:  # Só troca se a música for diferente
@@ -554,10 +638,10 @@ def abrirConfiguracoesFases():
 
     somLigadoBotao = criarBotao(som_x, som_y, "imagens/GUI/botaoSom/ligado0.png", "imagens/GUI/botaoSom/ligado1.png")
     somDesligadoBotao = criarBotao(som_x, som_y, "imagens/GUI/botaoSom/desligado0.png", "imagens/GUI/botaoSom/desligado1.png")
-    voltarBotao = criarBotao(som_x - 275, 540, "imagens/GUI/botaoVoltar/continuar0.png", "imagens/GUI/botaoVoltar/continuar1.png")
-    sairBotao = criarBotao(som_x - 105, 540,"imagens/GUI/botaoSair/Sair0.png", "imagens/GUI/botaoSair/Sair1.png")
+    continuarBotao = criarBotao(som_x - 275, 540, "imagens/GUI/botaoVoltar/continuar0.png", "imagens/GUI/botaoVoltar/continuar1.png")
+    sairBotao = criarBotao(som_x + 235, 540,"imagens/GUI/botaoSair/Sair0.png", "imagens/GUI/botaoSair/Sair1.png")
     menuBotao = criarBotao(som_x + 65, 540,"imagens/GUI/botaoInicio/botaoHome.png", "imagens/GUI/botaoInicio/botaoHome.png")
-    fasesBotao = criarBotao(som_x + 235, 540,"imagens/GUI/botaoFases/botaoFases.png", "imagens/GUI/botaoFases/botaoFases.png")
+    fasesBotao = criarBotao(som_x - 105, 540,"imagens/GUI/botaoFases/botaoFases.png", "imagens/GUI/botaoFases/botaoFases.png")
 
     run = True
     while run:
@@ -579,8 +663,8 @@ def abrirConfiguracoesFases():
             somDesligadoBotao.atualizarImagem(posicaoMouse)
             somDesligadoBotao.desenharBotao(tela)
 
-        voltarBotao.atualizarImagem(posicaoMouse)
-        voltarBotao.desenharBotao(tela)
+        continuarBotao.atualizarImagem(posicaoMouse)
+        continuarBotao.desenharBotao(tela)
         sairBotao.atualizarImagem(posicaoMouse)
         sairBotao.desenharBotao(tela)
         menuBotao.atualizarImagem(posicaoMouse)
@@ -617,7 +701,7 @@ def abrirConfiguracoesFases():
             somAtivo = True
             pygame.mixer.music.unpause()
 
-        if voltarBotao.clicarBotao(tela):
+        if continuarBotao.clicarBotao(tela):
             som_click.play()  # Som de clique
             run = False  # Sai do loop para voltar para a tela anterior
 
@@ -650,8 +734,8 @@ def abrirConfiguracoesFases():
 def abrirInstrucoes():
     global estadoJogo
     instrucoesBackground = pygame.image.load("imagens/GUI/Backgrounds/instrucoesBackground.jpg")
-    voltarBotao = criarBotao(40, 50, "imagens/GUI/botaoVoltar/voltar0.png", "imagens/GUI/botaoVoltar/voltar1.png")
-    configuracoesBotao = criarBotao(900, 50, "imagens/GUI/botaoConfiguracoes/configuracoes0.png", "imagens/GUI/botaoConfiguracoes/configuracoes1.png")
+    voltarBotao = criarBotao(20, 20, "imagens/GUI/botaoVoltar/voltar0.png", "imagens/GUI/botaoVoltar/voltar1.png")
+    configuracoesBotao = criarBotao(936, 20, "imagens/GUI/botaoConfiguracoes/configuracoes0.png", "imagens/GUI/botaoConfiguracoes/configuracoes1.png")
     fase1Botao = criarBotao(20, 250, "imagens/fase1/faseBotao1.png", "imagens/fase1/faseBotao1.png")
     fase2Botao = criarBotao(20, 370, "imagens/fase2/faseBotao2.png", "imagens/fase2/faseBotao2.png")
     fase3Botao = criarBotao(20, 490, "imagens/fase3/faseBotao3.png", "imagens/fase3/faseBotao3.png")
@@ -849,11 +933,12 @@ def abrirCreditos():
     global estadoJogo
     creditosBackground = pygame.image.load("imagens/GUI/Backgrounds/creditos.jpg")
     voltarBotao = criarBotao(20, 660, "imagens/GUI/botaoVoltar/voltar0.png", "imagens/GUI/botaoVoltar/voltar1.png")
+    configuracoesBotao = criarBotao(902, 50, "imagens/GUI/botaoConfiguracoes/configuracoes0.png", "imagens/GUI/botaoConfiguracoes/configuracoes1.png")
 
     linhas_creditos = [
         "Lixo no lixo é um jogo educativo criado para ",
         "ajudar na conscientização sobre a poluição.",
-        "Este jogo ajuda a lembrarmos que se deve",
+        "Este jogo ajuda a lembrarmos que não se deve",
         "jogar lixo no chão para não danificar o ",
         "meio ambiente!",
         "Combinando com esse tema, também podemos",
@@ -867,25 +952,26 @@ def abrirCreditos():
         "",
         "Jogo produzido por:",
         "- Brenda Amanda da Silva Garcez",
-        "- Nicole Louise Matias Jamuchewski",
         "- João Rafael Moreira Anhaia",
         "- Matheus Vinícius dos Santos Sachinski",
+        "- Nicole Louise Matias Jamuchewski",
         "- Pedro Victor A. M. L. Maciel",
         "                                  Desenvolvimento   ",
         "- Brenda Amanda da Silva Garcez",
         "- Matheus Vinícius dos Santos Sachinski",
         "                                   Ilustrações",
-        "- João Rafael Moreira Anhaia",
-        "- Nicole Louise Matias Jamuchewski",
         "- Brenda Amanda da Silva Garcez",
+        "- João Rafael Moreira Anhaia",
         "- Matheus Vinícius dos Santos Sachinski",
-        "                                  Audio e Vídeo",
-        "- Brenda Amanda da Silva Garcez",
         "- Nicole Louise Matias Jamuchewski",
-        "- João Rafael Moreira Anhaia",
-        "                                   Documentação",
-        "- Pedro Victor A. M. L. Maciel",
+        "                                  Áudio e Vídeo",
         "- Brenda Amanda da Silva Garcez",
+        "- João Rafael Moreira Anhaia",
+        "- Nicole Louise Matias Jamuchewski",
+
+        "                                   Documentação",
+        "- Brenda Amanda da Silva Garcez",
+        "- Pedro Victor A. M. L. Maciel",
         "                                     Fontes por:",
         "- 'Luckiest' Guy por Astigmatic (Google Fonts)",
         "                             Obrigado por jogar!",
@@ -898,9 +984,6 @@ def abrirCreditos():
     largura_quadro = 700  # Largura do quadrado marrom
     altura_quadro = 350  # Altura do quadrado marrom
     posicao_quadro = (200, 220)  # Posição do quadrado marrom
-
-    configuracoesBotao = criarBotao(930, 50, "imagens/GUI/botaoConfiguracoes/configuracoes0.png",
-                                    "imagens/GUI/botaoConfiguracoes/configuracoes1.png")
 
     # Altura total do conteúdo
     altura_conteudo = len(linhas_creditos) * espacamento
@@ -1006,7 +1089,7 @@ def abrirRelatorio(ultimo_jogador=None):
     tela = pygame.display.set_mode((1100, 720))  # Ajustando para o tamanho correto da tela
     relatorioBackground = pygame.image.load("imagens/GUI/Backgrounds/relatorioBackground.png")
     voltarBotao = criarBotao(20, 660, "imagens/GUI/botaoVoltar/voltar0.png", "imagens/GUI/botaoVoltar/voltar1.png")
-    configuracoesBotao = criarBotao(930, 50, "imagens/GUI/botaoConfiguracoes/configuracoes0.png", "imagens/GUI/botaoConfiguracoes/configuracoes1.png")
+    configuracoesBotao = criarBotao(936, 20, "imagens/GUI/botaoConfiguracoes/configuracoes0.png", "imagens/GUI/botaoConfiguracoes/configuracoes1.png")
     
     dados = carregar_dados_jogadores()
     jogadores = dados.get("jogadores", [])
@@ -1049,19 +1132,41 @@ def abrirRelatorio(ultimo_jogador=None):
         superficie_relatorio.fill((255, 189, 140))
         
         y_atual = 20
+        # Dentro do loop para desenhar o nome dos jogadores
         for jogador in jogadores:
             nome = jogador["nome"]
             fases = jogador.get("fases", [])
-            
+
             cor_atual = cor_ultimo if nome == ultimo_jogador else cor_texto
-            texto_nome = fonte.render(f"Jogador: {nome}", True, cor_atual)
-            superficie_relatorio.blit(texto_nome, (20, y_atual))
+            texto_nome = f"Jogador: {nome}"
+            
+            # Texto com contorno
+            texto_contorno_nome = fonte.render(texto_nome, True, (0, 0, 0))  # Contorno preto
+            texto_preenchimento_nome = fonte.render(texto_nome, True, cor_atual)  # Texto principal (branco ou verde)
+            
+            # Calculando a posição X para centralizar o nome
+            largura_texto = texto_preenchimento_nome.get_width()
+            pos_x = (largura_quadro - largura_texto) // 2  # Centralizando na largura do quadro
+
+            # Desenhando o texto com contorno
+            superficie_relatorio.blit(texto_contorno_nome, (pos_x - 1, y_atual))  # Contorno esquerdo
+            superficie_relatorio.blit(texto_contorno_nome, (pos_x + 1, y_atual))  # Contorno direito
+            superficie_relatorio.blit(texto_contorno_nome, (pos_x, y_atual - 1))  # Contorno cima
+            superficie_relatorio.blit(texto_contorno_nome, (pos_x, y_atual + 1))  # Contorno baixo
+            superficie_relatorio.blit(texto_preenchimento_nome, (pos_x, y_atual))  # Texto principal
             y_atual += espacamento
             
             for fase in fases:
                 fase_str = f"Fase {fase['fase']}: {fase['pontuacao']} pontos, Tempo: {fase.get('tempo', 'N/A')}s"
-                texto_fase = fonte.render(fase_str, True, cor_texto)
-                superficie_relatorio.blit(texto_fase, (40, y_atual))
+                
+                # Texto com contorno para as fases
+                texto_contorno_fase = fonte.render(fase_str, True, (0, 0, 0))  # Contorno preto
+                texto_preenchimento_fase = fonte.render(fase_str, True, cor_texto)  # Texto principal (branco)
+                superficie_relatorio.blit(texto_contorno_fase, (40 - 1, y_atual))  # Contorno esquerdo
+                superficie_relatorio.blit(texto_contorno_fase, (40 + 1, y_atual))  # Contorno direito
+                superficie_relatorio.blit(texto_contorno_fase, (40, y_atual - 1))  # Contorno cima
+                superficie_relatorio.blit(texto_contorno_fase, (40, y_atual + 1))  # Contorno baixo
+                superficie_relatorio.blit(texto_preenchimento_fase, (40, y_atual))  # Texto principal
                 y_atual += espacamento
         
         deslocamento = max(0, min(deslocamento, max(0, altura_conteudo - altura_quadro)))
@@ -1100,7 +1205,6 @@ def abrirRelatorio(ultimo_jogador=None):
         
         pygame.display.update()
 
-    
 # Função para as fases
 def iniciarFases():
     global estadoJogo
@@ -1172,31 +1276,27 @@ def iniciarFases():
         clock.tick(60)
 
 def fase1(nome_jogador):
-    global estadoJogo, jogoConcluido, pontuacao_fase1, fase_ativa
+    global estadoJogo, jogoConcluido, pontuacao_fase1, fase_ativa, somAtivo
     pontuacao_fase1 = 0
     jogoConcluido = False
     fase1Background = pygame.image.load("imagens/fase1/imagemZoologico.png")
 
-    mostrarVideo("video/fase1.mp4", 600, 300, "imagens/fase1/imagemTutorialZoo.png", "sons/tutorial/fase1.wav")
-
+    mostrarVideo("video/fase1.mp4", 600, 300, "imagens/fase1/imagemTutorialZoo.png", "sons/tutorial/fase1.wav", "sons/musicaZoo/fundoZoo.mp3")
+    
     # Verificar som
     if somAtivo:
         tocar_musica("sons/musicaZoo/fundoZoo.mp3")  # Toca a primeira música
 
-    voltarBotao = criarBotao(20, 660, "imagens/GUI/botaoVoltar/voltar0.png", "imagens/GUI/botaoVoltar/voltar1.png")
-    configuracoesBotao = criarBotao(940, 660, "imagens/GUI/botaoConfiguracoes/configuracoes0.png", "imagens/GUI/botaoConfiguracoes/configuracoes1.png")
-    
+    voltarBotao = criarBotao(20, 20, "imagens/GUI/botaoVoltar/voltar0.png", "imagens/GUI/botaoVoltar/voltar1.png")
+    configuracoesBotao = criarBotao(936, 20, "imagens/GUI/botaoConfiguracoes/configuracoes0.png", "imagens/GUI/botaoConfiguracoes/configuracoes1.png")
+    botaoTutorial = criarBotao(955, 665, "imagens/GUI/botaoTutorial/botaoTutorial0.png", "imagens/GUI/botaoTutorial/botaoTutorial1.png")
+
     # Configurações para o texto do temporizador
     fonte = pygame.font.Font("tipografia/LuckiestGuy-Regular.ttf", 36)
     cor_texto = (255, 255, 255)  # Branco
     
     # Configurações para objetos
     largura_tela, altura_tela = tela.get_size()
-    centro_x = largura_tela // 3 + 30
-    centro_y = altura_tela // 2 - 20
-    raio_x = largura_tela // 3 + 40
-    raio_y = altura_tela // 4
-    distancia_minima = 140  # Distância mínima entre objetos
 
     # Lista de imagens
     imagensCorretas = [
@@ -1230,8 +1330,6 @@ def fase1(nome_jogador):
     imagensCorretasSelecionadas = random.sample(imagensCorretas, 6)  # Seleciona 6 imagens corretas aleatórias
     imagensIncorretasSelecionadas = random.sample(imagensIncorretas, 4)  # Seleciona 4 imagens incorretas aleatórias
 
-    objetos = []
-
     imagensCorretasClicadas = 0  # Contador de imagens corretas clicadas
     imagensIncorretasClicadas = 0  # Contador de imagens incorretas clicadas
 
@@ -1249,55 +1347,54 @@ def fase1(nome_jogador):
         pygame.transform.scale(pygame.image.load("imagens/GUI/vidas/3vidas.png"), (220, 60))
     ]
 
+    objetos = []
+    
+    posicoes_fixas = [
+        (80, 440), (287, 163), (500, 155), (700, 180),
+        (837, 440), (100, 300), (438, 299), (674, 313),
+        (326, 463), (563, 468)
+    ]
+
+    # Função para posicionar os objetos
     def posicionar_objetos(lista_imagens, tipo="correto"):
         imagens_selecionadas = lista_imagens  # Lista de imagens a posicionar
 
-        while imagens_selecionadas:
-            imagem = imagens_selecionadas.pop(0)
-            
-            # Extrair o nome do arquivo da imagem (sem extensão)
-            nome_objeto = imagem.split("/")[-1].split(".")[0].replace("_", " ").capitalize()
+        # Embaralha as imagens antes de atribuir às posições fixas
+        random.shuffle(imagens_selecionadas)
 
-            posicao_valida = False
-            tentativa = 0
-            while not posicao_valida and tentativa < 300:  # Limite de tentativas para evitar loop infinito
-                tentativa += 1
-                
-                # Gerar posição aleatória
-                x = random.randint(centro_x - raio_x, centro_x + raio_x)
-                y = random.randint(centro_y - raio_y, centro_y + raio_y)
-                
-                posicao_valida = True  # Assume que a posição é válida inicialmente
-                
-                # Verifica se está longe o suficiente de outros objetos
-                for obj in objetos:
-                    distancia = math.sqrt((x - obj["x"])**2 + (y - obj["y"])**2)
-                    if distancia < distancia_minima:
-                        posicao_valida = False
-                        break
+        # Faz uma cópia das posições fixas disponíveis
+        posicoes_disponiveis = posicoes_fixas.copy()
 
-            if posicao_valida:
+        for imagem in imagens_selecionadas:
+            if len(posicoes_disponiveis) > 0:  # Verifica se há posições disponíveis
+                # Extrair o nome do arquivo da imagem (sem extensão)
+                nome_objeto = imagem.split("/")[-1].split(".")[0].replace("_", " ").capitalize()
+
+                # Escolhe uma posição disponível
+                posicao_escolhida = random.choice(posicoes_disponiveis)
+                while any(objeto["x"] == posicao_escolhida[0] and objeto["y"] == posicao_escolhida[1] for objeto in objetos):
+                    # Se a posição já estiver ocupada, escolhe outra posição
+                    posicao_escolhida = random.choice(posicoes_disponiveis)
+
+                # Remove a posição já utilizada
+                posicoes_disponiveis.remove(posicao_escolhida)
+
                 # Cria o botão para o objeto
-                botao = criarBotaoImagens(x, y, imagem, imagem)
+                x, y = posicao_escolhida
+                botao = criarBotaoImagensFASE3(x, y, imagem, imagem)
                 objetos.append({"x": x, "y": y, "botao": botao, "tipo": tipo, "movimento": 0, "nome": nome_objeto})
             else:
-                print(f"Falha ao posicionar objeto após {tentativa} tentativas: {imagem}")
+                break  # Interrompe o loop se não houver mais posições disponíveis
 
     # Posicionar objetos corretos e incorretos
     posicionar_objetos(imagensCorretasSelecionadas, "correto")
     posicionar_objetos(imagensIncorretasSelecionadas, "incorreto")
-
-    # Calcular a posição centralizada para o botão de confirmar na parte inferior
-    largura_botao_confirmar = 56  # Tamanho estimado do botão (ajuste conforme necessário)
-    altura_botao_confirmar = 56    # Altura estimada do botão (ajuste conforme necessário)
-    x_botao_confirmar = (largura_tela - 65 - largura_botao_confirmar) // 2  # Centraliza na horizontal
-    y_botao_confirmar = altura_tela - altura_botao_confirmar - 25     # Posiciona perto da parte inferior
     
     # Criar o botão de confirmar no centro inferior da tela
-    confirmarBotao = criarBotao(x_botao_confirmar, y_botao_confirmar, "imagens/GUI/botaoConfirmar/confirmar1.png", "imagens/GUI/botaoConfirmar/confirmar2.png")
+    confirmarBotao = criarBotao(470, 660, "imagens/GUI/botaoConfirmar/confirmar1.png", "imagens/GUI/botaoConfirmar/confirmar2.png")
 
      # Configurações do temporizador
-    tempo_inicial = 120  # Tempo inicial em segundos
+    tempo_inicial = 300  # Tempo inicial em segundos
     tempo_restante = tempo_inicial
     tempo_inicializado = pygame.time.get_ticks()  # Registrar o momento em que o temporizador começa
     
@@ -1322,14 +1419,14 @@ def fase1(nome_jogador):
 
         if not jogoGanhou and not jogoPerdeu:
             # Exibir as vidas
-            tela.blit(vida_imagens[vidas], (220, 640))  # Exibe a imagem das vidas no canto superior esquerdo
+            tela.blit(vida_imagens[vidas], (20, 640))  # Exibe a imagem das vidas no canto superior esquerdo
             # Configurações para o texto de "VIDAS"
             texto_vidas = "VIDAS"
             texto_vidas_contorno = fonte.render(texto_vidas, True, (0, 0, 0))  # Contorno preto
             texto_vidas_preenchimento = fonte.render(texto_vidas, True, cor_texto)  # Texto branco
 
             # Posição do texto "VIDAS" ajustada
-            posicao_vidas = (largura_tela // 3.85 - texto_vidas_contorno.get_width() // 80, altura_tela - 34)
+            posicao_vidas = (largura_tela // 13 - texto_vidas_contorno.get_width() // 80, altura_tela - 34)
 
             # Desenhar o texto com contorno
             tela.blit(texto_vidas_contorno, (posicao_vidas[0] - 1, posicao_vidas[1]))
@@ -1426,6 +1523,7 @@ def fase1(nome_jogador):
                     estadoJogo = "jogando"
                     fase_ativa = False
                     iniciarFases()
+                salvar_pontuacao(nome_jogador, 1, pontuacao_fase1, tempo_decorrido) 
 
             # Verificar clique no botão "Próxima Fase"
             if proximaFaseBotao.clicarBotao(tela):
@@ -1500,9 +1598,11 @@ def fase1(nome_jogador):
 
         voltarBotao.atualizarImagem(posicaoMouse)
         configuracoesBotao.atualizarImagem(posicaoMouse)
+        botaoTutorial.atualizarImagem(posicaoMouse)
 
         voltarBotao.desenharBotao(tela)
         configuracoesBotao.desenharBotao(tela)
+        botaoTutorial.desenharBotao(tela)
 
         # Apenas processa o botão confirmar se o jogo ainda não foi ganho ou perdido
         if not jogoGanhou and not jogoPerdeu:
@@ -1569,7 +1669,11 @@ def fase1(nome_jogador):
             som_click.play()  # Som de clique
             print("Configurações clicado")
             abrirConfiguracoesFases()
-
+        
+        elif botaoTutorial.clicarBotao(tela):
+            som_click.play()
+            print("tutorial clicado")
+            mostrarVideo("video/fase1.mp4", 600, 300, "imagens/fase1/imagemTutorialZoo.png", "sons/tutorial/fase1.wav", "sons/musicaZoo/fundoZoo.mp3")
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 confirmar_saida(tela)
@@ -1578,32 +1682,28 @@ def fase1(nome_jogador):
         clock.tick(60)
 
 def fase2(nome_jogador):
-    global estadoJogo, jogoConcluido, pontuacao_fase2, fase_ativa
+    global estadoJogo, jogoConcluido, pontuacao_fase2, fase_ativa, somAtivo
     pontuacao_fase2 = 0
     jogoConcluido = False
     fase2Background = pygame.image.load("imagens/fase2/imagemSaladeAula.png")
 
-    mostrarVideo("video/fase2.mp4", 600, 300, "imagens/fase2/imagemTutorialSala.png", "sons/tutorial/fase2.wav")
+    mostrarVideo("video/fase2.mp4", 600, 300, "imagens/fase2/imagemTutorialSala.png", "sons/tutorial/fase2.wav", "sons/musicaSala/fundoSala.mp3")
 
     # Verificar som
     if somAtivo:
         tocar_musica("sons/musicaSala/fundoSala.mp3")  # Toca a primeira música
 
-    voltarBotao = criarBotao(20, 660, "imagens/GUI/botaoVoltar/voltar0.png", "imagens/GUI/botaoVoltar/voltar1.png")
-    configuracoesBotao = criarBotao(940, 660, "imagens/GUI/botaoConfiguracoes/configuracoes0.png", "imagens/GUI/botaoConfiguracoes/configuracoes1.png")
-    
+    voltarBotao = criarBotao(20, 20, "imagens/GUI/botaoVoltar/voltar0.png", "imagens/GUI/botaoVoltar/voltar1.png")
+    configuracoesBotao = criarBotao(936, 20, "imagens/GUI/botaoConfiguracoes/configuracoes0.png", "imagens/GUI/botaoConfiguracoes/configuracoes1.png")
+    botaoTutorial = criarBotao(955, 665, "imagens/GUI/botaoTutorial/botaoTutorial0.png", "imagens/GUI/botaoTutorial/botaoTutorial1.png")
+
     # Configurações para o texto do temporizador
     fonte = pygame.font.Font("tipografia/LuckiestGuy-Regular.ttf", 36)
     cor_texto = (255, 255, 255)  # Branco
     
     # Configurações para objetos
     largura_tela, altura_tela = tela.get_size()
-    centro_x = largura_tela // 3
-    centro_y = altura_tela // 2 - 40
-    raio_x = largura_tela // 3 + 40
-    raio_y = altura_tela // 4 + 20
-    distancia_minima = 140  # Distância mínima entre objetos
-
+    
     # Inicializa a fonte para o texto do contador
     fonte = pygame.font.Font("tipografia/LuckiestGuy-Regular.ttf", 36)  # 'None' usa a fonte padrão; 36 é o tamanho 
     cor_texto = (255, 255, 255)  # Cor do texto (branco)
@@ -1637,8 +1737,6 @@ def fase2(nome_jogador):
     imagensCorretasSelecionadas = random.sample(imagensCorretas, 6)  # Seleciona 6 imagens corretas aleatórias
     imagensIncorretasSelecionadas = random.sample(imagensIncorretas, 4)  # Seleciona 4 imagens incorretas aleatórias
 
-    objetos = []
-
     imagensCorretasClicadas = 0  # Contador de imagens corretas clicadas
     imagensIncorretasClicadas = 0  # Contador de imagens incorretas clicadas
 
@@ -1656,57 +1754,55 @@ def fase2(nome_jogador):
         pygame.transform.scale(pygame.image.load("imagens/GUI/vidas/3vidas.png"), (220, 60))
     ]
 
-    # Função auxiliar para posicionar objetos
+    objetos = []
+    
+    posicoes_fixas = [
+        (80, 440), (287, 163), (500, 155), (700, 180),
+        (837, 440), (100, 300), (438, 299), (674, 313),
+        (326, 463), (563, 468)
+    ]
+
+    # Função para posicionar os objetos
     def posicionar_objetos(lista_imagens, tipo="correto"):
         imagens_selecionadas = lista_imagens  # Lista de imagens a posicionar
 
-        while imagens_selecionadas:
-            imagem = imagens_selecionadas.pop(0)
-            
-            # Extrair o nome do arquivo da imagem (sem extensão)
-            nome_objeto = imagem.split("/")[-1].split(".")[0].replace("_", " ").capitalize()
+        # Embaralha as imagens antes de atribuir às posições fixas
+        random.shuffle(imagens_selecionadas)
 
-            posicao_valida = False
-            tentativa = 0
-            while not posicao_valida and tentativa < 300:  # Limite de tentativas para evitar loop infinito
-                tentativa += 1
-                
-                # Gerar posição aleatória
-                x = random.randint(centro_x - raio_x, centro_x + raio_x)
-                y = random.randint(centro_y - raio_y, centro_y + raio_y)
-                
-                posicao_valida = True  # Assume que a posição é válida inicialmente
-                
-                # Verifica se está longe o suficiente de outros objetos
-                for obj in objetos:
-                    distancia = math.sqrt((x - obj["x"])**2 + (y - obj["y"])**2)
-                    if distancia < distancia_minima:
-                        posicao_valida = False
-                        break
+        # Faz uma cópia das posições fixas disponíveis
+        posicoes_disponiveis = posicoes_fixas.copy()
 
-            if posicao_valida:
+        for imagem in imagens_selecionadas:
+            if len(posicoes_disponiveis) > 0:  # Verifica se há posições disponíveis
+                # Extrair o nome do arquivo da imagem (sem extensão)
+                nome_objeto = imagem.split("/")[-1].split(".")[0].replace("_", " ").capitalize()
+
+                # Escolhe uma posição disponível
+                posicao_escolhida = random.choice(posicoes_disponiveis)
+                while any(objeto["x"] == posicao_escolhida[0] and objeto["y"] == posicao_escolhida[1] for objeto in objetos):
+                    # Se a posição já estiver ocupada, escolhe outra posição
+                    posicao_escolhida = random.choice(posicoes_disponiveis)
+
+                # Remove a posição já utilizada
+                posicoes_disponiveis.remove(posicao_escolhida)
+
                 # Cria o botão para o objeto
-                botao = criarBotaoImagens(x, y, imagem, imagem)
+                x, y = posicao_escolhida
+                botao = criarBotaoImagensFASE3(x, y, imagem, imagem)
                 objetos.append({"x": x, "y": y, "botao": botao, "tipo": tipo, "movimento": 0, "nome": nome_objeto})
             else:
-                print(f"Falha ao posicionar objeto após {tentativa} tentativas: {imagem}")
-
+                break  # Interrompe o loop se não houver mais posições disponíveis
 
     # Posicionar objetos corretos e incorretos
     posicionar_objetos(imagensCorretasSelecionadas, "correto")
     posicionar_objetos(imagensIncorretasSelecionadas, "incorreto")
 
-    # Calcular a posição centralizada para o botão de confirmar na parte inferior
-    largura_botao_confirmar = 56  # Tamanho estimado do botão (ajuste conforme necessário)
-    altura_botao_confirmar = 56    # Altura estimada do botão (ajuste conforme necessário)
-    x_botao_confirmar = (largura_tela - 65 - largura_botao_confirmar) // 2  # Centraliza na horizontal
-    y_botao_confirmar = altura_tela - altura_botao_confirmar - 25     # Posiciona perto da parte inferior
     
-    # Criar o botão de confirmar no centro inferior da tela
-    confirmarBotao = criarBotao(x_botao_confirmar, y_botao_confirmar, "imagens/GUI/botaoConfirmar/confirmar1.png", "imagens/GUI/botaoConfirmar/confirmar2.png")
+    # Criar o  de confirmar no centro inferior da tela
+    confirmarBotao = criarBotao(470, 660, "imagens/GUI/botaoConfirmar/confirmar1.png", "imagens/GUI/botaoConfirmar/confirmar2.png")
 
      # Configurações do temporizador
-    tempo_inicial = 120  # Tempo inicial em segundos
+    tempo_inicial = 300  # Tempo inicial em segundos
     tempo_restante = tempo_inicial
     tempo_inicializado = pygame.time.get_ticks()  # Registrar o momento em que o temporizador começa
 
@@ -1730,14 +1826,14 @@ def fase2(nome_jogador):
 
         if not jogoGanhou and not jogoPerdeu:
             # Exibir as vidas
-            tela.blit(vida_imagens[vidas], (220, 640))  # Exibe a imagem das vidas no canto superior esquerdo
+            tela.blit(vida_imagens[vidas], (20, 640))  # Exibe a imagem das vidas no canto superior esquerdo
             # Configurações para o texto de "VIDAS"
             texto_vidas = "VIDAS"
             texto_vidas_contorno = fonte.render(texto_vidas, True, (0, 0, 0))  # Contorno preto
             texto_vidas_preenchimento = fonte.render(texto_vidas, True, cor_texto)  # Texto branco
 
             # Posição do texto "VIDAS" ajustada
-            posicao_vidas = (largura_tela // 3.85 - texto_vidas_contorno.get_width() // 80, altura_tela - 34)
+            posicao_vidas = (largura_tela // 13 - texto_vidas_contorno.get_width() // 80, altura_tela - 34)
 
             # Desenhar o texto com contorno
             tela.blit(texto_vidas_contorno, (posicao_vidas[0] - 1, posicao_vidas[1]))
@@ -1833,7 +1929,7 @@ def fase2(nome_jogador):
                     estadoJogo = "jogando"
                     fase_ativa = False
                     iniciarFases()
-
+                salvar_pontuacao(nome_jogador, 2, pontuacao_fase2, tempo_decorrido)
             # Verificar clique no botão "Próxima Fase"
             if proximaFaseBotao.clicarBotao(tela):
                 som_click.play()  # Tocar som de clique
@@ -1912,9 +2008,11 @@ def fase2(nome_jogador):
         
         voltarBotao.atualizarImagem(posicaoMouse)
         configuracoesBotao.atualizarImagem(posicaoMouse)
+        botaoTutorial.atualizarImagem(posicaoMouse)
 
         voltarBotao.desenharBotao(tela)
         configuracoesBotao.desenharBotao(tela)
+        botaoTutorial.desenharBotao(tela)
 
         # Atualizar e desenhar objetos com movimento
         for obj in objetos:
@@ -1978,7 +2076,11 @@ def fase2(nome_jogador):
             som_click.play()  # Som de clique
             print("Configurações clicado")
             abrirConfiguracoesFases()
-            
+
+        elif botaoTutorial.clicarBotao(tela):
+            som_click.play()
+            print("tutorial clicado")
+            mostrarVideo("video/fase2.mp4", 600, 300, "imagens/fase2/imagemTutorialSala.png", "sons/tutorial/fase2.wav", "sons/musicaSala/fundoSala.mp3")
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -1988,32 +2090,28 @@ def fase2(nome_jogador):
         clock.tick(60)
 
 def fase3(nome_jogador):
-    global estadoJogo, jogoConcluido, pontuacao_fase3, fase_ativa
+    global estadoJogo, jogoConcluido, pontuacao_fase3, fase_ativa, somAtivo
     pontuacao_fase3 = 0
     jogoConcluido = False
     fase3Background = pygame.image.load("imagens/fase3/imagemPraia.png")
 
-    mostrarVideo("video/fase3.mp4", 600, 300, "imagens/fase3/imagemTutorialPraia.png", "sons/tutorial/fase3.wav")
+    largura_tela, altura_tela = tela.get_size()
+
+    mostrarVideo("video/fase3.mp4", 600, 300, "imagens/fase3/imagemTutorialPraia.png", "sons/tutorial/fase3.wav", "sons/musicaPraia/fundoPraia.mp3")
 
     # Verificar som
     if somAtivo:
         tocar_musica("sons/musicaPraia/fundoPraia.mp3")  # Toca a primeira música
 
     voltarBotao = criarBotao(20, 20, "imagens/GUI/botaoVoltar/voltar0.png", "imagens/GUI/botaoVoltar/voltar1.png")
-    configuracoesBotao = criarBotao(940, 20, "imagens/GUI/botaoConfiguracoes/configuracoes0.png", "imagens/GUI/botaoConfiguracoes/configuracoes1.png")
-    
+    configuracoesBotao = criarBotao(936, 20, "imagens/GUI/botaoConfiguracoes/configuracoes0.png", "imagens/GUI/botaoConfiguracoes/configuracoes1.png")
+    botaoTutorial = criarBotao(955, 665, "imagens/GUI/botaoTutorial/botaoTutorial0.png", "imagens/GUI/botaoTutorial/botaoTutorial1.png")
+
+
     # Configurações para o texto do temporizador
     fonte = pygame.font.Font("tipografia/LuckiestGuy-Regular.ttf", 36)
     cor_texto = (255, 255, 255)  # Branco
     
-    # Configurações para objetos
-    largura_tela, altura_tela = tela.get_size()
-    centro_x = largura_tela // 3 + 30
-    centro_y = altura_tela // 2 - 80
-    raio_x = largura_tela // 3 + 10
-    raio_y = altura_tela // 4 - 20
-    distancia_minima = 120  # Distância mínima entre objetos
-
     # Lista de imagens
     imagensCorretas = [
         "imagens/fase3/corretas/Balde de Areia.png",
@@ -2043,8 +2141,6 @@ def fase3(nome_jogador):
     # Selecionando aleatoriamente 6 imagens corretas e 4 incorretas
     imagensCorretasSelecionadas = random.sample(imagensCorretas, 5)  # Seleciona 6 imagens corretas aleatórias
     imagensIncorretasSelecionadas = random.sample(imagensIncorretas, 5)  # Seleciona 4 imagens incorretas aleatórias
-
-    objetos = []
 
     imagensCorretasClicadas = 0  # Contador de imagens corretas clicadas
     imagensIncorretasClicadas = 0  # Contador de imagens incorretas clicadas
@@ -2117,53 +2213,51 @@ def fase3(nome_jogador):
             return True
         return False
 
+    objetos = []
+    
+    posicoes_fixas = [
+        (89, 162), (287, 163), (500, 155), (679, 158),
+        (837, 162), (222, 290), (438, 299), (674, 313),
+        (326, 463), (563, 468)
+    ]
+
+    # Função para posicionar os objetos
     def posicionar_objetos(lista_imagens, tipo="correto"):
         imagens_selecionadas = lista_imagens  # Lista de imagens a posicionar
 
-        while imagens_selecionadas:
-            imagem = imagens_selecionadas.pop(0)
-            
-            # Extrair o nome do arquivo da imagem (sem extensão)
-            nome_objeto = imagem.split("/")[-1].split(".")[0].replace("_", " ").capitalize()
+        # Embaralha as imagens antes de atribuir às posições fixas
+        random.shuffle(imagens_selecionadas)
 
-            posicao_valida = False
-            tentativa = 0
-            while not posicao_valida and tentativa < 300:  # Limite de tentativas para evitar loop infinito
-                tentativa += 1
-                
-                # Gerar posição aleatória
-                x = random.randint(centro_x - raio_x, centro_x + raio_x)
-                y = random.randint(centro_y - raio_y, centro_y + raio_y)
-                
-                posicao_valida = True  # Assume que a posição é válida inicialmente
-                
-                # Verifica se está longe o suficiente de outros objetos
-                for obj in objetos:
-                    distancia = math.sqrt((x - obj["x"])**2 + (y - obj["y"])**2)
-                    if distancia < distancia_minima:
-                        posicao_valida = False
-                        break
+        # Faz uma cópia das posições fixas disponíveis
+        posicoes_disponiveis = posicoes_fixas.copy()
 
-                # Verifica se está longe o suficiente das áreas de "correto" e "errado"
-                distancia_area_correta = math.sqrt((x - posicao_area_PRAIA[0])**2 + (y - posicao_area_PRAIA[1])**2)
-                distancia_area_errada = math.sqrt((x - posicao_area_LIXO[0])**2 + (y - posicao_area_LIXO[1])**2)
-                
-                if distancia_area_correta < distancia_minima or distancia_area_errada < distancia_minima:
-                    posicao_valida = False  # Se o objeto estiver muito perto das áreas, a posição é inválida
+        for imagem in imagens_selecionadas:
+            if len(posicoes_disponiveis) > 0:  # Verifica se há posições disponíveis
+                # Extrair o nome do arquivo da imagem (sem extensão)
+                nome_objeto = imagem.split("/")[-1].split(".")[0].replace("_", " ").capitalize()
 
-            if posicao_valida:
+                # Escolhe uma posição disponível
+                posicao_escolhida = random.choice(posicoes_disponiveis)
+                while any(objeto["x"] == posicao_escolhida[0] and objeto["y"] == posicao_escolhida[1] for objeto in objetos):
+                    # Se a posição já estiver ocupada, escolhe outra posição
+                    posicao_escolhida = random.choice(posicoes_disponiveis)
+
+                # Remove a posição já utilizada
+                posicoes_disponiveis.remove(posicao_escolhida)
+
                 # Cria o botão para o objeto
+                x, y = posicao_escolhida
                 botao = criarBotaoImagensFASE3(x, y, imagem, imagem)
                 objetos.append({"x": x, "y": y, "botao": botao, "tipo": tipo, "movimento": 0, "nome": nome_objeto})
             else:
-                print(f"Falha ao posicionar objeto após {tentativa} tentativas: {imagem}")
+                break  # Interrompe o loop se não houver mais posições disponíveis
 
     # Posicionar objetos corretos e incorretos
     posicionar_objetos(imagensCorretasSelecionadas, "correto")
     posicionar_objetos(imagensIncorretasSelecionadas, "incorreto")
 
      # Configurações do temporizador
-    tempo_inicial = 120  # Tempo inicial em segundos
+    tempo_inicial = 300  # Tempo inicial em segundos
     tempo_restante = tempo_inicial
     tempo_inicializado = pygame.time.get_ticks()  # Registrar o momento em que o temporizador começa
     
@@ -2177,6 +2271,7 @@ def fase3(nome_jogador):
     while fase_ativa:
         tela.blit(fase3Background, (0, 0))
         if jogoPerdeu:
+            salvar_pontuacao(nome_jogador, 3, pontuacao_fase3, tempo_decorrido) 
             tela.blit(pygame.image.load("imagens/fase3/perdeuPraia.png"), (0, 0))
             objetos.clear()  # Limpa todos os objetos
         elif jogoGanhou:
@@ -2355,9 +2450,11 @@ def fase3(nome_jogador):
 
         voltarBotao.atualizarImagem(posicaoMouse)
         configuracoesBotao.atualizarImagem(posicaoMouse)
+        botaoTutorial.atualizarImagem(posicaoMouse)
 
         voltarBotao.desenharBotao(tela)
         configuracoesBotao.desenharBotao(tela)
+        botaoTutorial.desenharBotao(tela)
 
         if voltarBotao.clicarBotao(tela):
             som_click.play()  # Som de clique
@@ -2367,10 +2464,15 @@ def fase3(nome_jogador):
                 pontuacao_fase3 = 0
             fase_ativa = False
 
-        if configuracoesBotao.clicarBotao(tela):
+        elif configuracoesBotao.clicarBotao(tela):
             som_click.play()  # Som de clique
             print("Configurações clicado")
             abrirConfiguracoesFases()
+        
+        elif botaoTutorial.clicarBotao(tela):
+            som_click.play()
+            print("tutorial clicado")
+            mostrarVideo("video/fase3.mp4", 600, 300, "imagens/fase3/imagemTutorialPraia.png", "sons/tutorial/fase3.wav", "sons/musicaPraia/fundoPraia.mp3")
         
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -2398,7 +2500,7 @@ def fase3(nome_jogador):
                     # Atualiza a posição do objeto e o texto associado ao objeto
                     arrastando_objeto["x"] = posicaoMouse[0] - deslocamento_x
                     arrastando_objeto["y"] = posicaoMouse[1] - deslocamento_y
-
+                    print(f"Posição do objeto: X = {arrastando_objeto['x']}, Y = {arrastando_objeto['y']}")
             # Quando o mouse é solto, para o arraste
             elif event.type == pygame.MOUSEBUTTONUP:
                 if event.button == 1:  # Verifica se o botão solto é o esquerdo
@@ -2474,11 +2576,11 @@ def menuPrincipal():
 
     # Criando botões do menu
     jogarBotao = criarBotao(400, 300, "imagens/GUI/botaoJogar/jogar0.png", "imagens/GUI/botaoJogar/jogar1.png")
-    configuracoesBotao = criarBotao(900, 50, "imagens/GUI/botaoConfiguracoes/configuracoes0.png", "imagens/GUI/botaoConfiguracoes/configuracoes1.png")
-    instrucoesBotao = criarBotao(410, 425, "imagens/GUI/botaoInicio/instrucoes1.png", "imagens/GUI/botaoInicio/instrucoes01.png")
-    sairBotao = criarBotao(40, 50, "imagens/GUI/botaoSair/sair0.png", "imagens/GUI/botaoSair/sair1.png")
-    creditosBotao = criarBotao(960, 620, "imagens/GUI/botaoConfiguracoes/info0.png", "imagens/GUI/botaoConfiguracoes/info1.png")  
-    pontuacaoBotao = criarBotao(402, 550, "imagens/GUI/botaoPontuacao/pontuacao0.png", "imagens/GUI/botaoPontuacao/pontuacao1.png")
+    configuracoesBotao = criarBotao(936, 20, "imagens/GUI/botaoConfiguracoes/configuracoes0.png", "imagens/GUI/botaoConfiguracoes/configuracoes1.png")
+    instrucoesBotao = criarBotao(400, 425, "imagens/GUI/botaoInicio/instrucoes1.png", "imagens/GUI/botaoInicio/instrucoes01.png")
+    sairBotao = criarBotao(20, 20, "imagens/GUI/botaoSair/sair0.png", "imagens/GUI/botaoSair/sair1.png")
+    creditosBotao = criarBotao(990, 620, "imagens/GUI/botaoConfiguracoes/info0.png", "imagens/GUI/botaoConfiguracoes/info1.png")  
+    pontuacaoBotao = criarBotao(400, 550, "imagens/GUI/botaoPontuacao/pontuacao0.png", "imagens/GUI/botaoPontuacao/pontuacao1.png")
     run = True
     while run:
         tela.blit(menuBackground, (0, 0))
@@ -2503,9 +2605,9 @@ def menuPrincipal():
         if jogarBotao.clicarBotao(tela):
             som_click.play()  # Som de clique
             print("Jogar clicado")
+            estadoJogo = "jogando"
             pedir_nome()  # Jogador digita o nome
             adicionar_jogador(nome_jogador)  # Salva no JSON
-            estadoJogo = "jogando"
             run = False
             
         if configuracoesBotao.clicarBotao(tela):
