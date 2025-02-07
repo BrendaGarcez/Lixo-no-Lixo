@@ -796,6 +796,7 @@ def abrirInstrucoes():
     texto_fase1 = [
         "",
         "                           Bem-vindo à Fase 1!",
+        "",
         " Nesta fase estamos no zoológico,",
         " O zoológico é um lugar que protege os ",
         " animais que não podem estar na cidade,",
@@ -812,6 +813,7 @@ def abrirInstrucoes():
     texto_fase2 = [
         "",
         "                           Bem-vindo à Fase 2!",
+        "",
         " Nesta fase estamos na sala de aula,",
         " Alguem espalhou lixo pela sala inteira!",
         " Não podemos deixar a sala suja ",
@@ -828,6 +830,7 @@ def abrirInstrucoes():
     texto_fase3 = [
         "",
         "                           Bem-vindo à Fase 3!",
+        "",
         " Nesta fase estamos na praia,",
         " Alguem espalhou lixo pela praia toda!",
         " Não podemos deixar tudo se misturar ",
@@ -865,15 +868,15 @@ def abrirInstrucoes():
     altura_quadro = 480
     posicao_quadro = (330, 180)
 
-    # Cálculo do conteúdo e barra baseado no texto atual
-    def calcular_altura_barra(texto_atual):
-        altura_conteudo = len(texto_atual) * espacamento
+    def calcular_altura_barra(texto):
+        altura_conteudo = len(texto) * espacamento
         barra_altura = max(30, (altura_quadro ** 2) / max(altura_conteudo, altura_quadro))
         return altura_conteudo, barra_altura
 
     altura_conteudo, barra_altura = calcular_altura_barra(texto_atual)
-    deslocamento = 0  # Posição inicial
+    deslocamento = 0
     clicando_na_barra = False
+    offset_y = 0  # Armazena a posição relativa do clique na barra
 
     barra_largura = 15
     barra_x = posicao_quadro[0] + largura_quadro - barra_largura - 5
@@ -900,26 +903,17 @@ def abrirInstrucoes():
 
         # Superfície para instruções
         superficie_instrucoes = pygame.Surface((largura_quadro, max(len(texto_atual) * espacamento, altura_quadro)), pygame.SRCALPHA)
-        superficie_instrucoes.fill((131, 69, 31))  # Fundo do quadro
+        superficie_instrucoes.fill((131, 69, 31))
 
-        # Renderizar o texto
         for i, linha in enumerate(texto_atual):
-            texto_contorno = fonte.render(linha, True, (0, 0, 0))  # Contorno preto
-            texto_preenchimento = fonte.render(linha, True, cor_texto)  # Texto branco
-            x, y = 20, i * espacamento
-            superficie_instrucoes.blit(texto_contorno, (x - 1, y))
-            superficie_instrucoes.blit(texto_contorno, (x + 1, y))
-            superficie_instrucoes.blit(texto_contorno, (x, y - 1))
-            superficie_instrucoes.blit(texto_contorno, (x, y + 1))
-            superficie_instrucoes.blit(texto_preenchimento, (x, y))
+            texto_img = fonte.render(linha, True, cor_texto)
+            superficie_instrucoes.blit(texto_img, (20, i * espacamento))
 
         deslocamento = max(0, min(deslocamento, altura_conteudo - altura_quadro))
         recorte = superficie_instrucoes.subsurface((0, deslocamento, largura_quadro, altura_quadro))
         tela.blit(recorte, posicao_quadro)
 
         # Barra de rolagem
-        trilho_x = barra_x
-        trilho_altura = altura_quadro
         pygame.draw.rect(tela, (50, 50, 50), (trilho_x, posicao_quadro[1], barra_largura, trilho_altura))
         barra_y = posicao_quadro[1] + (deslocamento / (altura_conteudo - altura_quadro)) * (altura_quadro - barra_altura)
         pygame.draw.rect(tela, (236, 155, 94), (barra_x, barra_y, barra_largura, barra_altura), border_radius=5)
@@ -955,14 +949,18 @@ def abrirInstrucoes():
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 global rodando
-                confirmar_saida(tela)
                 rodando = False
                 run = False
 
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 if event.button == 1:
-                    if trilho_x <= posicaoMouse[0] <= trilho_x + barra_largura and barra_y <= posicaoMouse[1] <= barra_y + barra_altura:
-                        clicando_na_barra = True
+                    if barra_x <= posicaoMouse[0] <= barra_x + barra_largura:
+                        if barra_y <= posicaoMouse[1] <= barra_y + barra_altura:
+                            clicando_na_barra = True
+                            offset_y = posicaoMouse[1] - barra_y
+                        elif posicao_quadro[1] <= posicaoMouse[1] <= posicao_quadro[1] + altura_quadro:
+                            nova_pos = (posicaoMouse[1] - posicao_quadro[1]) / altura_quadro
+                            deslocamento = nova_pos * (altura_conteudo - altura_quadro)
 
                 elif event.button == 4:
                     deslocamento = max(deslocamento - 20, 0)
@@ -975,11 +973,11 @@ def abrirInstrucoes():
 
             elif event.type == pygame.MOUSEMOTION:
                 if clicando_na_barra:
-                    deslocamento = max(0, min(altura_conteudo - altura_quadro,
-                                              (event.pos[1] - posicao_quadro[1]) * (altura_conteudo / altura_quadro)))
+                    nova_pos = event.pos[1] - posicao_quadro[1] - offset_y
+                    nova_pos = max(0, min(nova_pos, altura_quadro - barra_altura))
+                    deslocamento = (nova_pos / (altura_quadro - barra_altura)) * (altura_conteudo - altura_quadro)
 
         pygame.display.update()
-
 
 def abrirCreditos():
     global estadoJogo
@@ -1283,47 +1281,46 @@ def abrirRelatorio(ultimo_jogador=None):
     jogadores = dados.get("jogadores", [])
     if jogadores:
         jogadores.insert(0, jogadores.pop())
-    
+
     fonte = pygame.font.Font("tipografia/LuckiestGuy-Regular.ttf", 26)
     cor_texto = (255, 255, 255)
-    cor_ultimo = (255, 0, 0)  # Nome do último jogador destacado em vermelho
-    cor_fases = {1: (163, 117, 78), 2: (243, 255, 156), 3: (166, 237, 255)}  # Cores para as fases
+    cor_ultimo = (255, 0, 0)
+    cor_fases = {1: (163, 117, 78), 2: (243, 255, 156), 3: (166, 237, 255)}
     espacamento = 50
-    
+
     largura_quadro = 700
     altura_quadro = 350
     posicao_quadro = ((1100 - largura_quadro) // 2, (720 - altura_quadro) // 2)
-    
+
     altura_conteudo = sum((1 + len(jogador.get("fases", []))) * espacamento for jogador in jogadores)
     deslocamento = 0
-    
+
     barra_largura = 15
     barra_altura = max(30, altura_quadro * (altura_quadro / max(altura_conteudo, altura_quadro)))
     barra_x = posicao_quadro[0] + largura_quadro - barra_largura - 5
     trilho_x = barra_x
     trilho_altura = altura_quadro
-    
+
     clicando_na_barra = False
-    deslocamento_inicial = 0
     mouse_inicial = 0
-    
+
     run = True
     while run:
         tela.blit(relatorioBackground, (0, 0))
         posicaoMouse = pygame.mouse.get_pos()
-        
+
         configuracoesBotao.atualizarImagem(posicaoMouse)
         configuracoesBotao.desenharBotao(tela)
-        
+
         voltarBotao.atualizarImagem(posicaoMouse)
         voltarBotao.desenharBotao(tela)
 
         calculoPontuacao.atualizarImagem(posicaoMouse)
         calculoPontuacao.desenharBotao(tela)
-        
+
         superficie_relatorio = pygame.Surface((largura_quadro, altura_conteudo), pygame.SRCALPHA)
         superficie_relatorio.fill((255, 189, 140))
-        
+
         y_atual = 20
         for jogador in jogadores:
             nome = jogador["nome"]
@@ -1331,75 +1328,85 @@ def abrirRelatorio(ultimo_jogador=None):
 
             cor_atual = cor_ultimo if nome == ultimo_jogador else cor_texto
             texto_nome = f"Jogador: {nome}"
-            
+
             texto_contorno_nome = fonte.render(texto_nome, True, (0, 0, 0))
             texto_preenchimento_nome = fonte.render(texto_nome, True, cor_atual)
-            
+
             largura_texto = texto_preenchimento_nome.get_width()
             pos_x = (largura_quadro - largura_texto) // 2
-            
+
             superficie_relatorio.blit(texto_contorno_nome, (pos_x - 1, y_atual))
             superficie_relatorio.blit(texto_contorno_nome, (pos_x + 1, y_atual))
             superficie_relatorio.blit(texto_contorno_nome, (pos_x, y_atual - 1))
             superficie_relatorio.blit(texto_contorno_nome, (pos_x, y_atual + 1))
             superficie_relatorio.blit(texto_preenchimento_nome, (pos_x, y_atual))
             y_atual += espacamento
-        
+
             for fase in fases:
                 fase_num = fase['fase']
-                cor_fase = cor_fases.get(fase_num, (255, 255, 255))  # Padrão branco se não for 1, 2 ou 3
+                cor_fase = cor_fases.get(fase_num, (255, 255, 255))
                 fase_str = f"Fase {fase_num}: {fase['pontuacao']} pontos, Tempo: {fase.get('tempo', 'N/A')} segundos"
-                
+
                 texto_contorno_fase = fonte.render(fase_str, True, (0, 0, 0))
                 texto_preenchimento_fase = fonte.render(fase_str, True, cor_fase)
                 largura_fase = texto_preenchimento_fase.get_width()
                 pos_x_fase = (largura_quadro - largura_fase) // 2
-                
+
                 superficie_relatorio.blit(texto_contorno_fase, (pos_x_fase - 1, y_atual))
                 superficie_relatorio.blit(texto_contorno_fase, (pos_x_fase + 1, y_atual))
                 superficie_relatorio.blit(texto_contorno_fase, (pos_x_fase, y_atual - 1))
                 superficie_relatorio.blit(texto_contorno_fase, (pos_x_fase, y_atual + 1))
                 superficie_relatorio.blit(texto_preenchimento_fase, (pos_x_fase, y_atual))
-                
+
                 y_atual += espacamento
-        
+
         deslocamento = max(0, min(deslocamento, max(0, altura_conteudo - altura_quadro)))
         recorte = superficie_relatorio.subsurface((0, deslocamento, largura_quadro, min(altura_quadro, altura_conteudo)))
         tela.blit(recorte, posicao_quadro)
-        
+
         pygame.draw.rect(tela, (100, 100, 100), (trilho_x, posicao_quadro[1], barra_largura, trilho_altura))
         barra_y = posicao_quadro[1] + (deslocamento / max(1, altura_conteudo - altura_quadro)) * (altura_quadro - barra_altura)
         pygame.draw.rect(tela, (200, 200, 200), (barra_x, barra_y, barra_largura, barra_altura), border_radius=5)
-        
+
         if calculoPontuacao.clicarBotao(tela):
             som_click.play()
             run = False
             calculoDaPontuacao()
-        
+
         if voltarBotao.clicarBotao(tela):
             som_click.play()
             estadoJogo = "menu"
             run = False
+
         if configuracoesBotao.clicarBotao(tela):
             som_click.play()
             abrirConfiguracoes()
-        
+
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 confirmar_saida(tela)
             elif event.type == pygame.MOUSEBUTTONDOWN:
-                if event.button == 1 and trilho_x <= posicaoMouse[0] <= trilho_x + barra_largura and barra_y <= posicaoMouse[1] <= barra_y + barra_altura:
-                    clicando_na_barra = True
-                    deslocamento_inicial = deslocamento
-                    mouse_inicial = event.pos[1]
+                if event.button == 1 and trilho_x <= posicaoMouse[0] <= trilho_x + barra_largura:
+                    if barra_y <= posicaoMouse[1] <= barra_y + barra_altura:
+                        clicando_na_barra = True
+                        mouse_inicial = event.pos[1]
+                    elif posicaoMouse[1] < barra_y:
+                        deslocamento = max(deslocamento - altura_quadro, 0)
+                    elif posicaoMouse[1] > barra_y + barra_altura:
+                        deslocamento = min(deslocamento + altura_quadro, max(0, altura_conteudo - altura_quadro))
                 elif event.button == 4:
                     deslocamento = max(deslocamento - 20, 0)
                 elif event.button == 5:
                     deslocamento = min(deslocamento + 20, max(0, altura_conteudo - altura_quadro))
             elif event.type == pygame.MOUSEBUTTONUP and event.button == 1:
                 clicando_na_barra = False
-        
+            elif event.type == pygame.MOUSEMOTION and clicando_na_barra:
+                deslocamento += (event.pos[1] - mouse_inicial) * (altura_conteudo / altura_quadro)
+                mouse_inicial = event.pos[1]
+
         pygame.display.update()
+
+
 
 # Função para as fases
 def iniciarFases():
@@ -1599,6 +1606,10 @@ def fase1(nome_jogador):
     
     # Criar o botão de confirmar no centro inferior da tela
     confirmarBotao = criarBotao(470, 660, "imagens/GUI/botaoConfirmar/confirmar1.png", "imagens/GUI/botaoConfirmar/confirmar2.png")
+    
+    lampadaAcesaImagem = pygame.image.load("imagens/GUI/lampadas/lampadaAcesa.png")
+    lampadaApagadaImagem = pygame.image.load("imagens/GUI/lampadas/lampadaApagada.png")
+    lampada = criarBotao(980, 170, "imagens/GUI/lampadas/lampadaApagada.png", "imagens/GUI/lampadas/lampadaApagada.png")
 
      # Configurações do temporizador
     tempo_inicial = 300  # Tempo inicial em segundos
@@ -1617,12 +1628,12 @@ def fase1(nome_jogador):
     while fase_ativa:
         if not jogoGanhou and not jogoPerdeu:
             if lampada_acesa:
-                lampada = criarBotao(980, 170, "imagens/GUI/lampadas/lampadaAcesa.png", "imagens/GUI/lampadas/lampadaAcesa.png")
+                lampada.mudarImagem(lampadaAcesaImagem, lampadaAcesaImagem)
                 if not som_da_lampada:
                     som_dica.play()  # Toca o som apenas se não foi tocado ainda
                     som_da_lampada = True  # Marca o som como tocado
             else:
-                lampada = criarBotao(980, 170, "imagens/GUI/lampadas/lampadaApagada.png", "imagens/GUI/lampadas/lampadaApagada.png")
+                lampada.mudarImagem(lampadaApagadaImagem, lampadaApagadaImagem)
                 som_da_lampada = False
         tela.blit(fase1Background, (0, 0))
 
@@ -1825,14 +1836,15 @@ def fase1(nome_jogador):
 
         voltarBotao.atualizarImagem(posicaoMouse)
         configuracoesBotao.atualizarImagem(posicaoMouse)
-        botaoTutorial.atualizarImagem(posicaoMouse)
         
         voltarBotao.desenharBotao(tela)
         configuracoesBotao.desenharBotao(tela)
-        botaoTutorial.desenharBotao(tela)
-
+        
         # Apenas processa o botão confirmar se o jogo ainda não foi ganho ou perdido
         if not jogoGanhou and not jogoPerdeu:
+            botaoTutorial.atualizarImagem(posicaoMouse)
+            botaoTutorial.desenharBotao(tela)
+            
             confirmarBotao.atualizarImagem(posicaoMouse)  # Atualiza a imagem do botão de confirmar
             confirmarBotao.desenharBotao(tela)  # Desenha o botão de confirmar
 
@@ -1840,15 +1852,12 @@ def fase1(nome_jogador):
             lampada.desenharBotao(tela)
 
             if lampada_acesa:
-                lampada = criarBotao(980, 170, "imagens/GUI/lampadas/lampadaAcesa.png", "imagens/GUI/lampadas/lampadaAcesa.png")
+                lampada.mudarImagem(lampadaAcesaImagem, lampadaAcesaImagem)
                 
                 # Verifica se o som já foi tocado
                 if not som_da_lampada:
                     som_dica.play()  # Toca o som apenas se não foi tocado ainda
                     som_da_lampada = True  # Marca o som como tocado
-                
-                # Desenhar o botão na tela
-                lampada.desenharBotao(tela)
                 
                 # Criar o texto "Dica" com contorno
                 texto_dica_contorno = fonte.render("Dica", True, cor_contorno)  # Contorno do texto
@@ -2088,6 +2097,10 @@ def fase2(nome_jogador):
     # Criar o  de confirmar no centro inferior da tela
     confirmarBotao = criarBotao(470, 660, "imagens/GUI/botaoConfirmar/confirmar1.png", "imagens/GUI/botaoConfirmar/confirmar2.png")
 
+    lampadaAcesaImagem = pygame.image.load("imagens/GUI/lampadas/lampadaAcesa.png")
+    lampadaApagadaImagem = pygame.image.load("imagens/GUI/lampadas/lampadaApagada.png")
+    lampada = criarBotao(980, 170, "imagens/GUI/lampadas/lampadaApagada.png", "imagens/GUI/lampadas/lampadaApagada.png")
+
      # Configurações do temporizador
     tempo_inicial = 300  # Tempo inicial em segundos
     tempo_restante = tempo_inicial
@@ -2102,16 +2115,16 @@ def fase2(nome_jogador):
     cor_texto = (255, 255, 255)  # Cor do texto (branco)
     cor_contorno = (0, 0, 0)  # Cor do contorno (preto)
 
-    while fase_ativa:
+    while fase_ativa:        
         if not jogoGanhou and not jogoPerdeu:
             if lampada_acesa:
-                lampada = criarBotao(980, 170, "imagens/GUI/lampadas/lampadaAcesa.png", "imagens/GUI/lampadas/lampadaAcesa.png")
+                lampada.mudarImagem(lampadaAcesaImagem, lampadaAcesaImagem)
                 if not som_da_lampada:
                     som_dica.play()  # Toca o som apenas se não foi tocado ainda
                     som_da_lampada = True  # Marca o som como tocado
             else:
-                lampada = criarBotao(980, 170, "imagens/GUI/lampadas/lampadaApagada.png", "imagens/GUI/lampadas/lampadaApagada.png")
-                som_da_lampada = False  
+                lampada.mudarImagem(lampadaApagadaImagem, lampadaApagadaImagem)
+                som_da_lampada = False
                 
         tela.blit(fase2Background, (0, 0))
         if jogoPerdeu:
@@ -2311,14 +2324,15 @@ def fase2(nome_jogador):
 
         voltarBotao.atualizarImagem(posicaoMouse)
         configuracoesBotao.atualizarImagem(posicaoMouse)
-        botaoTutorial.atualizarImagem(posicaoMouse)
 
         voltarBotao.desenharBotao(tela)
         configuracoesBotao.desenharBotao(tela)
-        botaoTutorial.desenharBotao(tela)
         
         # Apenas processa o botão confirmar se o jogo ainda não foi ganho ou perdido
         if not jogoGanhou and not jogoPerdeu:
+            botaoTutorial.atualizarImagem(posicaoMouse)
+            botaoTutorial.desenharBotao(tela)
+            
             confirmarBotao.atualizarImagem(posicaoMouse)  # Atualiza a imagem do botão de confirmar
             confirmarBotao.desenharBotao(tela)  # Desenha o botão de confirmar
 
@@ -2326,15 +2340,12 @@ def fase2(nome_jogador):
             lampada.desenharBotao(tela)
 
             if lampada_acesa:
-                lampada = criarBotao(980, 170, "imagens/GUI/lampadas/lampadaAcesa.png", "imagens/GUI/lampadas/lampadaAcesa.png")
+                lampada.mudarImagem(lampadaAcesaImagem, lampadaAcesaImagem)
                 
                 # Verifica se o som já foi tocado
                 if not som_da_lampada:
                     som_dica.play()  # Toca o som apenas se não foi tocado ainda
                     som_da_lampada = True  # Marca o som como tocado
-                
-                # Desenhar o botão na tela
-                lampada.desenharBotao(tela)
                 
                 # Criar o texto "Dica" com contorno
                 texto_dica_contorno = fonte.render("Dica", True, cor_contorno)  # Contorno do texto
@@ -2627,6 +2638,10 @@ def fase3(nome_jogador):
     posicionar_objetos(imagensCorretasSelecionadas, "correto")
     posicionar_objetos(imagensIncorretasSelecionadas, "incorreto")
 
+    lampadaAcesaImagem = pygame.image.load("imagens/GUI/lampadas/lampadaAcesa.png")
+    lampadaApagadaImagem = pygame.image.load("imagens/GUI/lampadas/lampadaApagada.png")
+    lampada = criarBotao(980, 170, "imagens/GUI/lampadas/lampadaApagada.png", "imagens/GUI/lampadas/lampadaApagada.png")
+
      # Configurações do temporizador
     tempo_inicial = 300  # Tempo inicial em segundos
     tempo_restante = tempo_inicial
@@ -2649,13 +2664,14 @@ def fase3(nome_jogador):
     while fase_ativa:
         if not jogoGanhou and not jogoPerdeu:
             if lampada_acesa:
-                lampada = criarBotao(980, 170, "imagens/GUI/lampadas/lampadaAcesa.png", "imagens/GUI/lampadas/lampadaAcesa.png")
+                lampada.mudarImagem(lampadaAcesaImagem, lampadaAcesaImagem)
                 if not som_da_lampada:
                     som_dica.play()  # Toca o som apenas se não foi tocado ainda
                     som_da_lampada = True  # Marca o som como tocado
             else:
-                lampada = criarBotao(980, 170, "imagens/GUI/lampadas/lampadaApagada.png", "imagens/GUI/lampadas/lampadaApagada.png")
+                lampada.mudarImagem(lampadaApagadaImagem, lampadaApagadaImagem)
                 som_da_lampada = False
+                
 
         tela.blit(fase3Background, (0, 0))
         if jogoPerdeu:
@@ -2841,27 +2857,25 @@ def fase3(nome_jogador):
 
         voltarBotao.atualizarImagem(posicaoMouse)
         configuracoesBotao.atualizarImagem(posicaoMouse)
-        botaoTutorial.atualizarImagem(posicaoMouse)
-
+        
         voltarBotao.desenharBotao(tela)
         configuracoesBotao.desenharBotao(tela)
-        botaoTutorial.desenharBotao(tela)
-
+       
         if not jogoGanhou and not jogoPerdeu:
+            botaoTutorial.atualizarImagem(posicaoMouse)
+            botaoTutorial.desenharBotao(tela)
+        
             lampada.atualizarImagem(posicaoMouse)
             lampada.desenharBotao(tela)
             
             if lampada_acesa:
-                lampada = criarBotao(980, 170, "imagens/GUI/lampadas/lampadaAcesa.png", "imagens/GUI/lampadas/lampadaAcesa.png")
+                lampada.mudarImagem(lampadaAcesaImagem, lampadaAcesaImagem)
                 
                 # Verifica se o som já foi tocado
                 if not som_da_lampada:
                     som_dica.play()  # Toca o som apenas se não foi tocado ainda
                     som_da_lampada = True  # Marca o som como tocado
-                
-                # Desenhar o botão na tela
-                lampada.desenharBotao(tela)
-                
+                                
                 # Criar o texto "Dica" com contorno
                 texto_dica_contorno = fonte.render("Dica", True, cor_contorno)  # Contorno do texto
                 texto_dica_preenchimento = fonte.render("Dica", True, cor_texto)  # Texto preenchido com a cor original

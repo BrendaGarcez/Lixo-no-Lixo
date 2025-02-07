@@ -27,6 +27,13 @@ class Botao():
                     self.clicked = False  
 
         return acao
+    
+    def mudarImagem(self, novaImagem, novaImagemAlterada):
+        """Muda a imagem do botão dinamicamente."""
+        self.imagemOriginal = novaImagem
+        self.imagemAlterada = novaImagemAlterada
+        self.imagem = self.imagemOriginal
+        self.rect = self.imagem.get_rect(topleft=self.rect.topleft)
 
     def atualizarImagem(self, posicaoMouse): 
         if self.rect.collidepoint(posicaoMouse):

@@ -3,20 +3,14 @@ Geral de Trabalho
 - Documentação de Risco
 - Documentação Geral
 - Casos de Uso(Tabelas e Diagramas)
-- Verificar se tem mais algo
-
 
 ---- Mudanças professora ----
--Layout detalhes p/professor       
+-Layout detalhes p/professor 
 
 Geral de aplicativo
 -->>> Tutoriais
 
-
 -> pyinstaller com -w para não abrir terminal
--> adicionar imagem clara para o botão de fases 
--> apagar o .venv (talvez)
--> problema de áudio, está abaixando para 19
 
 Telas:
 -----Tela Inicial-----
@@ -31,8 +25,8 @@ Telas:
 - Pronto
 
 -----Sons-----
-- Nome dos objetos falados 
+- Pronto
 
 -----Fase 1, 2 ,3-----
--> mensagens de apoio caso erro e de incentivo caso acerto (a pensar)
+-> Prontas, só falta o tutorial da fase 3 com melhor resolução
 
