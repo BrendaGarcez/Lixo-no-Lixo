@@ -1495,7 +1495,7 @@ def fase1(nome_jogador):
 
     voltarBotao = criarBotao(20, 20, "imagens/GUI/botaoVoltar/voltar0.png", "imagens/GUI/botaoVoltar/voltar1.png")
     configuracoesBotao = criarBotao(936, 20, "imagens/GUI/botaoConfiguracoes/configuracoes0.png", "imagens/GUI/botaoConfiguracoes/configuracoes1.png")
-    botaoTutorial = criarBotao(955, 665, "imagens/GUI/botaoTutorial/botaoTutorial0.png", "imagens/GUI/botaoTutorial/botaoTutorial1.png")
+    botaoTutorial = criarBotao(936, 660, "imagens/GUI/botaoTutorial/botaoTutorial0.png", "imagens/GUI/botaoTutorial/botaoTutorial1.png")
 
     # Configurações para o texto do temporizador
     fonte1 = pygame.font.Font("tipografia/LuckiestGuy-Regular.ttf", 36)
@@ -1992,7 +1992,7 @@ def fase2(nome_jogador):
 
     voltarBotao = criarBotao(20, 20, "imagens/GUI/botaoVoltar/voltar0.png", "imagens/GUI/botaoVoltar/voltar1.png")
     configuracoesBotao = criarBotao(936, 20, "imagens/GUI/botaoConfiguracoes/configuracoes0.png", "imagens/GUI/botaoConfiguracoes/configuracoes1.png")
-    botaoTutorial = criarBotao(955, 665, "imagens/GUI/botaoTutorial/botaoTutorial0.png", "imagens/GUI/botaoTutorial/botaoTutorial1.png")
+    botaoTutorial = criarBotao(936, 660, "imagens/GUI/botaoTutorial/botaoTutorial0.png", "imagens/GUI/botaoTutorial/botaoTutorial1.png")
 
     # Configurações para o texto do temporizador
     fonte1 = pygame.font.Font("tipografia/LuckiestGuy-Regular.ttf", 36)
@@ -2482,7 +2482,7 @@ def fase3(nome_jogador):
 
     voltarBotao = criarBotao(20, 20, "imagens/GUI/botaoVoltar/voltar0.png", "imagens/GUI/botaoVoltar/voltar1.png")
     configuracoesBotao = criarBotao(936, 20, "imagens/GUI/botaoConfiguracoes/configuracoes0.png", "imagens/GUI/botaoConfiguracoes/configuracoes1.png")
-    botaoTutorial = criarBotao(955, 665, "imagens/GUI/botaoTutorial/botaoTutorial0.png", "imagens/GUI/botaoTutorial/botaoTutorial1.png")
+    botaoTutorial = criarBotao(936, 660, "imagens/GUI/botaoTutorial/botaoTutorial0.png", "imagens/GUI/botaoTutorial/botaoTutorial1.png")
 
     # Configurações para o texto do temporizador
     fonte1 = pygame.font.Font("tipografia/LuckiestGuy-Regular.ttf", 36)
