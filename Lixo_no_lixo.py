@@ -229,10 +229,6 @@ def pedir_nome():
     """Solicita o nome do jogador via input no Pygame."""
     global nome_jogador, estadoJogo, somAtivo
 
-    # Verifique se o nome já foi definido antes de continuar
-    if nome_jogador:
-        return nome_jogador  # Retorna o nome existente se já houver
-
     fonte_titulo = pygame.font.Font("tipografia/LuckiestGuy-Regular.ttf", 50)  # Fonte do título
     fonte_nome = pygame.font.Font("tipografia/LuckiestGuy-Regular.ttf", 30)  # Fonte menor para o nome
 
