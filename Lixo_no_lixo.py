@@ -1316,7 +1316,7 @@ def abrirRelatorio(ultimo_jogador=None):
         calculoPontuacao.atualizarImagem(posicaoMouse)
         calculoPontuacao.desenharBotao(tela)
 
-        superficie_relatorio = pygame.Surface((largura_quadro+50, altura_conteudo), pygame.SRCALPHA)
+        superficie_relatorio = pygame.Surface((largura_quadro, altura_conteudo), pygame.SRCALPHA)
         superficie_relatorio.fill((255, 189, 140))
 
         # Desenhar cabeçalho
@@ -1343,7 +1343,7 @@ def abrirRelatorio(ultimo_jogador=None):
             fases = jogador.get("fases", [])
             cor_atual = cor_ultimo if nome == ultimo_jogador else cor_texto
 
-            pygame.draw.line(superficie_relatorio, (0, 0, 0), (0, altura_conteudo), (largura_quadro, altura_conteudo), 3)
+            pygame.draw.line(superficie_relatorio, (120, 64, 8), (0, y_atual - 10), (largura_quadro, y_atual - 10), 2)
 
             x_atual = 0
             for i, coluna in enumerate(colunas):
@@ -1370,18 +1370,17 @@ def abrirRelatorio(ultimo_jogador=None):
             # Verificar se é o último jogador (para desenhar a linha final da tabela e borda da última coluna)
             if index == len(jogadores) - 1:
                 # Linha final horizontal
-                pygame.draw.line(superficie_relatorio, (0, 0, 0), (0, y_atual), (largura_quadro, y_atual), 3)
+                pygame.draw.line(superficie_relatorio, (0, 0, 0), (0, y_atual - 10), (largura_quadro, y_atual - 10), 3)
 
                 # Borda da última coluna
-                x_final = sum(largura_colunas)  # Posição correta da última borda
-                pygame.draw.line(superficie_relatorio, (120, 64, 8), (x_final - 2, 20), (x_final - 2, altura_conteudo), 3)
-
-
+                x_atual = sum(largura_colunas)  # Posição da última coluna
+                pygame.draw.line(superficie_relatorio, (120, 64, 8), (x_atual, y_atual - 10), (x_atual, y_atual), 2)
 
         # Desenho da linha final da última coluna (Fase 3)
-        pygame.draw.line(superficie_relatorio, (120, 64, 8), (x_final, 20), (x_final, y_atual), 3)
+        pygame.draw.line(superficie_relatorio, (120, 64, 8), (0, y_atual - 10), (largura_quadro, y_atual - 10), 3)
+
         deslocamento = max(0, min(deslocamento, max(0, altura_conteudo - altura_quadro)))
-        recorte = superficie_relatorio.subsurface((0, deslocamento, largura_quadro , altura_conteudo))
+        recorte = superficie_relatorio.subsurface((0, deslocamento, largura_quadro, altura_conteudo))        
         tela.blit(recorte, posicao_quadro)
 
         pygame.draw.rect(tela, (200, 200, 200), (trilho_x, posicao_quadro[1], barra_largura, trilho_altura))
@@ -1425,9 +1424,6 @@ def abrirRelatorio(ultimo_jogador=None):
                 mouse_inicial = event.pos[1]
 
         pygame.display.update()
-
-
-
 
 
 # Função para as fases
