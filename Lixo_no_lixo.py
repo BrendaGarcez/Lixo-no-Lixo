@@ -4,6 +4,7 @@ import botao  # Importando a classe Botao
 import botaoObjetos
 import sys
 import random
+import math
 import cv2
 import json
 import os
