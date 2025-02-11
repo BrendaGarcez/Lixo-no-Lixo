@@ -1270,7 +1270,7 @@ def abrirRelatorio(ultimo_jogador=None):
     relatorioBackground = pygame.image.load("imagens/GUI/Backgrounds/relatorioBackground.png")
     voltarBotao = criarBotao(20, 20, "imagens/GUI/botaoVoltar/voltar0.png", "imagens/GUI/botaoVoltar/voltar1.png")
     configuracoesBotao = criarBotao(936, 20, "imagens/GUI/botaoConfiguracoes/configuracoes0.png", "imagens/GUI/botaoConfiguracoes/configuracoes1.png")
-    calculoPontuacao = criarBotao(990, 620, "imagens/GUI/botaoConfiguracoes/info0.png", "imagens/GUI/botaoConfiguracoes/info1.png")  
+    calculoPontuacao = criarBotao(990, 620, "imagens/GUI/botaoConfiguracoes/info0.png", "imagens/GUI/botaoConfiguracoes/info1.png")
 
     dados = carregar_dados_jogadores()
     jogadores = dados.get("jogadores", [])
@@ -1283,16 +1283,19 @@ def abrirRelatorio(ultimo_jogador=None):
     cor_fases = {1: (163, 117, 78), 2: (243, 255, 156), 3: (166, 237, 255)}
     espacamento = 50
 
-    largura_quadro = 700
+    largura_quadro = 600
     altura_quadro = 350
     posicao_quadro = ((1100 - largura_quadro) // 2, (720 - altura_quadro) // 2)
 
-    altura_conteudo = sum((1 + len(jogador.get("fases", []))) * espacamento for jogador in jogadores)
+    colunas = ["Jogador", "Fase 1", "Fase 2", "Fase 3"]
+    largura_colunas = [200, 150, 150, 150]
+
+    altura_conteudo = (len(jogadores) + 1) * espacamento
     deslocamento = 0
 
     barra_largura = 15
     barra_altura = max(30, altura_quadro * (altura_quadro / max(altura_conteudo, altura_quadro)))
-    barra_x = posicao_quadro[0] + largura_quadro - barra_largura - 5
+    barra_x = posicao_quadro[0] + largura_quadro - barra_largura + 35
     trilho_x = barra_x
     trilho_altura = altura_quadro
 
@@ -1313,55 +1316,77 @@ def abrirRelatorio(ultimo_jogador=None):
         calculoPontuacao.atualizarImagem(posicaoMouse)
         calculoPontuacao.desenharBotao(tela)
 
-        superficie_relatorio = pygame.Surface((largura_quadro, altura_conteudo), pygame.SRCALPHA)
+        superficie_relatorio = pygame.Surface((largura_quadro+50, altura_conteudo), pygame.SRCALPHA)
         superficie_relatorio.fill((255, 189, 140))
 
+        # Desenhar cabeçalho
         y_atual = 20
-        for jogador in jogadores:
+        pygame.draw.line(superficie_relatorio, (120, 84, 8), (0, y_atual - 10), (largura_quadro, y_atual - 10), 3)
+
+        x_atual = 0
+        for i, coluna in enumerate(colunas):
+            pygame.draw.line(superficie_relatorio, (120, 64, 8), (x_atual, y_atual - 10), (x_atual, y_atual + espacamento - 10), 2)
+            cor_cabecalho = (255, 215, 0) if i == 0 else (102, 51, 0)
+
+            texto_contorno = fonte.render(coluna, True, (102, 51, 0))
+            texto_preenchimento = fonte.render(coluna, True, cor_cabecalho)
+
+            superficie_relatorio.blit(texto_contorno, (x_atual + 10, y_atual))
+            superficie_relatorio.blit(texto_preenchimento, (x_atual + 10, y_atual))
+            x_atual += largura_colunas[i]
+
+        y_atual += espacamento
+
+        # Desenhar tabela com os jogadores
+        for index, jogador in enumerate(jogadores):
             nome = jogador["nome"]
             fases = jogador.get("fases", [])
-
             cor_atual = cor_ultimo if nome == ultimo_jogador else cor_texto
-            texto_nome = f"Jogador: {nome}"
 
-            texto_contorno_nome = fonte.render(texto_nome, True, (0, 0, 0))
-            texto_preenchimento_nome = fonte.render(texto_nome, True, cor_atual)
+            pygame.draw.line(superficie_relatorio, (0, 0, 0), (0, altura_conteudo), (largura_quadro, altura_conteudo), 3)
 
-            largura_texto = texto_preenchimento_nome.get_width()
-            pos_x = (largura_quadro - largura_texto) // 2
+            x_atual = 0
+            for i, coluna in enumerate(colunas):
+                pygame.draw.line(superficie_relatorio, (120, 64, 8), (x_atual, y_atual - 10), (x_atual, y_atual + espacamento - 10), 2)
 
-            superficie_relatorio.blit(texto_contorno_nome, (pos_x - 1, y_atual))
-            superficie_relatorio.blit(texto_contorno_nome, (pos_x + 1, y_atual))
-            superficie_relatorio.blit(texto_contorno_nome, (pos_x, y_atual - 1))
-            superficie_relatorio.blit(texto_contorno_nome, (pos_x, y_atual + 1))
-            superficie_relatorio.blit(texto_preenchimento_nome, (pos_x, y_atual))
+                if i == 0:
+                    texto = f"{nome}"
+                else:
+                    fase = next((f for f in fases if f['fase'] == i), None)
+                    texto = f"{fase['pontuacao']}" if fase else "N/A"
+
+                cor_fase = cor_fases.get(i, cor_texto)
+
+                texto_contorno = fonte.render(texto, True, (120, 84, 6))
+                texto_preenchimento = fonte.render(texto, True, cor_fase if i != 0 else cor_atual)
+
+                superficie_relatorio.blit(texto_contorno, (x_atual + 10, y_atual))
+                superficie_relatorio.blit(texto_preenchimento, (x_atual + 10, y_atual))
+
+                x_atual += largura_colunas[i]
+
             y_atual += espacamento
 
-            for fase in fases:
-                fase_num = fase['fase']
-                cor_fase = cor_fases.get(fase_num, (255, 255, 255))
-                fase_str = f"Fase {fase_num}: {fase['pontuacao']} pontos, Tempo: {fase.get('tempo', 'N/A')} segundos"
+            # Verificar se é o último jogador (para desenhar a linha final da tabela e borda da última coluna)
+            if index == len(jogadores) - 1:
+                # Linha final horizontal
+                pygame.draw.line(superficie_relatorio, (0, 0, 0), (0, y_atual), (largura_quadro, y_atual), 3)
 
-                texto_contorno_fase = fonte.render(fase_str, True, (0, 0, 0))
-                texto_preenchimento_fase = fonte.render(fase_str, True, cor_fase)
-                largura_fase = texto_preenchimento_fase.get_width()
-                pos_x_fase = (largura_quadro - largura_fase) // 2
+                # Borda da última coluna
+                x_final = sum(largura_colunas)  # Posição correta da última borda
+                pygame.draw.line(superficie_relatorio, (120, 64, 8), (x_final - 2, 20), (x_final - 2, altura_conteudo), 3)
 
-                superficie_relatorio.blit(texto_contorno_fase, (pos_x_fase - 1, y_atual))
-                superficie_relatorio.blit(texto_contorno_fase, (pos_x_fase + 1, y_atual))
-                superficie_relatorio.blit(texto_contorno_fase, (pos_x_fase, y_atual - 1))
-                superficie_relatorio.blit(texto_contorno_fase, (pos_x_fase, y_atual + 1))
-                superficie_relatorio.blit(texto_preenchimento_fase, (pos_x_fase, y_atual))
 
-                y_atual += espacamento
 
+        # Desenho da linha final da última coluna (Fase 3)
+        pygame.draw.line(superficie_relatorio, (120, 64, 8), (x_final, 20), (x_final, y_atual), 3)
         deslocamento = max(0, min(deslocamento, max(0, altura_conteudo - altura_quadro)))
-        recorte = superficie_relatorio.subsurface((0, deslocamento, largura_quadro, min(altura_quadro, altura_conteudo)))
+        recorte = superficie_relatorio.subsurface((0, deslocamento, largura_quadro , altura_conteudo))
         tela.blit(recorte, posicao_quadro)
 
-        pygame.draw.rect(tela, (100, 100, 100), (trilho_x, posicao_quadro[1], barra_largura, trilho_altura))
+        pygame.draw.rect(tela, (200, 200, 200), (trilho_x, posicao_quadro[1], barra_largura, trilho_altura))
         barra_y = posicao_quadro[1] + (deslocamento / max(1, altura_conteudo - altura_quadro)) * (altura_quadro - barra_altura)
-        pygame.draw.rect(tela, (200, 200, 200), (barra_x, barra_y, barra_largura, barra_altura), border_radius=5)
+        pygame.draw.rect(tela, (120, 84, 8), (barra_x, barra_y, barra_largura, barra_altura), border_radius=5)
 
         if calculoPontuacao.clicarBotao(tela):
             som_click.play()
@@ -1400,6 +1425,8 @@ def abrirRelatorio(ultimo_jogador=None):
                 mouse_inicial = event.pos[1]
 
         pygame.display.update()
+
+
 
 
 
