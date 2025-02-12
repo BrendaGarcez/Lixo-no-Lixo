@@ -4,7 +4,6 @@ import botao  # Importando a classe Botao
 import botaoObjetos
 import sys
 import random
-import math
 import cv2
 import json
 import os
@@ -453,7 +452,9 @@ def mostrarVideo(video_path, video_width, video_height, imagem_fundo_path, audio
         ret, frame = cap.read()
         if not ret:
             print("Fim do vídeo ou erro ao ler frame!")
+            pygame.mixer.music.stop()  # Parar a música ao terminar o vídeo
             break
+
 
         frame = cv2.resize(frame, (video_width, video_height))
         frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
@@ -1136,25 +1137,13 @@ def calculoDaPontuacao():
     configuracoesBotao = criarBotao(936, 20, "imagens/GUI/botaoConfiguracoes/configuracoes0.png", "imagens/GUI/botaoConfiguracoes/configuracoes1.png")
 
     linhas_creditos = [
-        "Como funciona o cálculo da pontuação:",
-        "",
-        "Fase 1",     
-        "10 pontos = 6 acertos",
-        "9 pontos = 5 acertos",
-        "8 pontos = 4 acertos",
-        "0 pontos = 3 erros",
-        "",
-        "Fase 2",      
-        "10 pontos = 6 acertos",
-        "9 pontos = 5 acertos",
-        "8 pontos = 4 acertos",
-        "0 pontos = 3 erros",
-        "",
-        "Fase 3",
-        "10 pontos = 10 acertos",
-        "9 pontos = 9 acertos",
-        "8 pontos = 8 acertos",
-        "0 pontos = 3 erros",
+        "Como funciona a pontuação:",
+        "- É com base nas vidas restantes durante a fase",
+        "ou seja:",
+        "3 corações = 0 erros",
+        "2 corações = 1 erro",
+        "1 coração = 2 erros",
+        "0 corações = 3 erros ",
     ]
 
     fonte = pygame.font.Font("tipografia/LuckiestGuy-Regular.ttf", 26)  # 40 é o tamanho da fonte
@@ -1273,20 +1262,40 @@ def abrirRelatorio(ultimo_jogador=None):
     configuracoesBotao = criarBotao(936, 20, "imagens/GUI/botaoConfiguracoes/configuracoes0.png", "imagens/GUI/botaoConfiguracoes/configuracoes1.png")
     calculoPontuacao = criarBotao(990, 620, "imagens/GUI/botaoConfiguracoes/info0.png", "imagens/GUI/botaoConfiguracoes/info1.png")
 
+    # Carregar as imagens das vidas e redimensioná-las
+    tamanho_imagem = (120, 30)  # Defina o tamanho desejado para as imagens
+    vidas_imagens = {
+        0: pygame.transform.scale(pygame.image.load("imagens/GUI/vidasRelatorio/0vidas.png"), tamanho_imagem),
+        1: pygame.transform.scale(pygame.image.load("imagens/GUI/vidasRelatorio/1vida.png"), tamanho_imagem),
+        2: pygame.transform.scale(pygame.image.load("imagens/GUI/vidasRelatorio/2vidas.png"), tamanho_imagem),
+        3: pygame.transform.scale(pygame.image.load("imagens/GUI/vidasRelatorio/3vidas.png"), tamanho_imagem)
+    }
+
+    # Função para mapear pontuação para vidas
+    def pontuacao_para_vidas(pontuacao):
+        if pontuacao == 10:
+            return 3
+        elif pontuacao == 9:
+            return 2
+        elif pontuacao == 8:
+            return 1
+        else:
+            return 0
+
     dados = carregar_dados_jogadores()
     jogadores = dados.get("jogadores", [])
     if jogadores:
         jogadores.insert(0, jogadores.pop())
 
     fonte = pygame.font.Font("tipografia/LuckiestGuy-Regular.ttf", 26)
+    fonte2 = pygame.font.Font("tipografia/LuckiestGuy-Regular.ttf", 18)
     cor_texto = (255, 255, 255)
     cor_ultimo = (255, 0, 0)
-    cor_fases = {1: (163, 117, 78), 2: (243, 255, 156), 3: (166, 237, 255)}
     espacamento = 50
 
-    largura_quadro = 600
+    largura_quadro = 640
     altura_quadro = 350
-    posicao_quadro = ((1100 - largura_quadro) // 2, (720 - altura_quadro) // 2)
+    posicao_quadro = ((1020 - largura_quadro) // 2, (720 - altura_quadro) // 2)
 
     colunas = ["Jogador", "Fase 1", "Fase 2", "Fase 3"]
     largura_colunas = [200, 150, 150, 150]
@@ -1296,7 +1305,7 @@ def abrirRelatorio(ultimo_jogador=None):
 
     barra_largura = 15
     barra_altura = max(30, altura_quadro * (altura_quadro / max(altura_conteudo, altura_quadro)))
-    barra_x = posicao_quadro[0] + largura_quadro - barra_largura + 35
+    barra_x = posicao_quadro[0] + largura_quadro - barra_largura + 80
     trilho_x = barra_x
     trilho_altura = altura_quadro
 
@@ -1345,25 +1354,31 @@ def abrirRelatorio(ultimo_jogador=None):
             cor_atual = cor_ultimo if nome == ultimo_jogador else cor_texto
 
             pygame.draw.line(superficie_relatorio, (120, 64, 8), (0, y_atual - 10), (largura_quadro, y_atual - 10), 2)
-
+            
             x_atual = 0
             for i, coluna in enumerate(colunas):
                 pygame.draw.line(superficie_relatorio, (120, 64, 8), (x_atual, y_atual - 10), (x_atual, y_atual + espacamento - 10), 2)
 
                 if i == 0:
                     texto = f"{nome}"
+                    texto_contorno = fonte.render(texto, True, (120, 84, 6))
+                    texto_preenchimento = fonte.render(texto, True, cor_atual)
+                    superficie_relatorio.blit(texto_contorno, (x_atual + 10, y_atual))
+                    superficie_relatorio.blit(texto_preenchimento, (x_atual + 10, y_atual))
                 else:
                     fase = next((f for f in fases if f['fase'] == i), None)
-                    texto = f"{fase['pontuacao']}" if fase else "N/A"
-
-                cor_fase = cor_fases.get(i, cor_texto)
-
-                texto_contorno = fonte.render(texto, True, (120, 84, 6))
-                texto_preenchimento = fonte.render(texto, True, cor_fase if i != 0 else cor_atual)
-
-                superficie_relatorio.blit(texto_contorno, (x_atual + 10, y_atual))
-                superficie_relatorio.blit(texto_preenchimento, (x_atual + 10, y_atual))
-
+                    if fase:
+                        pontuacao = fase['pontuacao']
+                        vidas = pontuacao_para_vidas(pontuacao)
+                        imagem_vidas = vidas_imagens[vidas]
+                        superficie_relatorio.blit(imagem_vidas, (x_atual + 15, y_atual))
+                    else:
+                        texto = "Não concluída"
+                        texto_contorno = fonte2.render(texto, True, (120, 84, 6))
+                        texto_preenchimento = fonte2.render(texto, True, cor_texto)
+                        superficie_relatorio.blit(texto_contorno, (x_atual + 10, y_atual))
+                        superficie_relatorio.blit(texto_preenchimento, (x_atual + 10, y_atual))
+                
                 x_atual += largura_colunas[i]
 
             y_atual += espacamento
@@ -1381,7 +1396,7 @@ def abrirRelatorio(ultimo_jogador=None):
         pygame.draw.line(superficie_relatorio, (120, 64, 8), (0, y_atual - 10), (largura_quadro, y_atual - 10), 3)
 
         deslocamento = max(0, min(deslocamento, max(0, altura_conteudo - altura_quadro)))
-        recorte = superficie_relatorio.subsurface((0, deslocamento, largura_quadro, altura_conteudo))        
+        recorte = superficie_relatorio.subsurface((0, deslocamento, largura_quadro, altura_quadro))        
         tela.blit(recorte, posicao_quadro)
 
         pygame.draw.rect(tela, (200, 200, 200), (trilho_x, posicao_quadro[1], barra_largura, trilho_altura))
@@ -1425,7 +1440,6 @@ def abrirRelatorio(ultimo_jogador=None):
                 mouse_inicial = event.pos[1]
 
         pygame.display.update()
-
 
 # Função para as fases
 def iniciarFases():
@@ -1643,6 +1657,7 @@ def fase1(nome_jogador):
     fonte2 = pygame.font.Font("tipografia/LuckiestGuy-Regular.ttf", 25)  # Fonte padrão de tamanho 36
     cor_texto = (255, 255, 255)  # Cor do texto (branco)
     cor_contorno = (0, 0, 0)  # Cor do contorno (preto)
+    tempo_perda = None
 
     while fase_ativa:
         if not jogoGanhou and not jogoPerdeu:
@@ -1656,18 +1671,15 @@ def fase1(nome_jogador):
                 som_da_lampada = False
         tela.blit(fase1Background, (0, 0))
 
-        if jogoPerdeu:
-            tela.blit(pygame.image.load("imagens/fase1/perdeuZoologico.png"), (0, 0))
-            objetos.clear()  # Limpa todos os objetos
-        elif jogoGanhou:
-            tela.blit(pygame.image.load("imagens/fase1/ganhouZoologico.jpg"), (0, 0))
-            objetos.clear()  # Limpa todos os objetos
-        else:
+        if not jogoGanhou and not jogoPerdeu:
             tempo_decorrido = (pygame.time.get_ticks() - tempo_inicializado) // 1000
             tempo_restante = max(tempo_inicial - tempo_decorrido, 0)
 
             if tempo_restante == 0:
                 jogoPerdeu = True
+                lampada_acesa = False
+                circulo = False
+                objeto_circulado = None
 
         if not jogoGanhou and not jogoPerdeu:
             # Exibir as vidas
@@ -1722,12 +1734,10 @@ def fase1(nome_jogador):
 
         # Se o jogo foi ganho ou perdido, exibe o tempo total e o número de objetos errados
         if jogoGanhou or jogoPerdeu:
-            # Desenhar o botão "Tentar Novamente"
-            botaoTentarNovamente.atualizarImagem(posicaoMouse)
-            botaoTentarNovamente.desenharBotao(tela)
             jogoConcluido = True
-            mostrar_informacoes = False
             if jogoGanhou:
+                tela.blit(pygame.image.load("imagens/fase1/ganhouZoologico.jpg"), (0, 0))
+                objetos.clear()  # Limpa todos os objetos
                 if pontuacao_fase1 == 6:
                     pontuacao_fase1 = 10
                 elif pontuacao_fase1 == 5:
@@ -1735,6 +1745,12 @@ def fase1(nome_jogador):
                 elif pontuacao_fase1 == 4:
                     pontuacao_fase1 = 8
                
+                mostrar_informacoes = False
+
+                # Desenhar o botão "Tentar Novamente"
+                botaoTentarNovamente.atualizarImagem(posicaoMouse)
+                botaoTentarNovamente.desenharBotao(tela)
+
                 # Exibir o botão de "Próxima Fase" na tela de vitória
                 proximaFaseBotao.atualizarImagem(posicaoMouse)
                 proximaFaseBotao.desenharBotao(tela)
@@ -1751,34 +1767,121 @@ def fase1(nome_jogador):
                     fase_ativa = False  # Sai do loop atual
                     lampada_acesa = False
                     menuPrincipal()  # Chama a função do menu principa
-                salvar_pontuacao(nome_jogador, 1, pontuacao_fase1, tempo_decorrido) 
+                salvar_pontuacao(nome_jogador, 1, pontuacao_fase1, tempo_decorrido)
+
+                tempo_total = tempo_inicial - tempo_restante  # Tempo total que o jogador levou
+                erros = imagensIncorretasClicadas  # Número de objetos errados que o jogador clicou
+                
+                # Configurações para o texto a ser exibido (pode usar a mesma fonte que foi definida antes)
+                texto_conclusao = f"Tempo: {tempo_total // 60:02}:{tempo_total % 60:02} | Erros: {erros}"
+
+                # Renderizando o texto para mostrar no centro da tela
+                texto_contorno_conclusao = fonte1.render(texto_conclusao, True, (0, 0, 0))  # Contorno preto
+                texto_preenchimento_conclusao = fonte1.render(texto_conclusao, True, cor_texto)  # Texto branco
+                posicao_conclusao = (largura_tela // 2 - texto_contorno_conclusao.get_width() // 2, altura_tela // 2 - 120)  # Centraliza o texto
+
+                # Desenhar o texto com contorno
+                tela.blit(texto_contorno_conclusao, (posicao_conclusao[0] - 1, posicao_conclusao[1]))
+                tela.blit(texto_contorno_conclusao, (posicao_conclusao[0] + 1, posicao_conclusao[1]))
+                tela.blit(texto_contorno_conclusao, (posicao_conclusao[0], posicao_conclusao[1] - 1))
+                tela.blit(texto_contorno_conclusao, (posicao_conclusao[0], posicao_conclusao[1] + 1))
+
+                # Desenhar o texto preenchido no centro
+                tela.blit(texto_preenchimento_conclusao, posicao_conclusao)
+
+            # Verifica se o jogo foi perdido
             if jogoPerdeu:
-                pontuacao_fase1 = 0
-                # Desenhar o botão "Voltar ao Menu"
+                # Filtra os objetos para pegar apenas os de tipo 'correto'
+                objetos_corretos = [obj for obj in objetos if obj["tipo"] == "correto"]
+                
+                # Desenha o círculo em cada objeto correto
+                for objeto in objetos_corretos:
+                    desenhar_circulo_redondo(objeto)    
 
-                fasesBotao.atualizarImagem(posicaoMouse)
-                fasesBotao.desenharBotao(tela)
+                # Exibir as vidas
+                tela.blit(vida_imagens[vidas], (20, 650))  # Exibe a imagem das vidas no canto superior esquerdo
+                # Configurações para o texto de "VIDAS"
+                texto_vidas = "VIDAS"
+                texto_vidas_contorno = fonte1.render(texto_vidas, True, (0, 0, 0))  # Contorno preto
+                texto_vidas_preenchimento = fonte1.render(texto_vidas, True, cor_texto)  # Texto branco
 
-                voltarMenuBotao.atualizarImagem(posicaoMouse)
-                voltarMenuBotao.desenharBotao(tela)
+                # Posição do texto "VIDAS" ajustada
+                posicao_vidas = (largura_tela // 13 - texto_vidas_contorno.get_width() // 80, altura_tela - 30)
 
-                # Verificar clique no botão "Voltar ao Menu"
-                if voltarMenuBotao.clicarBotao(tela):
-                    som_click.play()  # Tocar som de clique
-                    print("Botão 'Voltar ao Menu' clicado.")
-                    estadoJogo = "menu"  # Voltar para o menu
-                    fase_ativa = False  # Sai do loop atual
-                    lampada_acesa = False
-                    menuPrincipal()  # Chama a função do menu principa
+                # Desenhar o texto com contorno
+                tela.blit(texto_vidas_contorno, (posicao_vidas[0] - 1, posicao_vidas[1]))
+                tela.blit(texto_vidas_contorno, (posicao_vidas[0] + 1, posicao_vidas[1]))
+                tela.blit(texto_vidas_contorno, (posicao_vidas[0], posicao_vidas[1] - 1))
+                tela.blit(texto_vidas_contorno, (posicao_vidas[0], posicao_vidas[1] + 1))
 
-                if fasesBotao.clicarBotao(tela):
-                    som_click.play()
-                    print("botao fases clicado")
-                    estadoJogo = "jogando"
-                    fase_ativa = False
-                    lampada_acesa = False
-                    iniciarFases()
-                salvar_pontuacao(nome_jogador, 1, pontuacao_fase1, tempo_decorrido) 
+                # Desenhar o texto preenchido no centro
+                tela.blit(texto_vidas_preenchimento, posicao_vidas)
+
+                if tempo_perda is None:
+                    # Armazena o tempo em que o jogo foi perdido
+                    tempo_perda = pygame.time.get_ticks()
+
+                # Calcula o tempo decorrido desde a perda
+                tempo_decorrido = pygame.time.get_ticks() - tempo_perda
+
+                # Verifica se o tempo de delay passou (2 segundos = 2000 ms)
+                if tempo_decorrido >= 2000:
+                    # Executa o código desejado após o delay
+                    tela.blit(pygame.image.load("imagens/fase1/perdeuZoologico.png"), (0, 0))
+                    objetos.clear()  # Limpa todos os objetos
+                    pontuacao_fase1 = 0
+
+                    mostrar_informacoes = False
+
+                    # Desenhar o botão "Voltar ao Menu"
+                    # Desenhar o botão "Tentar Novamente"
+                    botaoTentarNovamente.atualizarImagem(posicaoMouse)
+                    botaoTentarNovamente.desenharBotao(tela)
+
+                    fasesBotao.atualizarImagem(posicaoMouse)
+                    fasesBotao.desenharBotao(tela)
+
+                    voltarMenuBotao.atualizarImagem(posicaoMouse)
+                    voltarMenuBotao.desenharBotao(tela)
+
+                    # Verificar clique no botão "Voltar ao Menu"
+                    if voltarMenuBotao.clicarBotao(tela):
+                        som_click.play()  # Tocar som de clique
+                        print("Botão 'Voltar ao Menu' clicado.")
+                        estadoJogo = "menu"  # Voltar para o menu
+                        fase_ativa = False  # Sai do loop atual
+                        lampada_acesa = False
+                        menuPrincipal()  # Chama a função do menu principal
+
+                    if fasesBotao.clicarBotao(tela):
+                        som_click.play()
+                        print("botao fases clicado")
+                        estadoJogo = "jogando"
+                        fase_ativa = False
+                        lampada_acesa = False
+                        iniciarFases()
+
+                    salvar_pontuacao(nome_jogador, 1, pontuacao_fase1, tempo_decorrido)
+
+                    tempo_total = tempo_inicial - tempo_restante  # Tempo total que o jogador levou
+                    erros = imagensIncorretasClicadas  # Número de objetos errados que o jogador clicou
+                    
+                    # Configurações para o texto a ser exibido (pode usar a mesma fonte que foi definida antes)
+                    texto_conclusao = f"Tempo: {tempo_total // 60:02}:{tempo_total % 60:02} | Erros: {erros}"
+
+                    # Renderizando o texto para mostrar no centro da tela
+                    texto_contorno_conclusao = fonte1.render(texto_conclusao, True, (0, 0, 0))  # Contorno preto
+                    texto_preenchimento_conclusao = fonte1.render(texto_conclusao, True, cor_texto)  # Texto branco
+                    posicao_conclusao = (largura_tela // 2 - texto_contorno_conclusao.get_width() // 2, altura_tela // 2 - 120)  # Centraliza o texto
+
+                    # Desenhar o texto com contorno
+                    tela.blit(texto_contorno_conclusao, (posicao_conclusao[0] - 1, posicao_conclusao[1]))
+                    tela.blit(texto_contorno_conclusao, (posicao_conclusao[0] + 1, posicao_conclusao[1]))
+                    tela.blit(texto_contorno_conclusao, (posicao_conclusao[0], posicao_conclusao[1] - 1))
+                    tela.blit(texto_contorno_conclusao, (posicao_conclusao[0], posicao_conclusao[1] + 1))
+
+                    # Desenhar o texto preenchido no centro
+                    tela.blit(texto_preenchimento_conclusao, posicao_conclusao)
 
             # Verificar clique no botão "Próxima Fase"
             if proximaFaseBotao.clicarBotao(tela):
@@ -1796,26 +1899,6 @@ def fase1(nome_jogador):
                 fase_ativa = False  # Sai do loop atual
                 lampada_acesa = False
                 fase1(nome_jogador)  # Reinicia a fase
-
-            tempo_total = tempo_inicial - tempo_restante  # Tempo total que o jogador levou
-            erros = imagensIncorretasClicadas  # Número de objetos errados que o jogador clicou
-            
-            # Configurações para o texto a ser exibido (pode usar a mesma fonte que foi definida antes)
-            texto_conclusao = f"Tempo: {tempo_total // 60:02}:{tempo_total % 60:02} | Erros: {erros}"
-
-            # Renderizando o texto para mostrar no centro da tela
-            texto_contorno_conclusao = fonte1.render(texto_conclusao, True, (0, 0, 0))  # Contorno preto
-            texto_preenchimento_conclusao = fonte1.render(texto_conclusao, True, cor_texto)  # Texto branco
-            posicao_conclusao = (largura_tela // 2 - texto_contorno_conclusao.get_width() // 2, altura_tela // 2 - 120)  # Centraliza o texto
-
-            # Desenhar o texto com contorno
-            tela.blit(texto_contorno_conclusao, (posicao_conclusao[0] - 1, posicao_conclusao[1]))
-            tela.blit(texto_contorno_conclusao, (posicao_conclusao[0] + 1, posicao_conclusao[1]))
-            tela.blit(texto_contorno_conclusao, (posicao_conclusao[0], posicao_conclusao[1] - 1))
-            tela.blit(texto_contorno_conclusao, (posicao_conclusao[0], posicao_conclusao[1] + 1))
-
-            # Desenhar o texto preenchido no centro
-            tela.blit(texto_preenchimento_conclusao, posicao_conclusao)
 
         if mostrar_informacoes:
             # Exibir o temporizador
@@ -1905,8 +1988,7 @@ def fase1(nome_jogador):
                 objetos_corretos = [obj for obj in objetos if obj["tipo"] == "correto"]  # Filtra objetos corretos
                 if objetos_corretos:  # Se houver objetos corretos
                     objeto_circulado = random.choice(objetos_corretos)  # Circula um objeto correto aleatório
-                lampada_acesa = False  # Apaga a lâmpada após o clique
-           
+                lampada_acesa = False
         # Desenhar o círculo ao redor do objeto circulado
         if objeto_circulado and circulo:
             desenhar_circulo_redondo(objeto_circulado)
@@ -1929,9 +2011,10 @@ def fase1(nome_jogador):
                 falar_nome_objeto(obj)
                 
                 # Verifica se o objeto clicado é o mesmo que está circulado
-                if lampada_acesa and objeto_circulado and obj == objeto_circulado:
-                    lampada_acesa = False  # Apaga a lâmpada
-                    objeto_circulado = None  # Remove o objeto circulado
+                if lampada.clicarBotao(tela):
+                    if lampada_acesa and objeto_circulado and obj == objeto_circulado:
+                        lampada_acesa = False  # Apaga a lâmpada
+                        objeto_circulado = None  # Remove o objeto circulado
                 
                 # Substituir o objeto selecionado
                 if objetosSelecionados:
@@ -1945,6 +2028,7 @@ def fase1(nome_jogador):
         # Verificar clique no botão de confirmar
         if confirmarBotao.clicarBotao(tela):
             som_click.play()  # Som de clique
+            lampada_acesa = False
             for obj in objetosSelecionados:
                 if obj["tipo"] == "correto":
                     imagensCorretasClicadas += 1
@@ -2129,6 +2213,7 @@ def fase2(nome_jogador):
     fonte2 = pygame.font.Font("tipografia/LuckiestGuy-Regular.ttf", 25)  # Fonte padrão de tamanho 36
     cor_texto = (255, 255, 255)  # Cor do texto (branco)
     cor_contorno = (0, 0, 0)  # Cor do contorno (preto)
+    tempo_perda = None
 
     while fase_ativa:        
         if not jogoGanhou and not jogoPerdeu:
@@ -2142,13 +2227,8 @@ def fase2(nome_jogador):
                 som_da_lampada = False
                 
         tela.blit(fase2Background, (0, 0))
-        if jogoPerdeu:
-            tela.blit(pygame.image.load("imagens/fase2/perdeuSaladeAula.png"), (0, 0))
-            objetos.clear()  # Limpa todos os objetos
-        elif jogoGanhou:
-            tela.blit(pygame.image.load("imagens/fase2/ganhouSaladeAula.jpg"), (0, 0))
-            objetos.clear()  # Limpa todos os objetos
-        else:
+        
+        if not jogoGanhou and not jogoPerdeu:
             tempo_decorrido = (pygame.time.get_ticks() - tempo_inicializado) // 1000
             tempo_restante = max(tempo_inicial - tempo_decorrido, 0)
 
@@ -2208,18 +2288,23 @@ def fase2(nome_jogador):
 
         # Se o jogo foi ganho ou perdido, exibe o tempo total e o número de objetos errados
         if jogoGanhou or jogoPerdeu:
-            # Desenhar o botão "Tentar Novamente"
-            botaoTentarNovamente.atualizarImagem(posicaoMouse)
-            botaoTentarNovamente.desenharBotao(tela)
             jogoConcluido = True
-            mostrar_informacoes = False
             if jogoGanhou:
+                tela.blit(pygame.image.load("imagens/fase2/ganhouSaladeAula.jpg"), (0, 0))
+                objetos.clear()  # Limpa todos os objetos
                 if pontuacao_fase2 == 6:
                     pontuacao_fase2 = 10
                 elif pontuacao_fase2 == 5:
                     pontuacao_fase2 = 9
                 elif pontuacao_fase2 == 4:
                     pontuacao_fase2 = 8
+
+                mostrar_informacoes = False
+
+                # Desenhar o botão "Tentar Novamente"
+                botaoTentarNovamente.atualizarImagem(posicaoMouse)
+                botaoTentarNovamente.desenharBotao(tela)
+
                 # Exibir o botão de "Próxima Fase" na tela de vitória
                 proximaFaseBotao.atualizarImagem(posicaoMouse)
                 proximaFaseBotao.desenharBotao(tela)
@@ -2237,33 +2322,120 @@ def fase2(nome_jogador):
                     lampada_acesa = False
                     menuPrincipal()  # Chama a função do menu principa
                 salvar_pontuacao(nome_jogador, 2, pontuacao_fase2, tempo_decorrido) 
+
+                tempo_total = tempo_inicial - tempo_restante  # Tempo total que o jogador levou
+                erros = imagensIncorretasClicadas  # Número de objetos errados que o jogador clicou
+                
+                # Configurações para o texto a ser exibido (pode usar a mesma fonte que foi definida antes)
+                texto_conclusao = f"Tempo: {tempo_total // 60:02}:{tempo_total % 60:02} | Erros: {erros}"
+
+                # Renderizando o texto para mostrar no centro da tela
+                texto_contorno_conclusao = fonte1.render(texto_conclusao, True, (0, 0, 0))  # Contorno preto
+                texto_preenchimento_conclusao = fonte1.render(texto_conclusao, True, cor_texto)  # Texto branco
+                posicao_conclusao = (largura_tela // 2 - texto_contorno_conclusao.get_width() // 2, altura_tela // 2 - 120)  # Centraliza o texto
+
+                # Desenhar o texto com contorno
+                tela.blit(texto_contorno_conclusao, (posicao_conclusao[0] - 1, posicao_conclusao[1]))
+                tela.blit(texto_contorno_conclusao, (posicao_conclusao[0] + 1, posicao_conclusao[1]))
+                tela.blit(texto_contorno_conclusao, (posicao_conclusao[0], posicao_conclusao[1] - 1))
+                tela.blit(texto_contorno_conclusao, (posicao_conclusao[0], posicao_conclusao[1] + 1))
+
+                # Desenhar o texto preenchido no centro
+                tela.blit(texto_preenchimento_conclusao, posicao_conclusao)
+
             if jogoPerdeu:
-                pontuacao_fase2 = 0
+                # Filtra os objetos para pegar apenas os de tipo 'correto'
+                objetos_corretos = [obj for obj in objetos if obj["tipo"] == "correto"]
+                
+                # Desenha o círculo em cada objeto correto
+                for objeto in objetos_corretos:
+                    desenhar_circulo_redondo(objeto)
 
-                fasesBotao.atualizarImagem(posicaoMouse)
-                fasesBotao.desenharBotao(tela)
+                # Exibir as vidas
+                tela.blit(vida_imagens[vidas], (20, 650))  # Exibe a imagem das vidas no canto superior esquerdo
+                # Configurações para o texto de "VIDAS"
+                texto_vidas = "VIDAS"
+                texto_vidas_contorno = fonte1.render(texto_vidas, True, (0, 0, 0))  # Contorno preto
+                texto_vidas_preenchimento = fonte1.render(texto_vidas, True, cor_texto)  # Texto branco
 
-                # Desenhar o botão "Voltar ao Menu"
-                voltarMenuBotao.atualizarImagem(posicaoMouse)
-                voltarMenuBotao.desenharBotao(tela)
+                # Posição do texto "VIDAS" ajustada
+                posicao_vidas = (largura_tela // 13 - texto_vidas_contorno.get_width() // 80, altura_tela - 30)
 
-                # Verificar clique no botão "Voltar ao Menu"
-                if voltarMenuBotao.clicarBotao(tela):
-                    som_click.play()  # Tocar som de clique
-                    print("Botão 'Voltar ao Menu' clicado.")
-                    estadoJogo = "menu"  # Voltar para o menu
-                    fase_ativa = False  # Sai do loop atual
-                    lampada_acesa = False
-                    menuPrincipal()  # Chama a função do menu principa
+                # Desenhar o texto com contorno
+                tela.blit(texto_vidas_contorno, (posicao_vidas[0] - 1, posicao_vidas[1]))
+                tela.blit(texto_vidas_contorno, (posicao_vidas[0] + 1, posicao_vidas[1]))
+                tela.blit(texto_vidas_contorno, (posicao_vidas[0], posicao_vidas[1] - 1))
+                tela.blit(texto_vidas_contorno, (posicao_vidas[0], posicao_vidas[1] + 1))
 
-                if fasesBotao.clicarBotao(tela):
-                    som_click.play()
-                    print("botao fases clicado")
-                    estadoJogo = "jogando"
-                    fase_ativa = False
-                    lampada_acesa = False
-                    iniciarFases()
-                salvar_pontuacao(nome_jogador, 2, pontuacao_fase2, tempo_decorrido)
+                # Desenhar o texto preenchido no centro
+                tela.blit(texto_vidas_preenchimento, posicao_vidas)
+
+                if tempo_perda is None:
+                    # Armazena o tempo em que o jogo foi perdido
+                    tempo_perda = pygame.time.get_ticks()
+
+                # Calcula o tempo decorrido desde a perda
+                tempo_decorrido = pygame.time.get_ticks() - tempo_perda
+
+                # Verifica se o tempo de delay passou (2 segundos = 2000 ms)
+                if tempo_decorrido >= 2000:
+                # Desenhar o texto preenchido no centro
+                    tela.blit(texto_vidas_preenchimento, posicao_vidas)
+                    tela.blit(pygame.image.load("imagens/fase2/perdeuSaladeAula.png"), (0, 0))
+                    objetos.clear()  # Limpa todos os objetos
+
+                    pontuacao_fase2 = 0
+
+                    mostrar_informacoes = False
+
+                    # Desenhar o botão "Tentar Novamente"
+                    botaoTentarNovamente.atualizarImagem(posicaoMouse)
+                    botaoTentarNovamente.desenharBotao(tela)
+
+                    fasesBotao.atualizarImagem(posicaoMouse)
+                    fasesBotao.desenharBotao(tela)
+
+                    # Desenhar o botão "Voltar ao Menu"
+                    voltarMenuBotao.atualizarImagem(posicaoMouse)
+                    voltarMenuBotao.desenharBotao(tela)
+
+                    # Verificar clique no botão "Voltar ao Menu"
+                    if voltarMenuBotao.clicarBotao(tela):
+                        som_click.play()  # Tocar som de clique
+                        print("Botão 'Voltar ao Menu' clicado.")
+                        estadoJogo = "menu"  # Voltar para o menu
+                        fase_ativa = False  # Sai do loop atual
+                        lampada_acesa = False
+                        menuPrincipal()  # Chama a função do menu principa
+
+                    if fasesBotao.clicarBotao(tela):
+                        som_click.play()
+                        print("botao fases clicado")
+                        estadoJogo = "jogando"
+                        fase_ativa = False
+                        lampada_acesa = False
+                        iniciarFases()
+                    salvar_pontuacao(nome_jogador, 2, pontuacao_fase2, tempo_decorrido)
+
+                    tempo_total = tempo_inicial - tempo_restante  # Tempo total que o jogador levou
+                    erros = imagensIncorretasClicadas  # Número de objetos errados que o jogador clicou
+                    
+                    # Configurações para o texto a ser exibido (pode usar a mesma fonte que foi definida antes)
+                    texto_conclusao = f"Tempo: {tempo_total // 60:02}:{tempo_total % 60:02} | Erros: {erros}"
+
+                    # Renderizando o texto para mostrar no centro da tela
+                    texto_contorno_conclusao = fonte1.render(texto_conclusao, True, (0, 0, 0))  # Contorno preto
+                    texto_preenchimento_conclusao = fonte1.render(texto_conclusao, True, cor_texto)  # Texto branco
+                    posicao_conclusao = (largura_tela // 2 - texto_contorno_conclusao.get_width() // 2, altura_tela // 2 - 120)  # Centraliza o texto
+
+                    # Desenhar o texto com contorno
+                    tela.blit(texto_contorno_conclusao, (posicao_conclusao[0] - 1, posicao_conclusao[1]))
+                    tela.blit(texto_contorno_conclusao, (posicao_conclusao[0] + 1, posicao_conclusao[1]))
+                    tela.blit(texto_contorno_conclusao, (posicao_conclusao[0], posicao_conclusao[1] - 1))
+                    tela.blit(texto_contorno_conclusao, (posicao_conclusao[0], posicao_conclusao[1] + 1))
+
+                    # Desenhar o texto preenchido no centro
+                    tela.blit(texto_preenchimento_conclusao, posicao_conclusao)
             # Verificar clique no botão "Próxima Fase"
             if proximaFaseBotao.clicarBotao(tela):
                 som_click.play()  # Tocar som de clique
@@ -2280,26 +2452,6 @@ def fase2(nome_jogador):
                 fase_ativa = False  # Sai do loop atual4
                 lampada_acesa = False
                 fase2(nome_jogador)  # Reinicia a fase
-
-            tempo_total = tempo_inicial - tempo_restante  # Tempo total que o jogador levou
-            erros = imagensIncorretasClicadas  # Número de objetos errados que o jogador clicou
-            
-            # Configurações para o texto a ser exibido (pode usar a mesma fonte que foi definida antes)
-            texto_conclusao = f"Tempo: {tempo_total // 60:02}:{tempo_total % 60:02} | Erros: {erros}"
-
-            # Renderizando o texto para mostrar no centro da tela
-            texto_contorno_conclusao = fonte1.render(texto_conclusao, True, (0, 0, 0))  # Contorno preto
-            texto_preenchimento_conclusao = fonte1.render(texto_conclusao, True, cor_texto)  # Texto branco
-            posicao_conclusao = (largura_tela // 2 - texto_contorno_conclusao.get_width() // 2, altura_tela // 2 - 120)  # Centraliza o texto
-
-            # Desenhar o texto com contorno
-            tela.blit(texto_contorno_conclusao, (posicao_conclusao[0] - 1, posicao_conclusao[1]))
-            tela.blit(texto_contorno_conclusao, (posicao_conclusao[0] + 1, posicao_conclusao[1]))
-            tela.blit(texto_contorno_conclusao, (posicao_conclusao[0], posicao_conclusao[1] - 1))
-            tela.blit(texto_contorno_conclusao, (posicao_conclusao[0], posicao_conclusao[1] + 1))
-
-            # Desenhar o texto preenchido no centro
-            tela.blit(texto_preenchimento_conclusao, posicao_conclusao)
 
         if mostrar_informacoes:
             # Exibir o temporizador
@@ -2415,10 +2567,11 @@ def fase2(nome_jogador):
                 # Fala o som do nome do objeto
                 falar_nome_objeto(obj)
                 
-                # Verifica se o objeto clicado é o mesmo que está circulado
-                if lampada_acesa and objeto_circulado and obj == objeto_circulado:
-                    lampada_acesa = False  # Apaga a lâmpada
-                    objeto_circulado = None  # Remove o objeto circulado
+                if lampada.clicarBotao(tela):
+                    # Verifica se o objeto clicado é o mesmo que está circulado
+                    if lampada_acesa and objeto_circulado and obj == objeto_circulado:
+                        lampada_acesa = False  # Apaga a lâmpada
+                        objeto_circulado = None  # Remove o objeto circulado
                 
                 # Substituir o objeto selecionado
                 if objetosSelecionados:
@@ -2432,6 +2585,7 @@ def fase2(nome_jogador):
         # Verificar clique no botão de confirmar
         if confirmarBotao.clicarBotao(tela):
             som_click.play()  # Som de clique
+            lampada_acesa = False
             for obj in objetosSelecionados:
                 if obj["tipo"] == "correto":
                     imagensCorretasClicadas += 1
@@ -2686,7 +2840,6 @@ def fase3(nome_jogador):
             else:
                 lampada.mudarImagem(lampadaApagadaImagem, lampadaApagadaImagem)
                 som_da_lampada = False
-                
 
         tela.blit(fase3Background, (0, 0))
         if jogoPerdeu:
@@ -2976,10 +3129,11 @@ def fase3(nome_jogador):
                             deslocamento_x = posicaoMouse[0] - obj["x"]  # Calcula o deslocamento
                             deslocamento_y = posicaoMouse[1] - obj["y"]
 
-                            # Verifica se o objeto clicado é o mesmo que está circulado
-                            if lampada_acesa and objeto_circulado and obj == objeto_circulado:
-                                lampada_acesa = False  # Apaga a lâmpada
-                                objeto_circulado = None  # Remove o objeto circulado
+                            if lampada.clicarBotao(tela):
+                                # Verifica se o objeto clicado é o mesmo que está circulado
+                                if lampada_acesa and objeto_circulado and obj == objeto_circulado:
+                                    lampada_acesa = False  # Apaga a lâmpada
+                                    objeto_circulado = None  # Remove o objeto circulado
 
             # Durante o movimento do mouse, se estiver arrastando
             elif event.type == pygame.MOUSEMOTION:
@@ -2995,6 +3149,7 @@ def fase3(nome_jogador):
                     if arrastando_objeto:
                         # Verifica se o objeto foi colocado na área correta ou incorreta
                         if colisao_com_area_PRAIA(arrastando_objeto):
+                            lampada_acesa = False
                             if arrastando_objeto["tipo"] == "correto":
                                 objetos.remove(arrastando_objeto)  # Remove o objeto da lista
                                 imagensCorretasClicadas += 1  # Incrementa a pontuação de objetos corretos
@@ -3014,6 +3169,7 @@ def fase3(nome_jogador):
                                 if objetos_incorretos:
                                     objeto_circulado = random.choice(objetos_incorretos)  # Circula um objeto correto
                         elif colisao_com_area_LIXO(arrastando_objeto):
+                            lampada_acesa = False
                             if arrastando_objeto["tipo"] == "correto":
                                 objetos.remove(arrastando_objeto)  # Remove o objeto da lista
                                 imagensIncorretasClicadas += 1  # Incrementa a pontuação de objetos incorretos
