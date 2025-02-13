@@ -8,6 +8,10 @@ import cv2
 import json
 import os
 import time
+import smtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
+
 
 pygame.init()  # Inicializa os módulos do pygame
 pygame.mixer.init()
@@ -1130,6 +1134,163 @@ def abrirCreditos():
 
         pygame.display.update()
 
+def enviar_email(email_usuario, mensagem):
+    try:
+        remetente = "jogosdevmk@gmail.com"  # Substitua pelo seu e-mail
+        senha = "ijhj wfbb fchq wwjd"  # Substitua pela sua senha
+        destinatario = "jogosdevmk@gmail.com"  # E-mail de suporte
+        #tyhj anlg csxw wzrn
+        # Configurar o e-mail
+        mensagem_email = MIMEMultipart()
+        mensagem_email['From'] = remetente
+        mensagem_email['To'] = destinatario
+        mensagem_email['Subject'] = "Mensagem de Suporte"
+        
+        corpo = f"Email do Usuário: {email_usuario}\n\nMensagem:\n{mensagem}"
+        mensagem_email.attach(MIMEText(corpo, 'plain'))
+
+        # Enviar o e-mail
+        servidor = smtplib.SMTP('smtp.gmail.com', 587)
+        servidor.starttls()
+        servidor.login(remetente, senha)
+        servidor.send_message(mensagem_email)
+        servidor.quit()
+
+        print("E-mail enviado com sucesso!")
+        return True
+    except Exception as e:
+        print(f"Erro ao enviar e-mail: {e}")
+        return False
+
+def abrirSuporte():
+    global estadoJogo
+    pygame.init()
+
+    # Configuração da janela
+    largura_tela, altura_tela = 1100, 720
+    tela = pygame.display.set_mode((largura_tela, altura_tela))
+    pygame.display.set_caption("Suporte")
+
+    suporteBackground = pygame.image.load("imagens/GUI/Backgrounds/suporteBackground.png")
+    voltarBotao = criarBotao(20, 20, "imagens/GUI/botaoVoltar/voltar0.png", "imagens/GUI/botaoVoltar/voltar1.png")
+    confirmarBotao = criarBotao(473, 500, "imagens/GUI/botaoConfirmar/confirmar1.png", "imagens/GUI/botaoConfirmar/confirmar2.png")
+
+    # Mensagens de suporte
+    textoSuporte = [
+        "Se tiver alguma duvida ou sugestão entre em contato!",
+        "email: jogosdevmk@gmail.com",
+        "Obrigado por jogar!",
+    ]
+
+    fonte = pygame.font.Font("tipografia/LuckiestGuy-Regular.ttf", 26)
+    input_fonte = pygame.font.Font(None, 32)
+    cor_texto = (255, 255, 255)
+    cor_input = (50, 50, 50)
+    cor_input_ativo = (200, 200, 200)
+
+    # Campos de entrada centralizados
+    campo_email = pygame.Rect((largura_tela - 400) // 2, 350, 400, 40)
+    campo_mensagem = pygame.Rect((largura_tela - 400) // 2, 450, 400, 40)
+
+    email_usuario = ""
+    mensagem = ""
+    ativo_email = False
+    ativo_mensagem = False
+
+    def limitar_texto(texto, fonte, largura_max):
+        while fonte.size(texto)[0] > largura_max:
+            texto = texto[1:]  # Remove o primeiro caractere se exceder a largura
+        return texto
+
+    run = True
+    while run:
+        tela.blit(suporteBackground, (0, 0))
+        posicaoMouse = pygame.mouse.get_pos()
+
+        voltarBotao.atualizarImagem(posicaoMouse)
+        confirmarBotao.atualizarImagem(posicaoMouse)
+        voltarBotao.desenharBotao(tela)
+        confirmarBotao.desenharBotao(tela)
+
+        # Renderizar as mensagens de suporte centralizadas
+        y_offset = 150
+        for linha in textoSuporte:
+            texto = fonte.render(linha, True, cor_texto)
+            texto_rect = texto.get_rect(center=(largura_tela // 2, y_offset))
+            tela.blit(texto, texto_rect.topleft)
+            y_offset += 40
+
+        # Renderizar textos dos campos de entrada centralizados
+        texto_email = fonte.render("Seu e-mail:", True, cor_texto)
+        texto_email_rect = texto_email.get_rect(center=(largura_tela // 2, 320))
+        tela.blit(texto_email, texto_email_rect.topleft)
+
+        texto_mensagem = fonte.render("Sua mensagem:", True, cor_texto)
+        texto_mensagem_rect = texto_mensagem.get_rect(center=(largura_tela // 2, 420))
+        tela.blit(texto_mensagem, texto_mensagem_rect.topleft)
+
+        # Renderizar campos de entrada
+        pygame.draw.rect(tela, cor_input_ativo if ativo_email else cor_input, campo_email)
+        pygame.draw.rect(tela, cor_input_ativo if ativo_mensagem else cor_input, campo_mensagem)
+
+        texto_email_usuario = input_fonte.render(limitar_texto(email_usuario, input_fonte, campo_email.width - 10), True, (255, 255, 255))
+        texto_mensagem_usuario = input_fonte.render(limitar_texto(mensagem, input_fonte, campo_mensagem.width - 10), True, (255, 255, 255))
+
+        tela.blit(texto_email_usuario, (campo_email.x + 5, campo_email.y + 5))
+        tela.blit(texto_mensagem_usuario, (campo_mensagem.x + 5, campo_mensagem.y + 5))
+
+        if voltarBotao.clicarBotao(tela):
+            print("Voltando ao menu principal")
+            estadoJogo = "menu"
+            run = False
+        if confirmarBotao.clicarBotao(tela):
+            if email_usuario.strip() and mensagem.strip():  # Verifica se os campos não estão vazios
+                sucesso = enviar_email(email_usuario, mensagem)
+                if sucesso:
+                    print("E-mail enviado com sucesso!")
+                    email_usuario = ""
+                    mensagem = ""
+                else:
+                    print("Erro ao enviar o e-mail. Tente novamente.")
+            else:
+                print("Preencha todos os campos antes de enviar.")
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                confirmar_saida(tela)
+
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                # Verifica se clicou dentro dos campos de entrada
+                if campo_email.collidepoint(event.pos):
+                    ativo_email = True
+                    ativo_mensagem = False  # Desativa o outro campo
+                elif campo_mensagem.collidepoint(event.pos):
+                    ativo_mensagem = True
+                    ativo_email = False  # Desativa o outro campo
+                else:
+                    ativo_email = False
+                    ativo_mensagem = False  # Desativa ambos se clicar fora
+
+            if event.type == pygame.KEYDOWN:
+                if ativo_email:
+                    if event.key == pygame.K_BACKSPACE:
+                        email_usuario = email_usuario[:-1]  # Remove o último caractere
+                    elif event.key == pygame.K_RETURN:
+                        ativo_email = False  # Sai do campo ao pressionar Enter
+                    else:
+                        email_usuario += event.unicode  # Adiciona caracteres
+
+                if ativo_mensagem:
+                    if event.key == pygame.K_BACKSPACE:
+                        mensagem = mensagem[:-1]  # Remove o último caractere
+                    elif event.key == pygame.K_RETURN:
+                        ativo_mensagem = False  # Sai do campo ao pressionar Enter
+                    else:
+                        mensagem += event.unicode  # Adiciona caracteres
+
+        pygame.display.flip()
+
+
 def calculoDaPontuacao():
     global estadoJogo
     creditosBackground = pygame.image.load("imagens/GUI/Backgrounds/menuBackground.jpg")
@@ -1395,9 +1556,10 @@ def abrirRelatorio(ultimo_jogador=None):
         # Desenho da linha final da última coluna (Fase 3)
         pygame.draw.line(superficie_relatorio, (120, 64, 8), (0, y_atual - 10), (largura_quadro, y_atual - 10), 3)
 
-        deslocamento = max(0, min(deslocamento, max(0, altura_conteudo - altura_quadro)))
-        recorte = superficie_relatorio.subsurface((0, deslocamento, largura_quadro, altura_quadro))        
-        tela.blit(recorte, posicao_quadro)
+        deslocamento = max(0, min(deslocamento, altura_conteudo - altura_quadro))
+        altura_recorte = min(altura_quadro, altura_conteudo - deslocamento)
+        recorte = superficie_relatorio.subsurface((0, deslocamento, largura_quadro, altura_recorte))        
+        tela.blit(recorte, (posicao_quadro[0], posicao_quadro[1]))
 
         pygame.draw.rect(tela, (200, 200, 200), (trilho_x, posicao_quadro[1], barra_largura, trilho_altura))
         barra_y = posicao_quadro[1] + (deslocamento / max(1, altura_conteudo - altura_quadro)) * (altura_quadro - barra_altura)
@@ -3232,7 +3394,8 @@ def menuPrincipal():
     configuracoesBotao = criarBotao(936, 20, "imagens/GUI/botaoConfiguracoes/configuracoes0.png", "imagens/GUI/botaoConfiguracoes/configuracoes1.png")
     instrucoesBotao = criarBotao(400, 425, "imagens/GUI/botaoInicio/instrucoes1.png", "imagens/GUI/botaoInicio/instrucoes01.png")
     sairBotao = criarBotao(20, 20, "imagens/GUI/botaoSair/sair0.png", "imagens/GUI/botaoSair/sair1.png")
-    creditosBotao = criarBotao(990, 620, "imagens/GUI/botaoConfiguracoes/info0.png", "imagens/GUI/botaoConfiguracoes/info1.png")  
+    creditosBotao = criarBotao(990, 620, "imagens/GUI/botaoConfiguracoes/info0.png", "imagens/GUI/botaoConfiguracoes/info1.png")
+    suporteBotao = criarBotao(30, 620, "imagens/GUI/botaoConfiguracoes/suporte0.png", "imagens/GUI/botaoConfiguracoes/suporte1.png")  
     pontuacaoBotao = criarBotao(400, 550, "imagens/GUI/botaoPontuacao/pontuacao0.png", "imagens/GUI/botaoPontuacao/pontuacao1.png")
     run = True
     while run:
@@ -3245,6 +3408,7 @@ def menuPrincipal():
         instrucoesBotao.atualizarImagem(posicaoMouse)
         sairBotao.atualizarImagem(posicaoMouse)
         creditosBotao.atualizarImagem(posicaoMouse)
+        suporteBotao.atualizarImagem(posicaoMouse)
         pontuacaoBotao.atualizarImagem(posicaoMouse)
 
         jogarBotao.desenharBotao(tela)
@@ -3252,6 +3416,7 @@ def menuPrincipal():
         instrucoesBotao.desenharBotao(tela)
         sairBotao.desenharBotao(tela)
         creditosBotao.desenharBotao(tela)
+        suporteBotao.desenharBotao(tela)
         pontuacaoBotao.desenharBotao(tela)
 
         # Verificar cliques
@@ -3279,6 +3444,12 @@ def menuPrincipal():
             som_click.play()  # Som de clique
             print("Créditos clicado")
             abrirCreditos()
+            run = False
+        
+        if suporteBotao.clicarBotao(tela):  # Detecta clique no botão de créditos
+            som_click.play()  # Som de clique
+            print("Suporte Clicado")
+            abrirSuporte()
             run = False
 
         if sairBotao.clicarBotao(tela):
