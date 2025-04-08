@@ -49,3 +49,5 @@ Este jogo foi desenvolvido como parte da disciplina de **Engenharia de Software 
 
 ## Licença  
 Este projeto está licenciado sob a [MIT License](LICENSE).
+
+Link: [Media Fire](https://www.mediafire.com/file/i35kds17524bzef/Lixo-no-Lixo.zip/file)
